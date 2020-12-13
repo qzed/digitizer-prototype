@@ -286,7 +286,7 @@ class Parser:
 
         self.pos += ctypes.sizeof(hdr)
         for i in range(hdr.elements):
-            pld = self._parse_stylus_data_v2(hdr, i, pld)
+            pld = self._parse_stylus_data_v2(hdr, i, pld, self._on_stylus_data_v2s)
 
         if pld:
             self.stats.err(self.pos, f"stylus report: skipped {len(pld)} bytes")
@@ -303,7 +303,7 @@ class Parser:
 
         self.pos += ctypes.sizeof(hdr)
         for i in range(hdr.elements):
-            pld = self._parse_stylus_data_v2(hdr, i, pld)
+            pld = self._parse_stylus_data_v2(hdr, i, pld, self._on_stylus_data_v2n)
 
         if pld:
             self.stats.err(self.pos, f"stylus report: skipped {len(pld)} bytes")
@@ -311,11 +311,11 @@ class Parser:
 
         self._end_report_stylus_v2n(hdr)
 
-    def _parse_stylus_data_v2(self, hdr, index, pld):
+    def _parse_stylus_data_v2(self, hdr, index, pld, fn):
         report = IptsStylusDataV2.from_buffer_copy(pld)
 
         self.stats.dbg(self.pos, f"{report} (index: {index})")
-        self._on_stylus_data_v2(hdr, index, report)
+        fn(hdr, index, report)
 
         self.pos += ctypes.sizeof(report)
         return pld[ctypes.sizeof(report):]
@@ -356,5 +356,8 @@ class Parser:
     def _end_report_stylus_v2n(self, header):
         pass
 
-    def _on_stylus_data_v2(self, header, index, report):
+    def _on_stylus_data_v2s(self, header, index, report):
+        pass
+
+    def _on_stylus_data_v2n(self, header, index, report):
         pass

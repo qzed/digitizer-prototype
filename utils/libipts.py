@@ -125,6 +125,27 @@ class IptsStylusDataV2(ctypes.Structure):
             + f"azimuth={self.azimuth} }}"
 
 
+class IptsHeatmapDim(ctypes.Structure):
+    _pack_ = True
+    _fields_ = [
+        ('height',   ctypes.c_uint8),
+        ('width',    ctypes.c_uint8),
+        ('y_min',    ctypes.c_uint8),
+        ('y_max',    ctypes.c_uint8),
+        ('x_min',    ctypes.c_uint8),
+        ('x_max',    ctypes.c_uint8),
+        ('z_min',    ctypes.c_uint8),
+        ('z_max',    ctypes.c_uint8),
+    ]
+
+    def __str__(self):
+        return f"IptsHeatmapDim {{ "                        \
+            + f"height={self.height}, width={self.width}, " \
+            + f"y_min={self.y_min}, y_max={self.y_max}, "   \
+            + f"x_min={self.x_min}, x_max={self.x_max}, "   \
+            + f"z_min={self.z_min}, z_max={self.z_max} }}"
+
+
 class LogLevel(enum.IntEnum):
     DBG = 0
     INFO = 1
@@ -172,6 +193,7 @@ class Parser:
         self.pfn_pldf[0x08] = self._parse_payload_frame_reports
 
         self.pfn_rprt = defaultdict(lambda: self._parse_report_unknown)
+        self.pfn_rprt[0x403] = self._parse_report_heatmap_dim
         self.pfn_rprt[0x460] = self._parse_report_stylus_v2s
         self.pfn_rprt[0x461] = self._parse_report_stylus_v2n
 
@@ -277,6 +299,15 @@ class Parser:
         self.stats.unknown_type(self.pos, header)
         self.pos += len(data)
 
+    def _parse_report_heatmap_dim(self, header, data):
+        hdr = IptsHeatmapDim.from_buffer_copy(data)
+
+        if len(data) != ctypes.sizeof(hdr):
+            self.stats.err(self.pos, f"heatmap dimension report: invalid size: {len(data)}")
+
+        self._on_heatmap_dim(hdr)
+        self.pos += len(data)
+
     def _parse_report_stylus_v2s(self, header, data):
         hdr = IptsStylusReportS.from_buffer_copy(data)
         pld = data[ctypes.sizeof(hdr):]
@@ -354,6 +385,9 @@ class Parser:
         pass
 
     def _end_report_stylus_v2n(self, header):
+        pass
+
+    def _on_heatmap_dim(self, dim):
         pass
 
     def _on_stylus_data_v2s(self, header, index, report):

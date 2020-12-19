@@ -194,6 +194,7 @@ class Parser:
 
         self.pfn_rprt = defaultdict(lambda: self._parse_report_unknown)
         self.pfn_rprt[0x403] = self._parse_report_heatmap_dim
+        self.pfn_rprt[0x425] = self._parse_report_heatmap
         self.pfn_rprt[0x460] = self._parse_report_stylus_v2s
         self.pfn_rprt[0x461] = self._parse_report_stylus_v2n
 
@@ -308,6 +309,10 @@ class Parser:
         self._on_heatmap_dim(hdr)
         self.pos += len(data)
 
+    def _parse_report_heatmap(self, header, data):
+        self._on_heatmap(data)
+        self.pos += len(data)
+
     def _parse_report_stylus_v2s(self, header, data):
         hdr = IptsStylusReportS.from_buffer_copy(data)
         pld = data[ctypes.sizeof(hdr):]
@@ -388,6 +393,9 @@ class Parser:
         pass
 
     def _on_heatmap_dim(self, dim):
+        pass
+
+    def _on_heatmap(self, data):
         pass
 
     def _on_stylus_data_v2s(self, header, index, report):

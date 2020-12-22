@@ -180,7 +180,7 @@ def main():
 
     print("Processing...")
     ims = []
-    for i, hm in enumerate(heatmaps[:100]):
+    for i, hm in enumerate(heatmaps):
         elapsed = datetime.datetime.now() - time_start
         print(f"  Frame {i+1}/{len(heatmaps)}, {((i + 1) / len(heatmaps)) * 100:.2f}%, elapsed: {elapsed}")
 

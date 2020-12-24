@@ -65,8 +65,8 @@ def get_local_maximas(data, delta=0.05):
 def area(center, delta, n):
     center = np.rint(center).astype(np.int)
 
-    range_x = (max(center[0] - delta[0], 0), (min(center[0] + delta[0], n[0] - 1)))
-    range_y = (max(center[1] - delta[1], 0), (min(center[1] + delta[1], n[1] - 1)))
+    range_x = (max(center[0] - delta[0], 0), (min(center[0] + delta[0] + 1, n[0])))
+    range_y = (max(center[1] - delta[1], 0), (min(center[1] + delta[1] + 1, n[1])))
 
     return (range_x, range_y)
 
@@ -194,7 +194,7 @@ def main():
             mu_init = get_local_maximas(hm)
 
             params_init = [(1.0, mu, np.identity(2)) for mu in mu_init]
-            params_est = fit_multi(hm, params_init, 3, drange=(4, 4))
+            params_est = fit_multi(hm, params_init, 3, drange=(3, 3))
             params_est = [(mu, sigma) for (c, mu, sigma) in params_est]
 
             for (mu, sigma) in params_est:

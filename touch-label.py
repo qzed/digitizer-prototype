@@ -101,21 +101,38 @@ def main():
         blobs = hm > delta
         labels = measure.label(blobs, background=0)
 
+        maximas = get_local_maximas(hm, delta)
+
+        counts = np.zeros((np.max(labels) + 1,))
+        for mu in maximas:
+            counts[labels[mu[0], mu[1]]] += 1
+
         p = list()
         p.append(ax.imshow(hm.T, cmap='gray', animated=True))
         p.append(ax.imshow(labels.T, cmap='viridis', alpha=0.5, animated=True))
 
-        for mu in get_local_maximas(hm, delta):
-            p += ax.plot([mu[0], mu[0]], [mu[1] - 0.4, mu[1] + 0.4], linewidth=1, color='red', animated=True)
-            p += ax.plot([mu[0] - 0.4, mu[0] + 0.4], [mu[1], mu[1]], linewidth=1, color='red', animated=True)
+        for mu in maximas:
+            color = 'red' if counts[labels[mu[0], mu[1]]] > 1 else 'green'
+            p += ax.plot([mu[0], mu[0]], [mu[1] - 0.4, mu[1] + 0.4], linewidth=1, color=color, animated=True)
+            p += ax.plot([mu[0] - 0.4, mu[0] + 0.4], [mu[1], mu[1]], linewidth=1, color=color, animated=True)
 
+        nf, no = 0, 0
         for l in range(1, np.max(labels) + 1):
+            if counts[l] == 1:
+                color = 'lightgreen'
+                text = f'F{nf}'
+                nf += 1
+            else:
+                color = 'red'
+                text = f'O{no}'
+                no += 1
+
             x1, x2, y1, y2 = get_bbox(labels, l)
-            r = patches.Rectangle((x1 - 0.5, y1 - 0.5), x2 - x1 + 1.0, y2 - y1 + 1.0, fill=False, linewidth=1, color='red')
+            r = patches.Rectangle((x1 - 0.5, y1 - 0.5), x2 - x1 + 1.0, y2 - y1 + 1.0, fill=False, linewidth=1, color=color)
             ax.add_artist(r)
             p.append(r)
 
-            p.append(ax.text(x1 - 0.5, y1 - 0.5, f"{l} ", fontsize='small', horizontalalignment='right', verticalalignment='top', color='red'))
+            p.append(ax.text(x1 - 0.5, y1 - 0.5, f"{text} ", fontsize='small', horizontalalignment='right', verticalalignment='top', color=color))
 
         ims.append(p)
 

@@ -68,6 +68,8 @@ def get_bbox(data, label):
 
 
 def main():
+    delta = 0.075
+
     parser = argparse.ArgumentParser(
             description="Label raw IPTS touch data and output image files for prototyping")
     parser.add_argument('file_in', metavar='INPUT', type=str, nargs=1, help='raw IPTS input data')
@@ -96,14 +98,14 @@ def main():
         print(f"  Frame {i+1}/{len(heatmaps)}, {((i + 1) / len(heatmaps)) * 100:.2f}%, elapsed: {elapsed}")
 
         hm = np.maximum(hm - np.average(hm), 0.0)
-        blobs = hm > 0.075
+        blobs = hm > delta
         labels = measure.label(blobs, background=0)
 
         p = list()
         p.append(ax.imshow(hm.T, cmap='gray', animated=True))
         p.append(ax.imshow(labels.T, cmap='viridis', alpha=0.5, animated=True))
 
-        for mu in get_local_maximas(hm):
+        for mu in get_local_maximas(hm, delta):
             p += ax.plot([mu[0], mu[0]], [mu[1] - 0.4, mu[1] + 0.4], linewidth=1, color='red', animated=True)
             p += ax.plot([mu[0] - 0.4, mu[0] + 0.4], [mu[1], mu[1]], linewidth=1, color='red', animated=True)
 

@@ -11,6 +11,7 @@ import matplotlib.animation as animation
 
 import sys
 import os
+import re
 import itertools
 import datetime
 import traceback
@@ -224,9 +225,15 @@ def main():
     an = animation.ArtistAnimation(fig, ims, interval=16.66, repeat_delay=1000, blit=True)
 
     file_out = args.file_out[0]
-    os.makedirs(os.path.dirname(os.path.realpath(file_out)), exist_ok=True)
+    dir_out = os.path.dirname(os.path.realpath(file_out))
+    os.makedirs(dir_out, exist_ok=True)
     an.save(file_out, writer='imagemagick')
 
+    # rename files
+    r = re.compile('(.+)-(\d+).(.+)')
+    for file in os.listdir(dir_out):
+        m = r.match(file)
+        os.rename(f"{dir_out}/{file}", f"model-3/{m[1]}-{int(m[2]):04d}.{m[3]}")
 
 if __name__ == '__main__':
     main()

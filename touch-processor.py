@@ -198,8 +198,7 @@ def main():
             params_est = [(mu, sigma) for (c, mu, sigma) in params_est]
 
             for (mu, sigma) in params_est:
-                p += ax.plot([mu[0], mu[0]], [mu[1] - 0.4, mu[1] + 0.4], linewidth=1, color='red', animated=True)
-                p += ax.plot([mu[0] - 0.4, mu[0] + 0.4], [mu[1], mu[1]], linewidth=1, color='red', animated=True)
+                p += ax.plot(mu[0], mu[1], 'b+', ms=10, color='red', animated=True)
 
                 if sigma is not None:
                     eigvals, eigvecs = np.linalg.eigh(sigma)

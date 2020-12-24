@@ -113,8 +113,7 @@ def main():
 
         for mu in maximas:
             color = 'black' if counts[labels[mu[0], mu[1]]] > 1 else 'red'
-            p += ax.plot([mu[0], mu[0]], [mu[1] - 0.4, mu[1] + 0.4], linewidth=1, color=color, animated=True)
-            p += ax.plot([mu[0] - 0.4, mu[0] + 0.4], [mu[1], mu[1]], linewidth=1, color=color, animated=True)
+            p += ax.plot(mu[0], mu[1], 'b+', ms=10, color=color, animated=True)
 
         nf, no = 0, 0
         for l in range(1, np.max(labels) + 1):

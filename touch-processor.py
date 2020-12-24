@@ -216,7 +216,7 @@ def main():
             ims.append(p)
 
         except:
-            traceback.print_exc() 
+            traceback.print_exc()
             ims.append(p)
             break
 

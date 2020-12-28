@@ -234,5 +234,6 @@ def main():
         m = r.match(file)
         os.rename(f"{dir_out}/{file}", f"{dir_out}/{m[1]}-{int(m[2]):04d}.{m[3]}")
 
+
 if __name__ == '__main__':
     main()

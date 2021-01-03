@@ -4,6 +4,7 @@ from __future__ import print_function
 from utils.libipts import Parser
 
 import numpy as np
+import scipy.ndimage
 from scipy.stats import multivariate_normal
 
 import matplotlib.pyplot as plt
@@ -186,6 +187,7 @@ def main():
         elapsed = datetime.datetime.now() - time_start
         print(f"  Frame {i+1}/{len(heatmaps)}, {((i + 1) / len(heatmaps)) * 100:.2f}%, elapsed: {elapsed}")
 
+        hm = scipy.ndimage.gaussian_filter(hm, 1.0)
         hm = np.maximum(hm - np.average(hm), 0.0)
 
         p = []

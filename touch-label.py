@@ -2,9 +2,10 @@
 
 from utils.libipts import Parser
 
+import numpy as np
+import scipy.ndimage
 from skimage import measure
 
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.patches as patches
@@ -96,6 +97,7 @@ def main():
         elapsed = datetime.datetime.now() - time_start
         print(f"  Frame {i+1}/{len(heatmaps)}, {((i + 1) / len(heatmaps)) * 100:.2f}%, elapsed: {elapsed}")
 
+        hm = scipy.ndimage.gaussian_filter(hm, 1.0)
         hm = np.maximum(hm - np.average(hm), 0.0)
         blobs = hm > delta
         labels = measure.label(blobs, background=0)

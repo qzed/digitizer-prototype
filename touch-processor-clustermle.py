@@ -3,6 +3,7 @@
 from utils.libipts import Parser
 
 import numpy as np
+import scipy.ndimage
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -171,6 +172,7 @@ def main():
         elapsed = datetime.datetime.now() - time_start
         print(f"  Frame {i+1}/{len(heatmaps)}, {((i + 1) / len(heatmaps)) * 100:.2f}%, elapsed: {elapsed}")
 
+        hm = scipy.ndimage.gaussian_filter(hm, 1.0)
         hm = np.maximum(hm - np.average(hm), 0.0)
 
         visited = np.full(hm.shape, False, dtype=np.bool)

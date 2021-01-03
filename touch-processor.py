@@ -2,12 +2,13 @@
 from __future__ import print_function
 
 from utils.libipts import Parser
-from scipy.stats import multivariate_normal
-from matplotlib.patches import Ellipse
 
 import numpy as np
+from scipy.stats import multivariate_normal
+
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.patches import Ellipse
 
 import sys
 import os

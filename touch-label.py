@@ -3,7 +3,6 @@
 from utils.libipts import Parser
 
 from skimage import measure
-from skimage import filters
 
 import numpy as np
 import matplotlib.pyplot as plt

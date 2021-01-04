@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
-from utils.libipts import Parser
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils')))
+
+from libipts import Parser
 
 import numpy as np
 import scipy.ndimage
@@ -10,7 +13,6 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.patches as patches
 
-import os
 import re
 import itertools
 import datetime
@@ -139,8 +141,8 @@ def main():
     print("Writing images...")
     an = animation.ArtistAnimation(fig, ims, interval=16.66, repeat_delay=1000, blit=True)
 
-    file_out = args.file_out[0]
-    dir_out = os.path.dirname(os.path.realpath(file_out))
+    file_out = os.path.abspath(args.file_out[0])
+    dir_out = os.path.dirname(file_out)
     os.makedirs(dir_out, exist_ok=True)
     an.save(file_out, writer='imagemagick')
 

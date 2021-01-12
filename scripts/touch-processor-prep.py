@@ -304,7 +304,7 @@ def data_maps(data, params, drange):
 
     s = np.sum(p, axis=0)
     for i in range(p.shape[0]):
-        p[i, :, :] = data * np.divide(p[i, :, :], s, where=s!=0)
+        p[i, :, :] = data * np.divide(p[i, :, :], s, out=np.zeros_like(s), where=s!=0)
 
     return p
 

@@ -236,7 +236,8 @@ def component_score(hm, rot, labels, num_labels, scale=100.0):
         lbl_rot[labels[x1, x2] - 1] += rot[x1, x2]
 
     cscore = 100.0 * (lbl_rot / lbl_vol**2) * (1.0 / lbl_max) + np.finfo(np.float).eps
-    cscore = 1.0 / (1.0 + (1.0 / cscore))   # equivalent to sigmoid(log(cscore))
+    # cscore = 1.0 / (1.0 + (1.0 / cscore))   # equivalent to sigmoid(log(cscore))
+    cscore = cscore / (cscore + 1)            # equivalent to sigmoid(log(cscore)) and the above
 
     return cscore
 

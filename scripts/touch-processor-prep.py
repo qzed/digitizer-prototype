@@ -209,8 +209,8 @@ def compute_distance_map(hm, labels, cost, include, sigma=1.0, cutoff=1e-10):
     return w
 
 
-def compute_weights(hm, g, ridge, labels, sets, c_ridge=9.0, c_grad=1.0, c_offs=0.1):
-    cost = ridge * c_ridge + np.linalg.norm(g, axis=-1) * c_grad + c_offs
+def compute_weights(hm, ews_s, ridge, labels, sets, c_ridge=9.0, c_grad=1.0, c_offs=0.1):
+    cost = ridge * c_ridge + np.sum(np.abs(ews_s), axis=-1) * c_grad + c_offs
 
     weights = np.array([compute_distance_map(hm, labels, cost, s) for s in sets])
     total = np.sum(weights, axis=0)
@@ -280,7 +280,7 @@ def filter(hm):
 
     set_inc, set_exc = get_component_sets(hm, rot, labels, num_labels)
 
-    ws = compute_weights(hm, g, ridge, labels, [set_inc, set_exc])
+    ws = compute_weights(hm, ews_s, ridge, labels, [set_inc, set_exc])
 
     return ws[0, :, :] * hm
 

@@ -8,7 +8,6 @@ from libipts import Parser
 import numpy as np
 import scipy.ndimage
 import scipy.signal
-from scipy.stats import multivariate_normal
 import diplib as dip
 
 import matplotlib.pyplot as plt
@@ -297,11 +296,12 @@ def area(center, delta, n):
 def data_maps(data, params, drange):
     p = np.zeros((len(params), data.shape[0], data.shape[1]))
 
-    for i, (c, mu, sigma) in enumerate(params):
+    for i, (c, mu, sigma_inv) in enumerate(params):
         range_xy = area(mu, drange, data.shape)
 
         for x1, x2 in itertools.product(range(range_xy[0][0], range_xy[0][1]), range(range_xy[1][0], range_xy[1][1])):
-            p[i, x1, x2] = multivariate_normal.pdf(np.array([x1, x2]), mu, sigma)
+            d = np.matrix([[x1 - mu[0]], [x2 - mu[1]]])
+            p[i, x1, x2] = c * np.exp(-0.5 * d.T @ sigma_inv @ d)
 
     s = np.sum(p, axis=0)
     for i in range(p.shape[0]):
@@ -329,13 +329,12 @@ def assemble_system(data, center, drange):
 
 def gaussian_from_sle(a, b, c):
     sigma_inv = -2.0 * a
-    sigma = np.matrix(np.linalg.inv(sigma_inv))
 
-    mu = sigma * np.matrix(b).T
+    mu = np.matrix(np.linalg.inv(sigma_inv)) * np.matrix(b).T
 
     alpha = np.exp(c + 0.5 * (mu.T * sigma_inv * mu).item())
 
-    return alpha, np.array(mu).flatten(), sigma
+    return alpha, np.array(mu).flatten(), np.matrix(sigma_inv)
 
 
 def fit_single(data, mu_init, drange=(2, 2)):
@@ -415,7 +414,7 @@ def main():
 
         params_init = [(1.0, mu, np.identity(2)) for mu in ms]
         params_est = fit_multi(hmf, params_init, 3, drange=(3, 3))
-        params_est = [(mu, sigma) for (c, mu, sigma) in params_est if sigma is not None]
+        params_est = [(mu, np.linalg.inv(sigma_inv)) for (c, mu, sigma_inv) in params_est if sigma_inv is not None]
 
         # plot
         nstd = 1.5

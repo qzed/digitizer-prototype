@@ -317,12 +317,10 @@ def assemble_system(data, center, drange):
     rhs = np.zeros(shape=(6,))
 
     for x1, x2 in itertools.product(range(range_xy[0][0], range_xy[0][1]), range(range_xy[1][0], range_xy[1][1])):
-        if data[x1, x2] < 1e-20:
-            continue
-
         base = np.array([x1**2, 2 * x1 * x2, x2**2, x1, x2, 1.0])
         system += np.outer(base, base) * data[x1, x2]**2
-        rhs += np.log(data[x1, x2]) * base * data[x1, x2]**2
+        rhs += np.log(data[x1, x2] + 1e-20) * base * data[x1, x2]**2
+        # NB: Add small epsilon to data in log to prevent log(0)
 
     return system, rhs
 

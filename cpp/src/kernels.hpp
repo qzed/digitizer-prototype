@@ -6,31 +6,31 @@
 
 namespace kernels {
 
-constexpr kernel<f32, 3, 3> sobel3_x {
+inline constexpr kernel<f32, 3, 3> sobel3_x {
     1.0, 0.0, -1.0,
     2.0, 0.0, -2.0,
     1.0, 0.0, -1.0,
 };
 
-constexpr kernel<f32, 3, 3> sobel3_y {
+inline constexpr kernel<f32, 3, 3> sobel3_y {
      1.0,  2.0,  1.0,
      0.0,  0.0,  0.0,
     -1.0, -2.0, -1.0,
 };
 
-constexpr kernel<f32, 3, 3> sobel3_xx {
+inline constexpr kernel<f32, 3, 3> sobel3_xx {
     1.0, -2.0, 1.0,
     2.0, -4.0, 2.0,
     1.0, -2.0, 1.0,
 };
 
-constexpr kernel<f32, 3, 3> sobel3_yy {
+inline constexpr kernel<f32, 3, 3> sobel3_yy {
      1.0,  2.0,  1.0,
     -2.0, -4.0, -2.0,
      1.0,  2.0,  1.0,
 };
 
-constexpr kernel<f32, 3, 3> sobel3_xy {
+inline constexpr kernel<f32, 3, 3> sobel3_xy {
      1.0, 0.0, -1.0,
      0.0, 0.0,  0.0,
     -1.0, 0.0,  1.0,

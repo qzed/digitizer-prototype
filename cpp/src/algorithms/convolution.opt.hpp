@@ -1,0 +1,975 @@
+/*
+ * Optimized version of convolution.hpp. Do not include directly.
+ */
+
+#include "convolution.hpp"
+
+
+namespace impl {
+
+template<typename T, typename S>
+void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const& kern)
+{
+    // strides
+    auto const stride_d = stride(data.shape());
+    auto const stride_k = stride({ 5, 5 });
+
+    // access helpers
+    auto const k = [&](index dx, index dy) constexpr -> S {
+        return kern[12 + dy * stride_k + dx];
+    };
+
+    auto const d = [&](index i, index dx, index dy) constexpr -> T {
+        return data[i + dy * stride_d + dx];
+    };
+
+    // processing...
+    index i = 0;
+
+    // y = 0
+    {
+        // x = 0
+        {
+            T v = zero<T>();
+
+            v += d(i,  0,  0) * k(-2, -2);      // extended
+            v += d(i,  0,  0) * k(-1, -2);      // extended
+            v += d(i,  0,  0) * k( 0, -2);      // extended
+            v += d(i,  1,  0) * k( 1, -2);      // extended
+            v += d(i,  2,  0) * k( 2, -2);      // extended
+
+            v += d(i,  0,  0) * k(-2, -1);      // extended
+            v += d(i,  0,  0) * k(-1, -1);      // extended
+            v += d(i,  0,  0) * k( 0, -1);      // extended
+            v += d(i,  1,  0) * k( 1, -1);      // extended
+            v += d(i,  2,  0) * k( 2, -1);      // extended
+
+            v += d(i,  0,  0) * k(-2,  0);      // extended
+            v += d(i,  0,  0) * k(-1,  0);      // extended
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i,  0,  1) * k(-2,  1);      // extended
+            v += d(i,  0,  1) * k(-1,  1);      // extended
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i,  0,  2) * k(-2,  2);      // extended
+            v += d(i,  0,  2) * k(-1,  2);      // extended
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // x = 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -1,  0) * k(-2, -2);      // extended
+            v += d(i, -1,  0) * k(-1, -2);      // extended
+            v += d(i,  0,  0) * k( 0, -2);      // extended
+            v += d(i,  1,  0) * k( 1, -2);      // extended
+            v += d(i,  2,  0) * k( 2, -2);      // extended
+
+            v += d(i, -1,  0) * k(-2, -1);      // extended
+            v += d(i, -1,  0) * k(-1, -1);      // extended
+            v += d(i,  0,  0) * k( 0, -1);      // extended
+            v += d(i,  1,  0) * k( 1, -1);      // extended
+            v += d(i,  2,  0) * k( 2, -1);      // extended
+
+            v += d(i, -1,  0) * k(-2,  0);      // extended
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -1,  1) * k(-2,  1);      // extended
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -1,  2) * k(-2,  2);      // extended
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // 1 < x < n - 2
+        auto const limit = i + data.shape().x - 4;
+        while (i < limit) {
+            T v = zero<T>();
+
+            v += d(i, -2,  0) * k(-2, -2);      // extended
+            v += d(i, -1,  0) * k(-1, -2);      // extended
+            v += d(i,  0,  0) * k( 0, -2);      // extended
+            v += d(i,  1,  0) * k( 1, -2);      // extended
+            v += d(i,  2,  0) * k( 2, -2);      // extended
+
+            v += d(i, -2,  0) * k(-2, -1);      // extended
+            v += d(i, -1,  0) * k(-1, -1);      // extended
+            v += d(i,  0,  0) * k( 0, -1);      // extended
+            v += d(i,  1,  0) * k( 1, -1);      // extended
+            v += d(i,  2,  0) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // x = n - 2
+        {
+            T v = zero<T>();
+
+            v += d(i, -2,  0) * k(-2, -2);      // extended
+            v += d(i, -1,  0) * k(-1, -2);      // extended
+            v += d(i,  0,  0) * k( 0, -2);      // extended
+            v += d(i,  1,  0) * k( 1, -2);      // extended
+            v += d(i,  1,  0) * k( 2, -2);      // extended
+
+            v += d(i, -2,  0) * k(-2, -1);      // extended
+            v += d(i, -1,  0) * k(-1, -1);      // extended
+            v += d(i,  0,  0) * k( 0, -1);      // extended
+            v += d(i,  1,  0) * k( 1, -1);      // extended
+            v += d(i,  1,  0) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  1,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  1,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  1,  2) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -2,  0) * k(-2, -2);      // extended
+            v += d(i, -1,  0) * k(-1, -2);      // extended
+            v += d(i,  0,  0) * k( 0, -2);      // extended
+            v += d(i,  0,  0) * k( 1, -2);      // extended
+            v += d(i,  0,  0) * k( 2, -2);      // extended
+
+            v += d(i, -2,  0) * k(-2, -1);      // extended
+            v += d(i, -1,  0) * k(-1, -1);      // extended
+            v += d(i,  0,  0) * k( 0, -1);      // extended
+            v += d(i,  0,  0) * k( 1, -1);      // extended
+            v += d(i,  0,  0) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  0,  0) * k( 1,  0);      // extended
+            v += d(i,  0,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  0,  1) * k( 1,  1);      // extended
+            v += d(i,  0,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  0,  2) * k( 1,  2);      // extended
+            v += d(i,  0,  2) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+    }
+
+    // y = 1
+    {
+        // x = 0
+        {
+            T v = zero<T>();
+
+            v += d(i,  0, -1) * k(-2, -2);      // extended
+            v += d(i,  0, -1) * k(-1, -2);      // extended
+            v += d(i,  0, -1) * k( 0, -2);      // extended
+            v += d(i,  1, -1) * k( 1, -2);      // extended
+            v += d(i,  2, -1) * k( 2, -2);      // extended
+
+            v += d(i,  0, -1) * k(-2, -1);      // extended
+            v += d(i,  0, -1) * k(-1, -1);      // extended
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i,  0,  0) * k(-2,  0);      // extended
+            v += d(i,  0,  0) * k(-1,  0);      // extended
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i,  0,  1) * k(-2,  1);      // extended
+            v += d(i,  0,  1) * k(-1,  1);      // extended
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i,  0,  2) * k(-2,  2);      // extended
+            v += d(i,  0,  2) * k(-1,  2);      // extended
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // x = 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -1, -1) * k(-2, -2);      // extended
+            v += d(i, -1, -1) * k(-1, -2);      // extended
+            v += d(i,  0, -1) * k( 0, -2);      // extended
+            v += d(i,  1, -1) * k( 1, -2);      // extended
+            v += d(i,  2, -1) * k( 2, -2);      // extended
+
+            v += d(i, -1, -1) * k(-2, -1);      // extended
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -1,  0) * k(-2,  0);      // extended
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -1,  1) * k(-2,  1);      // extended
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -1,  2) * k(-2,  2);      // extended
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // 1 < x < n - 2
+        auto const limit = i + data.shape().x - 4;
+        while (i < limit) {
+            T v = zero<T>();
+
+            v += d(i, -2, -1) * k(-2, -2);      // extended
+            v += d(i, -1, -1) * k(-1, -2);      // extended
+            v += d(i,  0, -1) * k( 0, -2);      // extended
+            v += d(i,  1, -1) * k( 1, -2);      // extended
+            v += d(i,  2, -1) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // x = n - 2
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -1) * k(-2, -2);      // extended
+            v += d(i, -1, -1) * k(-1, -2);      // extended
+            v += d(i,  0, -1) * k( 0, -2);      // extended
+            v += d(i,  1, -1) * k( 1, -2);      // extended
+            v += d(i,  1, -1) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  1, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  1,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  1,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  1,  2) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -1) * k(-2, -2);      // extended
+            v += d(i, -1, -1) * k(-1, -2);      // extended
+            v += d(i,  0, -1) * k( 0, -2);      // extended
+            v += d(i,  0, -1) * k( 1, -2);      // extended
+            v += d(i,  0, -1) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  0, -1) * k( 1, -1);      // extended
+            v += d(i,  0, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  0,  0) * k( 1,  0);      // extended
+            v += d(i,  0,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  0,  1) * k( 1,  1);      // extended
+            v += d(i,  0,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  0,  2) * k( 1,  2);      // extended
+            v += d(i,  0,  2) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+    }
+
+    // 1 < y < n - 2
+    while (i < data.shape().x * (data.shape().y - 2)) {
+        // x = 0
+        {
+            T v = zero<T>();
+
+            v += d(i,  0, -2) * k(-2, -2);      // extended
+            v += d(i,  0, -2) * k(-1, -2);      // extended
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i,  0, -1) * k(-2, -1);      // extended
+            v += d(i,  0, -1) * k(-1, -1);      // extended
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i,  0,  0) * k(-2,  0);      // extended
+            v += d(i,  0,  0) * k(-1,  0);      // extended
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i,  0,  1) * k(-2,  1);      // extended
+            v += d(i,  0,  1) * k(-1,  1);      // extended
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i,  0,  2) * k(-2,  2);      // extended
+            v += d(i,  0,  2) * k(-1,  2);      // extended
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // x = 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -1, -2) * k(-2, -2);      // extended
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i, -1, -1) * k(-2, -1);      // extended
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -1,  0) * k(-2,  0);      // extended
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -1,  1) * k(-2,  1);      // extended
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -1,  2) * k(-2,  2);      // extended
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // 1 < x < n - 2
+        auto const limit = i + data.shape().x - 4;
+        while (i < limit) {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  2,  2) * k( 2,  2);
+
+            out[i++] = v;
+        }
+
+        // x = n - 2
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  1, -2) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  1, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  1,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  1,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  1,  2) * k( 1,  2);
+            v += d(i,  1,  2) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  0, -2) * k( 1, -2);      // extended
+            v += d(i,  0, -2) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  0, -1) * k( 1, -1);      // extended
+            v += d(i,  0, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  0,  0) * k( 1,  0);      // extended
+            v += d(i,  0,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  0,  1) * k( 1,  1);      // extended
+            v += d(i,  0,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  2) * k(-2,  2);
+            v += d(i, -1,  2) * k(-1,  2);
+            v += d(i,  0,  2) * k( 0,  2);
+            v += d(i,  0,  2) * k( 1,  2);      // extended
+            v += d(i,  0,  2) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+    }
+
+    // y = n - 2
+    {
+        // x = 0
+        {
+            T v = zero<T>();
+
+            v += d(i,  0, -2) * k(-2, -2);      // extended
+            v += d(i,  0, -2) * k(-1, -2);      // extended
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i,  0, -1) * k(-2, -1);      // extended
+            v += d(i,  0, -1) * k(-1, -1);      // extended
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i,  0,  0) * k(-2,  0);      // extended
+            v += d(i,  0,  0) * k(-1,  0);      // extended
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i,  0,  1) * k(-2,  1);      // extended
+            v += d(i,  0,  1) * k(-1,  1);      // extended
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i,  0,  1) * k(-2,  2);      // extended
+            v += d(i,  0,  1) * k(-1,  2);      // extended
+            v += d(i,  0,  1) * k( 0,  2);      // extended
+            v += d(i,  1,  1) * k( 1,  2);      // extended
+            v += d(i,  2,  1) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -1, -2) * k(-2, -2);      // extended
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i, -1, -1) * k(-2, -1);      // extended
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -1,  0) * k(-2,  0);      // extended
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -1,  1) * k(-2,  1);      // extended
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -1,  1) * k(-2,  2);      // extended
+            v += d(i, -1,  1) * k(-1,  2);      // extended
+            v += d(i,  0,  1) * k( 0,  2);      // extended
+            v += d(i,  1,  1) * k( 1,  2);      // extended
+            v += d(i,  2,  1) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // 1 < x < n - 2
+        auto const limit = i + data.shape().x - 4;
+        while (i < limit) {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  2,  1) * k( 2,  1);
+
+            v += d(i, -2,  1) * k(-2,  2);      // extended
+            v += d(i, -1,  1) * k(-1,  2);      // extended
+            v += d(i,  0,  1) * k( 0,  2);      // extended
+            v += d(i,  1,  1) * k( 1,  2);      // extended
+            v += d(i,  2,  1) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 2
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  1, -2) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  1, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  1,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  1,  1) * k( 1,  1);
+            v += d(i,  1,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  1) * k(-2,  2);      // extended
+            v += d(i, -1,  1) * k(-1,  2);      // extended
+            v += d(i,  0,  1) * k( 0,  2);      // extended
+            v += d(i,  1,  1) * k( 1,  2);      // extended
+            v += d(i,  1,  1) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  0, -2) * k( 1, -2);      // extended
+            v += d(i,  0, -2) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  0, -1) * k( 1, -1);      // extended
+            v += d(i,  0, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  0,  0) * k( 1,  0);      // extended
+            v += d(i,  0,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  1) * k(-2,  1);
+            v += d(i, -1,  1) * k(-1,  1);
+            v += d(i,  0,  1) * k( 0,  1);
+            v += d(i,  0,  1) * k( 1,  1);      // extended
+            v += d(i,  0,  1) * k( 2,  1);      // extended
+
+            v += d(i, -2,  1) * k(-2,  2);      // extended
+            v += d(i, -1,  1) * k(-1,  2);      // extended
+            v += d(i,  0,  1) * k( 0,  2);      // extended
+            v += d(i,  0,  1) * k( 1,  2);      // extended
+            v += d(i,  0,  1) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+    }
+
+    // y = n - 1
+    {
+        // x = 0
+        {
+            T v = zero<T>();
+
+            v += d(i,  0, -2) * k(-2, -2);      // extended
+            v += d(i,  0, -2) * k(-1, -2);      // extended
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i,  0, -1) * k(-2, -1);      // extended
+            v += d(i,  0, -1) * k(-1, -1);      // extended
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i,  0,  0) * k(-2,  0);      // extended
+            v += d(i,  0,  0) * k(-1,  0);      // extended
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i,  0,  0) * k(-2,  1);      // extended
+            v += d(i,  0,  0) * k(-1,  1);      // extended
+            v += d(i,  0,  0) * k( 0,  1);      // extended
+            v += d(i,  1,  0) * k( 1,  1);      // extended
+            v += d(i,  2,  0) * k( 2,  1);      // extended
+
+            v += d(i,  0,  0) * k(-2,  2);      // extended
+            v += d(i,  0,  0) * k(-1,  2);      // extended
+            v += d(i,  0,  0) * k( 0,  2);      // extended
+            v += d(i,  1,  0) * k( 1,  2);      // extended
+            v += d(i,  2,  0) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -1, -2) * k(-2, -2);      // extended
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i, -1, -1) * k(-2, -1);      // extended
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -1,  0) * k(-2,  0);      // extended
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -1,  0) * k(-2,  1);      // extended
+            v += d(i, -1,  0) * k(-1,  1);      // extended
+            v += d(i,  0,  0) * k( 0,  1);      // extended
+            v += d(i,  1,  0) * k( 1,  1);      // extended
+            v += d(i,  2,  0) * k( 2,  1);      // extended
+
+            v += d(i, -1,  0) * k(-2,  2);      // extended
+            v += d(i, -1,  0) * k(-1,  2);      // extended
+            v += d(i,  0,  0) * k( 0,  2);      // extended
+            v += d(i,  1,  0) * k( 1,  2);      // extended
+            v += d(i,  2,  0) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // 1 < x < n - 2
+        auto const limit = i + data.shape().x - 4;
+        while (i < limit) {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  2, -2) * k( 2, -2);
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  2, -1) * k( 2, -1);
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  2,  0) * k( 2,  0);
+
+            v += d(i, -2,  0) * k(-2,  1);      // extended
+            v += d(i, -1,  0) * k(-1,  1);      // extended
+            v += d(i,  0,  0) * k( 0,  1);      // extended
+            v += d(i,  1,  0) * k( 1,  1);      // extended
+            v += d(i,  2,  0) * k( 2,  1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  2);      // extended
+            v += d(i, -1,  0) * k(-1,  2);      // extended
+            v += d(i,  0,  0) * k( 0,  2);      // extended
+            v += d(i,  1,  0) * k( 1,  2);      // extended
+            v += d(i,  2,  0) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 2
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  1, -2) * k( 1, -2);
+            v += d(i,  1, -2) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  1, -1) * k( 1, -1);
+            v += d(i,  1, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  1,  0) * k( 1,  0);
+            v += d(i,  1,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  0) * k(-2,  1);      // extended
+            v += d(i, -1,  0) * k(-1,  1);      // extended
+            v += d(i,  0,  0) * k( 0,  1);      // extended
+            v += d(i,  1,  0) * k( 1,  1);      // extended
+            v += d(i,  1,  0) * k( 2,  1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  2);      // extended
+            v += d(i, -1,  0) * k(-1,  2);      // extended
+            v += d(i,  0,  0) * k( 0,  2);      // extended
+            v += d(i,  1,  0) * k( 1,  2);      // extended
+            v += d(i,  1,  0) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+
+        // x = n - 1
+        {
+            T v = zero<T>();
+
+            v += d(i, -2, -2) * k(-2, -2);
+            v += d(i, -1, -2) * k(-1, -2);
+            v += d(i,  0, -2) * k( 0, -2);
+            v += d(i,  0, -2) * k( 1, -2);      // extended
+            v += d(i,  0, -2) * k( 2, -2);      // extended
+
+            v += d(i, -2, -1) * k(-2, -1);
+            v += d(i, -1, -1) * k(-1, -1);
+            v += d(i,  0, -1) * k( 0, -1);
+            v += d(i,  0, -1) * k( 1, -1);      // extended
+            v += d(i,  0, -1) * k( 2, -1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  0);
+            v += d(i, -1,  0) * k(-1,  0);
+            v += d(i,  0,  0) * k( 0,  0);
+            v += d(i,  0,  0) * k( 1,  0);      // extended
+            v += d(i,  0,  0) * k( 2,  0);      // extended
+
+            v += d(i, -2,  0) * k(-2,  1);      // extended
+            v += d(i, -1,  0) * k(-1,  1);      // extended
+            v += d(i,  0,  0) * k( 0,  1);      // extended
+            v += d(i,  0,  0) * k( 1,  1);      // extended
+            v += d(i,  0,  0) * k( 2,  1);      // extended
+
+            v += d(i, -2,  0) * k(-2,  2);      // extended
+            v += d(i, -1,  0) * k(-1,  2);      // extended
+            v += d(i,  0,  0) * k( 0,  2);      // extended
+            v += d(i,  0,  0) * k( 1,  2);      // extended
+            v += d(i,  0,  0) * k( 2,  2);      // extended
+
+            out[i++] = v;
+        }
+    }
+}
+
+} /* namespace impl */

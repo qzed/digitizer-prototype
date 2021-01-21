@@ -98,15 +98,18 @@ void conv_5x5_extend(image<T>& out, image<T> const& in, kernel<S, 5, 5> const& k
 } /* namespace impl */
 
 
+#include "convolution.opt.3x3-extend.hpp"
+#include "convolution.opt.5x5-extend.hpp"
+
 template<typename B=border::extend, typename T, typename S, index Nx, index Ny>
 void conv(image<T>& out, image<T> const& in, kernel<S, Nx, Ny> const& k)
 {
     // workaround for partial function template specialization
     if constexpr (Nx == 5 && Ny == 5 && std::is_same_v<B, border::extend>) {
         impl::conv_5x5_extend<T, S>(out, in, k);
+    } else if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<B, border::extend>) {
+        impl::conv_3x3_extend<T, S>(out, in, k);
     } else {
         impl::conv_generic<B, T, S, Nx, Ny>(out, in, k);
     }
 }
-
-#include "convolution.opt.hpp"

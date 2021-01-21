@@ -491,7 +491,7 @@ auto main(int argc, char** argv) -> int
             auto const eigen = eigenvectors(inv(prec).value());
 
             // get standard deviation
-            auto const nstd = 1.5;
+            auto const nstd = 1.0;
             auto const s1 = nstd * std::sqrt(eigen.w[0]);
             auto const s2 = nstd * std::sqrt(eigen.w[1]);
 

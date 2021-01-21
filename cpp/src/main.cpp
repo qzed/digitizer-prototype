@@ -475,17 +475,17 @@ auto main(int argc, char** argv) -> int
             auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 
-            cairo_move_to(*cr, (mean.x + 0.1) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0));
-            cairo_line_to(*cr, (mean.x + 0.9) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0));
+            cr.move_to({(mean.x + 0.1) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
+            cr.line_to({(mean.x + 0.9) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
 
-            cairo_move_to(*cr, (mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.1) * (height / 48.0));
-            cairo_line_to(*cr, (mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.9) * (height / 48.0));
+            cr.move_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.1) * (height / 48.0)});
+            cr.line_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.9) * (height / 48.0)});
 
-            cairo_move_to(*cr, (mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0));
-            cairo_line_to(*cr, (mean.x + 0.5 + v1.x) * (width / 72.0), height - (mean.y + 0.5 + v1.y) * (height / 48.0));
+            cr.move_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
+            cr.line_to({(mean.x + 0.5 + v1.x) * (width / 72.0), height - (mean.y + 0.5 + v1.y) * (height / 48.0)});
 
-            cairo_move_to(*cr, (mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0));
-            cairo_line_to(*cr, (mean.x + 0.5 + v2.x) * (width / 72.0), height - (mean.y + 0.5 + v2.y) * (height / 48.0));
+            cr.move_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
+            cr.line_to({(mean.x + 0.5 + v2.x) * (width / 72.0), height - (mean.y + 0.5 + v2.y) * (height / 48.0)});
         }
 
         cairo_stroke(*cr);

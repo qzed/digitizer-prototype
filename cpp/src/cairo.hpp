@@ -86,6 +86,8 @@ public:
 
     void scale(vec2<f64> s);
 
+    void move_to(vec2<f64> pos);
+    void line_to(vec2<f64> pos);
     void rectangle(vec2<f64> origin, vec2<f64> size);
 };
 
@@ -213,6 +215,16 @@ void cairo::restore()
 void cairo::scale(vec2<f64> s)
 {
     cairo_scale(m_raw, s.x, s.y);
+}
+
+void cairo::move_to(vec2<f64> pos)
+{
+    cairo_move_to(m_raw, pos.x, pos.y);
+}
+
+void cairo::line_to(vec2<f64> pos)
+{
+    cairo_line_to(m_raw, pos.x, pos.y);
 }
 
 void cairo::rectangle(vec2<f64> origin, vec2<f64> size)

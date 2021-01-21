@@ -19,17 +19,6 @@ class pattern;
 class matrix;
 
 
-class exception : public std::exception {
-private:
-    status_t m_code;
-
-public:
-    exception(status_t code);
-
-    auto what() const noexcept -> const char*;
-    auto code() const noexcept -> status_t;
-};
-
 enum class format {
     argb32   = CAIRO_FORMAT_ARGB32,
     rgba128f = CAIRO_FORMAT_RGBA128F,
@@ -48,10 +37,19 @@ enum class font_weight {
 };
 
 
-class cairo {
-private:
-    cairo_t* m_raw;
+class exception : public std::exception {
+public:
+    exception(status_t code);
 
+    auto what() const noexcept -> const char*;
+    auto code() const noexcept -> status_t;
+
+private:
+    status_t m_code;
+};
+
+
+class cairo {
 public:
     cairo();
     cairo(cairo_t* raw);
@@ -96,13 +94,13 @@ public:
     void select_font_face(char const* family, font_slant slant, font_weight weight);
     void set_font_size(f64 size);
     void show_text(char const* utf8);
+
+private:
+    cairo_t* m_raw;
 };
 
 
 class surface {
-private:
-    cairo_surface_t* m_raw;
-
 public:
     surface();
     surface(cairo_surface_t* raw);
@@ -120,13 +118,13 @@ public:
 
     void write_to_png(char const* filename);
     void write_to_png(std::filesystem::path const& p);
+
+private:
+    cairo_surface_t* m_raw;
 };
 
 
 class pattern {
-private:
-    cairo_pattern_t* m_raw;
-
 public:
     pattern();
     pattern(cairo_pattern_t* raw);
@@ -146,13 +144,13 @@ public:
 
     void set_matrix(matrix &m);
     void set_filter(filter f);
+
+private:
+    cairo_pattern_t* m_raw;
 };
 
 
 class matrix {
-private:
-    cairo_matrix_t m_raw;
-
 public:
     matrix();
     matrix(cairo_matrix_t m);
@@ -164,6 +162,9 @@ public:
 
     void translate(vec2<f64> v);
     void scale(vec2<f64> v);
+
+private:
+    cairo_matrix_t m_raw;
 };
 
 

@@ -481,10 +481,12 @@ auto main(int argc, char** argv) -> int
         for (auto const [mean, prec] : out_tp[i]) {
             auto const eigen = eigenvectors(inv(prec).value());
 
+            // get standard deviation
             auto const nstd = 1.5;
             auto const s1 = nstd * std::sqrt(eigen.w[0]);
             auto const s2 = nstd * std::sqrt(eigen.w[1]);
 
+            // eigenvectors scaled with standard deviation
             auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 

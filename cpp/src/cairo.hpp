@@ -41,7 +41,9 @@ enum class filter {
 };
 
 enum class font_slant {
-    normal = CAIRO_FONT_SLANT_NORMAL,
+    normal  = CAIRO_FONT_SLANT_NORMAL,
+    italic  = CAIRO_FONT_SLANT_ITALIC,
+    oblique = CAIRO_FONT_SLANT_OBLIQUE,
 };
 
 enum class font_weight {

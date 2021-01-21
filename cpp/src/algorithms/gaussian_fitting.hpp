@@ -293,6 +293,10 @@ using math::mat6;
 using math::vec6;
 
 
+template<class T>
+inline constexpr auto const range = vec2<T> { static_cast<T>(1), static_cast<T>(1) };
+
+
 struct bbox {
     index xmin, xmax;
     index ymin, ymax;
@@ -329,13 +333,18 @@ inline void assemble_system(mat6<S>& m, vec6<S>& rhs, bbox const& b, image<T> co
 {
     auto const eps = std::numeric_limits<S>::epsilon();
 
+    auto const scale = vec2<S> {
+        static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),
+        static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
+    };
+
     std::fill(m.data.begin(), m.data.end(), zero<S>());
     std::fill(rhs.data.begin(), rhs.data.end(), zero<S>());
 
     for (index iy = b.ymin; iy <= b.ymax; ++iy) {
         for (index ix = b.xmin; ix <= b.xmax; ++ix) {
-            auto const x = static_cast<S>(ix);
-            auto const y = static_cast<S>(iy);
+            auto const x = static_cast<S>(ix) * scale.x - range<S>.x;
+            auto const y = static_cast<S>(iy) * scale.y - range<S>.y;
 
             auto const d = w[{ix - b.xmin, iy - b.ymin}] * static_cast<S>(data[{ix, iy}]);
             auto const v = std::log(d + eps) * d * d;
@@ -424,6 +433,11 @@ bool extract_params(vec6<T> const& chi, T& scale, vec2<T>& mean, mat2s<T>& prec,
 template<class T>
 inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& total)
 {
+    auto const scale = vec2<T> {
+        static_cast<T>(2) * range<T>.x / static_cast<T>(total.shape().x),
+        static_cast<T>(2) * range<T>.y / static_cast<T>(total.shape().y),
+    };
+
     std::fill(total.begin(), total.end(), zero<T>());
 
     // compute individual Gaussians in sample windows
@@ -432,12 +446,14 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
             continue;
         }
 
-        for (index y = p.bounds.ymin; y <= p.bounds.ymax; ++y) {
-            for (index x = p.bounds.xmin; x <= p.bounds.xmax; ++x) {
-                auto const xy = vec2<T> { static_cast<T>(x), static_cast<T>(y) };
-                auto const v = p.scale * gaussian_like<T>(xy, p.mean, p.prec);
+        for (index iy = p.bounds.ymin; iy <= p.bounds.ymax; ++iy) {
+            for (index ix = p.bounds.xmin; ix <= p.bounds.xmax; ++ix) {
+                auto const x = static_cast<T>(ix) * scale.x - range<T>.x;
+                auto const y = static_cast<T>(iy) * scale.y - range<T>.y;
 
-                p.weights[{x - p.bounds.xmin, y - p.bounds.ymin}] = v;
+                auto const v = p.scale * gaussian_like<T>({x, y}, p.mean, p.prec);
+
+                p.weights[{ix - p.bounds.xmin, iy - p.bounds.ymin}] = v;
             }
         }
     }
@@ -475,7 +491,6 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
 
 
 // TODO: vector as parameter container is not good... drops image memory when resized
-// TODO: normalize x/y to [0, 1] range?
 
 template<class T>
 void reserve(std::vector<parameters<T>>& params, std::size_t n, index2 shape)
@@ -500,6 +515,23 @@ template<class T, class S>
 void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp,
          unsigned int n_iter, S eps=static_cast<S>(1e-20))
 {
+    auto const scale = vec2<S> {
+        static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),
+        static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
+    };
+
+    // down-scaling
+    for (auto& p : params) {
+        // scale and center mean
+        p.mean.x = p.mean.x * scale.x - range<S>.x;
+        p.mean.y = p.mean.y * scale.y - range<S>.y;
+
+        // scale precision matrix (compute (S * Sigma * S^T)^-1 = S^-T * Prec * S^-1)
+        p.prec.xx = p.prec.xx / (scale.x * scale.x);
+        p.prec.xy = p.prec.xy / (scale.x * scale.y);
+        p.prec.yy = p.prec.yy / (scale.y * scale.y);
+    }
+
     // perform iterations
     for (unsigned int i = 0; i < n_iter; ++i) {
         // update weights
@@ -531,6 +563,18 @@ void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp
                 std::cout << "warning: parameter extraction failed\n";
             }
         }
+    }
+
+    // undo down-scaling
+    for (auto& p : params) {
+        // un-scale and re-adjust mean
+        p.mean.x = (p.mean.x + range<S>.x) / scale.x;
+        p.mean.y = (p.mean.y + range<S>.y) / scale.y;
+
+        // un-scale precision matrix
+        p.prec.xx = p.prec.xx * scale.x * scale.x;
+        p.prec.xy = p.prec.xy * scale.x * scale.y;
+        p.prec.yy = p.prec.yy * scale.y * scale.y;
     }
 }
 

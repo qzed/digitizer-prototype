@@ -5,6 +5,8 @@
 
 #include <exception>
 #include <utility>
+#include <filesystem>
+
 #include <cairo/cairo.h>
 
 
@@ -130,6 +132,9 @@ public:
     auto operator* () -> cairo_surface_t*;
 
     auto status() const -> status_t;
+
+    void write_to_png(char const* filename);
+    void write_to_png(std::filesystem::path const& p);
 };
 
 
@@ -391,6 +396,21 @@ auto surface::operator* () -> cairo_surface_t*
 auto surface::status() const -> cairo_status_t
 {
     return cairo_surface_status(m_raw);
+}
+
+void surface::write_to_png(char const* filename)
+{
+    status_t status;
+
+    status = cairo_surface_write_to_png(m_raw, filename);
+    if (status) {
+        throw exception{ status };
+    }
+}
+
+void surface::write_to_png(std::filesystem::path const& p)
+{
+    write_to_png(p.c_str());
 }
 
 

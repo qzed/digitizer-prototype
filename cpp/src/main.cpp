@@ -454,15 +454,17 @@ auto main(int argc, char** argv) -> int
         // plot
         cmap::viridis.map_into(img_out_color, img_out, {{ 0.0f, 0.3f }});
 
-        cr.save();
-        cr.scale({ width / 72.0, -height / 48.0 });
+        auto m = cairo::matrix::identity();
+        m.translate({0.0, 48.0});
+        m.scale({72.0 / width, -48.0 / height});
 
-        cr.set_source(src, { 0.0, -48.0 });
-        cr.set_source_filter(cairo::filter::nearest);
+        auto p = cairo::pattern::create_for_surface(src);
+        p.set_matrix(m);
+        p.set_filter(cairo::filter::nearest);
 
-        cr.rectangle({ 0, 0 }, { 72.0, -48.0 });
+        cr.set_source(p);
+        cr.rectangle({ 0, 0 }, { static_cast<f64>(width), static_cast<f64>(height) });
         cr.fill();
-        cr.restore();
 
         cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
 

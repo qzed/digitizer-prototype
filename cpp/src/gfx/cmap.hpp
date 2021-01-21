@@ -29,7 +29,7 @@ auto normalize(T const& value, std::pair<T, T> range) -> f32
 
 class cmap {
 public:
-    virtual ~cmap() = default;
+    inline virtual ~cmap() = default;
 
     virtual auto map_value(f32 value) const -> srgb = 0;
 
@@ -82,7 +82,7 @@ public:
     auto map_value(f32 value) const -> srgb;
 };
 
-auto grayscale_t::map_value(f32 value) const -> srgb {
+inline auto grayscale_t::map_value(f32 value) const -> srgb {
     return srgb::from(value, value, value);
 };
 

@@ -152,7 +152,7 @@ auto main(int argc, char** argv) -> int
     auto img_dm1 = image<f32> { img_pp.shape() };
     auto img_dm2 = image<f32> { img_pp.shape() };
     auto img_flt = image<f32> { img_pp.shape() };
-    auto img_gftmp = image<f64> { img_pp.shape() };
+    auto img_gftmp = image<f32> { img_pp.shape() };
 
     auto img_out_color = image<cmap::srgba> { img_pp.shape() };
 
@@ -164,7 +164,7 @@ auto main(int argc, char** argv) -> int
     auto cstats = std::vector<component_stats>{};
     auto cscore = std::vector<f32>{};
 
-    auto gfparams = std::vector<gfit::parameters<f64>>{};
+    auto gfparams = std::vector<gfit::parameters<f32>>{};
     auto gfwindow = index2 { 11, 11 };
     gfit::reserve(gfparams, 32, gfwindow);
 
@@ -178,7 +178,7 @@ auto main(int argc, char** argv) -> int
     auto out = std::vector<image<f32>>{};
     out.reserve(heatmaps.size());
 
-    auto out_tp = std::vector<std::vector<std::pair<vec2<f64>, mat2s<f64>>>>{};
+    auto out_tp = std::vector<std::vector<std::pair<vec2<f32>, mat2s<f32>>>>{};
     out_tp.reserve(heatmaps.size());
 
     std::cout << "Processing..." << std::endl;

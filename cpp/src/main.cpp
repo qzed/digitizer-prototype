@@ -373,7 +373,7 @@ auto main(int argc, char** argv) -> int
             }
 
             // gaussian fitting
-            {
+            if (!maximas.empty()) {
                 auto _r = perf_reg.record(perf_t_gfit);
 
                 gfit::reserve(gfparams, maximas.size(), gfwindow);
@@ -397,6 +397,10 @@ auto main(int argc, char** argv) -> int
                 }
 
                 gfit::fit(gfparams, img_flt, img_gftmp, 3);
+            } else {
+                for (auto& p : gfparams) {
+                    p.valid = false;
+                }
             }
 
             _tr.stop();

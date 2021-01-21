@@ -77,7 +77,7 @@ auto get_cost(T& cost, index i, vec2<int> d) -> V
 }
 
 template<typename T, typename Q, typename B, typename M, typename C>
-void evaluate(image<T>& out, Q& queue, B& bin, M& mask, C& cost, index i, index stride, index2 dir, T limit)
+inline void evaluate(image<T>& out, Q& queue, B& bin, M& mask, C& cost, index i, index stride, index2 dir, T limit)
 {
     if (!is_compute(bin, mask, i + stride))
         return;

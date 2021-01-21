@@ -404,7 +404,7 @@ auto main(int argc, char** argv) -> int
             }
 
             _tr.stop();
-            out.push_back(img_flt);
+            out.push_back(hm);
 
             if (mode == mode_type::plot) {
                 out_tp.push_back({});
@@ -469,7 +469,7 @@ auto main(int argc, char** argv) -> int
         };
 
         // plot
-        cmap::viridis.map_into(img_out_color, img_out, {{ 0.0f, 0.3f }});
+        cmap::viridis.map_into(img_out_color, img_out, {{ 0.1f, 0.7f }});
 
         // plot heatmap
         auto m = cairo::matrix::identity();

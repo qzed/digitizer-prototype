@@ -1,5 +1,3 @@
-#include "cairo.hpp"
-#include "cmap.hpp"
 #include "math.hpp"
 #include "parser.hpp"
 #include "types.hpp"
@@ -15,6 +13,9 @@
 
 #include "eval/perf.hpp"
 
+#include "gfx/cairo.hpp"
+#include "gfx/cmap.hpp"
+
 #include <vector>
 #include <numeric>
 #include <fstream>
@@ -22,8 +23,6 @@
 #include <iomanip>
 #include <chrono>
 #include <filesystem>
-
-#include <cairo/cairo.h>
 
 
 auto read_file(char const* path) -> std::vector<u8>

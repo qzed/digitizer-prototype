@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math.hpp"
 #include "cmap.hpp"
+#include "../math.hpp"
 
 #include <exception>
 #include <utility>

@@ -13,14 +13,18 @@
 
 namespace gfx::cmap {
 
+namespace impl {
+
 template<typename T>
-auto normalized(T const& value, std::pair<T, T> range) -> f32
+auto normalize(T const& value, std::pair<T, T> range) -> f32
 {
     auto v = static_cast<f32>(value - range.first);
     auto n = static_cast<f32>(range.second - range.first);
 
     return std::clamp(v / n, 0.0f, 1.0f);
 }
+
+}   /* namespace impl */
 
 
 class cmap {
@@ -42,7 +46,7 @@ public:
 template<typename T, typename P>
 auto cmap::map(T const& value, std::pair<T, T> range) const -> P
 {
-    auto m = this->map_value(normalized(value, range));
+    auto m = this->map_value(impl::normalize(value, range));
 
     return P::from(m.r, m.g, m.b);
 }

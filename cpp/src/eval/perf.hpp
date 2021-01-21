@@ -159,12 +159,14 @@ inline measurement::~measurement()
 
 inline void measurement::stop()
 {
+    using ns = std::chrono::nanoseconds;
+
     auto const duration = clock::now() - m_start;
 
     if (m_start == clock::time_point::max())
         return;
 
-    auto const d_ns = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
+    auto const d_ns = static_cast<double>(std::chrono::duration_cast<ns>(duration).count());
 
     if (m_entry.n_measurements == 0)
         m_entry.r_mean_ns = d_ns;

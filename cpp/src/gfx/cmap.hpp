@@ -89,14 +89,14 @@ auto grayscale_t::map_value(f32 value) const -> srgb {
 
 template<std::size_t N>
 class lut : public cmap {
-private:
-    std::array<srgb, N> m_table;
-
 public:
     template<typename... Args>
     lut(Args&&... t);
 
     auto map_value(f32 value) const -> srgb;
+
+private:
+    std::array<srgb, N> m_table;
 };
 
 template<std::size_t N>

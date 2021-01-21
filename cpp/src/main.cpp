@@ -478,8 +478,6 @@ auto main(int argc, char** argv) -> int
         cr.fill();
 
         // plot touch-points
-        cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
-
         for (auto const [mean, prec] : out_tp[i]) {
             auto const eigen = eigenvectors(inv(prec).value());
 
@@ -490,23 +488,43 @@ auto main(int argc, char** argv) -> int
             auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 
+            // standard deviation
+            cr.set_source(cmap::srgba { 0.0, 0.0, 0.0, 0.33 });
+
+            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
+            cr.line_to(t({ mean.x + 0.5 + v1.x, mean.y + 0.5 + v1.y }));
+
+            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
+            cr.line_to(t({ mean.x + 0.5 + v2.x, mean.y + 0.5 + v2.y }));
+
+            cr.stroke();
+
             // mean
+            cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
+
             cr.move_to(t({ mean.x + 0.1, mean.y + 0.5 }));
             cr.line_to(t({ mean.x + 0.9, mean.y + 0.5 }));
 
             cr.move_to(t({ mean.x + 0.5, mean.y + 0.1 }));
             cr.line_to(t({ mean.x + 0.5, mean.y + 0.9 }));
 
-            // standard deviation
-            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
-            cr.line_to(t({ mean.x + 0.5 + v1.x, mean.y + 0.5 + v1.y }));
+            cr.stroke();
 
-            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
-            cr.line_to(t({ mean.x + 0.5 + v2.x, mean.y + 0.5 + v2.y }));
+            // standard deviation ellipse
+            cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
+
+            cr.save();
+
+            cr.translate(t({ mean.x + 0.5, mean.y + 0.5 }));
+            cr.rotate(std::atan2(v1.x, v1.y));
+            cr.scale({s2 * win_w / img_w, s1 * win_h / img_h});
+            cr.arc({ 0.0, 0.0 }, 1.0, 0.0, 2.0 * 3.141592);
+
+            cr.restore();
+            cr.stroke();
         }
 
-        cr.stroke();
-
+        // write file
         std::ostringstream oss;
         oss << argv[3] << "/out-";
         oss << std::setfill('0') << std::setw(4) << i;

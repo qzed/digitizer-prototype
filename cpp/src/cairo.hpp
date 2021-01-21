@@ -52,6 +52,14 @@ enum class filter {
     nearest = CAIRO_FILTER_NEAREST,
 };
 
+enum class font_slant {
+    normal = CAIRO_FONT_SLANT_NORMAL,
+};
+
+enum class font_weight {
+    normal = CAIRO_FONT_WEIGHT_NORMAL,
+};
+
 
 class cairo {
 private:
@@ -97,6 +105,10 @@ public:
     void line_to(vec2<f64> pos);
     void rectangle(vec2<f64> origin, vec2<f64> size);
     void arc(vec2<f64> center, f64 radius, f64 angle1, f64 angle2);
+
+    void select_font_face(char const* family, font_slant slant, font_weight weight);
+    void set_font_size(f64 size);
+    void show_text(char const* utf8);
 };
 
 
@@ -312,6 +324,24 @@ void cairo::rectangle(vec2<f64> origin, vec2<f64> size)
 void cairo::arc(vec2<f64> center, f64 radius, f64 angle1, f64 angle2)
 {
     cairo_arc(m_raw, center.x, center.y, radius, angle1, angle2);
+}
+
+void cairo::select_font_face(char const* family, font_slant slant, font_weight weight)
+{
+    auto const s = static_cast<cairo_font_slant_t>(slant);
+    auto const w = static_cast<cairo_font_weight_t>(weight);
+
+    cairo_select_font_face(m_raw, family, s, w);
+}
+
+void cairo::set_font_size(f64 size)
+{
+    cairo_set_font_size(m_raw, size);
+}
+
+void cairo::show_text(char const* utf8)
+{
+    cairo_show_text(m_raw, utf8);
 }
 
 

@@ -48,6 +48,7 @@ enum class font_slant {
 
 enum class font_weight {
     normal = CAIRO_FONT_WEIGHT_NORMAL,
+    bold   = CAIRO_FONT_WEIGHT_BOLD,
 };
 
 

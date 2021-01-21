@@ -3,7 +3,7 @@
 #include "../types.hpp"
 
 
-namespace cmap {
+namespace gfx {
 
 struct srgb {
     f32 r, g, b;
@@ -44,4 +44,4 @@ constexpr auto srgba::from(f32 r, f32 g, f32 b) -> srgba
     return {r, g, b, 1.0};
 }
 
-}   /* namespace cmap */
+}   /* namespace gfx */

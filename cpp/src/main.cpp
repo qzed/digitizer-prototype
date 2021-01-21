@@ -153,7 +153,7 @@ auto main(int argc, char** argv) -> int
     auto img_flt = image<f32> { img_pp.shape() };
     auto img_gftmp = image<f32> { img_pp.shape() };
 
-    auto img_out_color = image<cmap::srgba> { img_pp.shape() };
+    auto img_out_color = image<gfx::srgba> { img_pp.shape() };
 
     auto kern_pp = kernels::gaussian<f32, 5, 5>(1.0);
     auto kern_st = kernels::gaussian<f32, 5, 5>(1.0);
@@ -450,11 +450,11 @@ auto main(int argc, char** argv) -> int
     auto const dir_out = std::filesystem::path { argv[3] };
     std::filesystem::create_directories(dir_out);
 
-    auto src = cairo::image_surface_create(img_out_color);
-    auto surface = cairo::image_surface_create(cairo::format::argb32, { width, height });
-    auto cr = cairo::cairo::create(surface);
+    auto src = gfx::cairo::image_surface_create(img_out_color);
+    auto surface = gfx::cairo::image_surface_create(gfx::cairo::format::argb32, { width, height });
+    auto cr = gfx::cairo::cairo::create(surface);
 
-    cr.select_font_face("monospace", cairo::font_slant::normal, cairo::font_weight::normal);
+    cr.select_font_face("monospace", gfx::cairo::font_slant::normal, gfx::cairo::font_weight::normal);
     cr.set_font_size(12.0);
 
     for (std::size_t i = 0; i < out.size(); ++i) {
@@ -471,16 +471,16 @@ auto main(int argc, char** argv) -> int
         };
 
         // plot
-        cmap::viridis.map_into(img_out_color, img_out, {{ 0.1f, 0.7f }});
+        gfx::cmap::viridis.map_into(img_out_color, img_out, {{ 0.1f, 0.7f }});
 
         // plot heatmap
-        auto m = cairo::matrix::identity();
+        auto m = gfx::cairo::matrix::identity();
         m.translate({ 0.0, img_h });
         m.scale({ img_w / win_w, -img_h / win_h });
 
-        auto p = cairo::pattern::create_for_surface(src);
+        auto p = gfx::cairo::pattern::create_for_surface(src);
         p.set_matrix(m);
-        p.set_filter(cairo::filter::nearest);
+        p.set_filter(gfx::cairo::filter::nearest);
 
         cr.set_source(p);
         cr.rectangle({ 0, 0 }, { win_w, win_h });
@@ -502,7 +502,7 @@ auto main(int argc, char** argv) -> int
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 
             // standard deviation
-            cr.set_source(cmap::srgba { 0.0, 0.0, 0.0, 0.33 });
+            cr.set_source(gfx::srgba { 0.0, 0.0, 0.0, 0.33 });
 
             cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
             cr.line_to(t({ mean.x + 0.5 + v1.x, mean.y + 0.5 + v1.y }));
@@ -513,7 +513,7 @@ auto main(int argc, char** argv) -> int
             cr.stroke();
 
             // mean
-            cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
+            cr.set_source(gfx::srgb { 1.0, 0.0, 0.0 });
 
             cr.move_to(t({ mean.x + 0.1, mean.y + 0.5 }));
             cr.line_to(t({ mean.x + 0.9, mean.y + 0.5 }));
@@ -524,7 +524,7 @@ auto main(int argc, char** argv) -> int
             cr.stroke();
 
             // standard deviation ellipse
-            cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
+            cr.set_source(gfx::srgb { 1.0, 0.0, 0.0 });
 
             cr.save();
 
@@ -537,7 +537,7 @@ auto main(int argc, char** argv) -> int
             cr.stroke();
 
             // stats
-            cr.set_source(cmap::srgb { 1.0, 1.0, 1.0 });
+            cr.set_source(gfx::srgb { 1.0, 1.0, 1.0 });
 
             std::snprintf(txtbuf.data(), txtbuf.size(), "c:%.02f", confidence);
             cr.move_to(t({ mean.x - 3.5, mean.y + 3.0 }));

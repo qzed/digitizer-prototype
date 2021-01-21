@@ -12,7 +12,7 @@
 #include <cairo/cairo.h>
 
 
-namespace cairo {
+namespace gfx::cairo {
 
 using status_t = cairo_status_t;
 
@@ -85,8 +85,8 @@ public:
     auto status() const -> status_t;
 
     void set_source(pattern& p);
-    void set_source(cmap::srgb rgb);
-    void set_source(cmap::srgba rgba);
+    void set_source(srgb rgb);
+    void set_source(srgba rgba);
     void set_source(surface& src, vec2<f64> origin);
     auto get_source() -> pattern;
 
@@ -264,12 +264,12 @@ inline void cairo::set_source(pattern& p)
     cairo_set_source(m_raw, *p);
 }
 
-inline void cairo::set_source(cmap::srgb c)
+inline void cairo::set_source(srgb c)
 {
     cairo_set_source_rgb(m_raw, c.r, c.g, c.b);
 }
 
-inline void cairo::set_source(cmap::srgba c)
+inline void cairo::set_source(srgba c)
 {
     cairo_set_source_rgba(m_raw, c.r, c.g, c.b, c.a);
 }
@@ -536,13 +536,13 @@ template<typename T>
 constexpr auto pixel_format() -> format;
 
 template<>
-inline constexpr auto pixel_format<cmap::srgba>() -> format
+inline constexpr auto pixel_format<srgba>() -> format
 {
     return format::rgba128f;
 }
 
 template<>
-inline constexpr auto pixel_format<cmap::srgb>() -> format
+inline constexpr auto pixel_format<srgb>() -> format
 {
     return format::rgb96f;
 }
@@ -589,4 +589,4 @@ inline auto image_surface_create(image<T>& image) -> surface
     return s;
 }
 
-} /* namespace cairo */
+} /* namespace gfx::cairo */

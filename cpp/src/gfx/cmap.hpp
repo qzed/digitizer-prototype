@@ -11,7 +11,7 @@
 #include <cassert>
 
 
-namespace cmap {
+namespace gfx::cmap {
 
 template<typename T>
 auto normalized(T const& value, std::pair<T, T> range) -> f32
@@ -384,4 +384,4 @@ inline const lut<256> viridis {
     srgb { 0.993248, 0.906157, 0.143936 },
 };
 
-} /* namespace cmap */
+}   /* namespace gfx::cmap */

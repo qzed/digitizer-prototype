@@ -13,16 +13,38 @@ using clock = std::chrono::high_resolution_clock;
 
 class token {
 private:
-    std::size_t m_index;
-
-private:
     friend class registry;
 
-    inline token(std::size_t index);
+    token(std::size_t index);
+
+private:
+    std::size_t m_index;
 };
 
 
-struct entry {
+class entry {
+public:
+    entry(std::string name);
+
+    template<class D>
+    auto total() const -> D;
+
+    template<class D>
+    auto min() const -> D;
+
+    template<class D>
+    auto max() const -> D;
+
+    template<class D>
+    auto mean() const -> D;
+
+    template<class D>
+    auto var() const -> D;
+
+    template<class D>
+    auto stddev() const -> D;
+
+public:
     std::string name;
 
     unsigned int n_measurements;
@@ -32,44 +54,22 @@ struct entry {
 
     double r_mean_ns;
     double r_var_ns;
-
-public:
-    inline entry(std::string name);
-
-    template<class D>
-    inline auto total() const -> D;
-
-    template<class D>
-    inline auto min() const -> D;
-
-    template<class D>
-    inline auto max() const -> D;
-
-    template<class D>
-    inline auto mean() const -> D;
-
-    template<class D>
-    inline auto var() const -> D;
-
-    template<class D>
-    inline auto stddev() const -> D;
 };
 
 
 class measurement {
 public:
-    inline ~measurement();
-
-    inline void stop();
-
-private:
-    entry& m_entry;
-    clock::time_point m_start;
+    ~measurement();
+    void stop();
 
 private:
     friend class registry;
 
-    inline measurement(entry& e, clock::time_point start);
+    measurement(entry& e, clock::time_point start);
+
+private:
+    entry& m_entry;
+    clock::time_point m_start;
 };
 
 
@@ -189,25 +189,25 @@ inline void measurement::stop()
 }
 
 
-auto registry::create_entry(std::string name) -> token
+inline auto registry::create_entry(std::string name) -> token
 {
     m_entries.emplace_back(std::move(name));
     return token { m_entries.size() - 1 };
 }
 
-auto registry::record(token const& t) -> measurement
+inline auto registry::record(token const& t) -> measurement
 {
     return measurement { m_entries[t.m_index], clock::now() };
 }
 
-auto registry::get_entry(token const& t) const -> entry const&
+inline auto registry::get_entry(token const& t) const -> entry const&
 {
     return m_entries[t.m_index];
 }
 
-auto registry::entries() const -> std::vector<entry> const&
+inline auto registry::entries() const -> std::vector<entry> const&
 {
     return m_entries;
 }
 
-}    /* namespace eval::perf */
+}   /* namespace eval::perf */

@@ -89,6 +89,7 @@ public:
     void save();
     void restore();
 
+    void translate(vec2<f64> s);
     void scale(vec2<f64> s);
 
     void move_to(vec2<f64> pos);
@@ -274,6 +275,11 @@ void cairo::save()
 void cairo::restore()
 {
     cairo_restore(m_raw);
+}
+
+void cairo::translate(vec2<f64> v)
+{
+    cairo_translate(m_raw, v.x, v.y);
 }
 
 void cairo::scale(vec2<f64> s)

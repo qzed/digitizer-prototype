@@ -539,6 +539,12 @@ inline constexpr auto pixel_format<cmap::srgba>() -> format
     return format::rgba128f;
 }
 
+template<>
+inline constexpr auto pixel_format<cmap::srgb>() -> format
+{
+    return format::rgb96f;
+}
+
 
 inline auto image_surface_create(format fmt, vec2<i32> shape) -> surface
 {

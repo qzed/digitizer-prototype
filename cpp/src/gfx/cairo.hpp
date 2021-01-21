@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cmap.hpp"
+#include "color.hpp"
+
 #include "../math.hpp"
 
 #include <exception>

@@ -573,7 +573,7 @@ auto solve_quadratic(T a, T b, T c, T eps=static_cast<T>(1e-20)) -> std::array<T
         return { -b / a, zero<T>() };
     }
 
-    // Note: Does not preven ptotential overflows in b^2
+    // Note: Does not prevent potential overflows in b^2
 
     // stable(-ish) algorithm: prevent cancellation
     auto const r1 = (-b - std::copysign(std::sqrt(b * b - 4 * a * c), b)) / (2 * a);

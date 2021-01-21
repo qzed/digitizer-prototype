@@ -20,8 +20,15 @@ class matrix;
 
 
 enum class format {
-    argb32   = CAIRO_FORMAT_ARGB32,
-    rgba128f = CAIRO_FORMAT_RGBA128F,
+    invalid   = CAIRO_FORMAT_INVALID,
+    argb32    = CAIRO_FORMAT_ARGB32,
+    rgb24     = CAIRO_FORMAT_RGB24,
+    a8        = CAIRO_FORMAT_A8,
+    a1        = CAIRO_FORMAT_A1,
+    rgb16_565 = CAIRO_FORMAT_RGB16_565,
+    rbg30     = CAIRO_FORMAT_RGB30,
+    rgb96f    = CAIRO_FORMAT_RGB96F,
+    rgba128f  = CAIRO_FORMAT_RGBA128F,
 };
 
 enum class filter {

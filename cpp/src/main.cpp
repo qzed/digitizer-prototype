@@ -20,8 +20,8 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
 #include <chrono>
+#include <filesystem>
 
 #include <cairo/cairo.h>
 
@@ -448,6 +448,9 @@ auto main(int argc, char** argv) -> int
     auto width = 900;
     auto height = 600;
 
+    auto const dir_out = std::filesystem::path { argv[3] };
+    std::filesystem::create_directories(dir_out);
+
     auto src = cairo::image_surface_create(img_out_color);
     auto surface = cairo::image_surface_create(cairo::format::argb32, { width, height });
     auto cr = cairo::cairo::create(surface);
@@ -551,13 +554,9 @@ auto main(int argc, char** argv) -> int
         }
 
         // write file
-        std::ostringstream oss;
-        oss << argv[3] << "/out-";
-        oss << std::setfill('0') << std::setw(4) << i;
-        oss << ".png";
+        auto fname = std::array<char, 32>{};
+        std::snprintf(fname.data(), fname.size(), "out-%04ld.png", i);
 
-        auto const file_out = oss.str();
-
-        cairo_surface_write_to_png(surface.raw(), file_out.c_str());
+        surface.write_to_png(dir_out / fname.data());
     }
 }

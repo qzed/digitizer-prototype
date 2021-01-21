@@ -13,6 +13,7 @@ namespace cairo {
 using status_t = cairo_status_t;
 
 class surface;
+class matrix;
 
 
 class exception : public std::exception {
@@ -110,6 +111,24 @@ public:
     auto operator* () -> cairo_surface_t*;
 
     auto status() const -> status_t;
+};
+
+
+class matrix {
+private:
+    cairo_matrix_t m_raw;
+
+public:
+    matrix();
+    matrix(cairo_matrix_t m);
+
+    static auto identity() -> matrix;
+
+    auto raw() -> cairo_matrix_t*;
+    auto operator* () -> cairo_matrix_t*;
+
+    void translate(vec2<f64> v);
+    void scale(vec2<f64> v);
 };
 
 
@@ -282,6 +301,42 @@ auto surface::status() const -> cairo_status_t
 }
 
 
+matrix::matrix()
+    : m_raw{}
+{}
+
+matrix::matrix(cairo_matrix_t m)
+    : m_raw{m}
+{}
+
+auto matrix::identity() -> matrix
+{
+    auto m = matrix{};
+    cairo_matrix_init_identity(&m.m_raw);
+    return m;
+}
+
+auto matrix::raw() -> cairo_matrix_t*
+{
+    return &m_raw;
+}
+
+auto matrix::operator* () -> cairo_matrix_t*
+{
+    return &m_raw;
+}
+
+void matrix::translate(vec2<f64> v)
+{
+    cairo_matrix_translate(&m_raw, v.x, v.y);
+}
+
+void matrix::scale(vec2<f64> s)
+{
+    cairo_matrix_scale(&m_raw, s.x, s.y);
+}
+
+
 template<typename T>
 constexpr auto pixel_format() -> format;
 
@@ -332,6 +387,5 @@ auto image_surface_create(image<T>& image) -> surface
 
     return s;
 }
-
 
 } /* namespace cairo */

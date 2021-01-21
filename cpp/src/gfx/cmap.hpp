@@ -6,9 +6,9 @@
 #include "../math.hpp"
 
 #include <algorithm>
-#include <optional>
-#include <cmath>
 #include <cassert>
+#include <cmath>
+#include <optional>
 
 
 namespace gfx::cmap {

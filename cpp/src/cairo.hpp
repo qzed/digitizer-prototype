@@ -13,6 +13,7 @@ namespace cairo {
 using status_t = cairo_status_t;
 
 class surface;
+class pattern;
 class matrix;
 
 
@@ -73,9 +74,11 @@ public:
 
     auto status() const -> status_t;
 
+    void set_source(pattern& p);
     void set_source(cmap::srgb rgb);
     void set_source(cmap::srgba rgba);
     void set_source(surface& src, vec2<f64> origin);
+    auto get_source() -> pattern;
 
     void set_source_filter(filter f);
 
@@ -111,6 +114,32 @@ public:
     auto operator* () -> cairo_surface_t*;
 
     auto status() const -> status_t;
+};
+
+
+class pattern {
+private:
+    cairo_pattern_t* m_raw;
+
+public:
+    pattern();
+    pattern(cairo_pattern_t* raw);
+    pattern(pattern const& other);
+    pattern(pattern&& other);
+    ~pattern();
+
+    static auto create_for_surface(surface &surface) -> pattern;
+
+    void operator=(pattern const& rhs);
+    void operator=(pattern&& rhs);
+
+    auto raw() -> cairo_pattern_t*;
+    auto operator* () -> cairo_pattern_t*;
+
+    auto status() const -> status_t;
+
+    void set_matrix(matrix &m);
+    void set_filter(filter f);
 };
 
 
@@ -191,6 +220,11 @@ auto cairo::status() const -> cairo_status_t
     return cairo_status(m_raw);
 }
 
+void cairo::set_source(pattern& p)
+{
+    cairo_set_source(m_raw, *p);
+}
+
 void cairo::set_source(cmap::srgb c)
 {
     cairo_set_source_rgb(m_raw, c.r, c.g, c.b);
@@ -204,6 +238,11 @@ void cairo::set_source(cmap::srgba c)
 void cairo::set_source(surface& src, vec2<f64> origin)
 {
     cairo_set_source_surface(m_raw, *src, origin.x, origin.y);
+}
+
+auto cairo::get_source() -> pattern
+{
+    return { cairo_pattern_reference(cairo_get_source(m_raw)) };
 }
 
 void cairo::set_source_filter(filter f)
@@ -298,6 +337,70 @@ auto surface::operator* () -> cairo_surface_t*
 auto surface::status() const -> cairo_status_t
 {
     return cairo_surface_status(m_raw);
+}
+
+
+pattern::pattern()
+    : m_raw{}
+{}
+
+pattern::pattern(cairo_pattern_t* raw)
+    : m_raw{raw}
+{}
+
+pattern::pattern(pattern const& other)
+    : m_raw{other.m_raw ? cairo_pattern_reference(other.m_raw) : nullptr}
+{}
+
+pattern::pattern(pattern&& other)
+    : m_raw{std::exchange(other.m_raw, nullptr)}
+{}
+
+pattern::~pattern()
+{
+    if (m_raw) {
+        cairo_pattern_destroy(m_raw);
+    }
+}
+
+auto pattern::create_for_surface(surface &surface) -> pattern
+{
+    return { cairo_pattern_create_for_surface(*surface) };
+}
+
+void pattern::operator=(pattern const& rhs)
+{
+    m_raw = rhs.m_raw ? cairo_pattern_reference(rhs.m_raw) : nullptr;
+}
+
+void pattern::operator=(pattern&& rhs)
+{
+    m_raw = std::exchange(rhs.m_raw, nullptr);
+}
+
+auto pattern::raw() -> cairo_pattern_t*
+{
+    return m_raw;
+}
+
+auto pattern::operator* () -> cairo_pattern_t*
+{
+    return m_raw;
+}
+
+auto pattern::status() const -> status_t
+{
+    return cairo_pattern_status(m_raw);
+}
+
+void pattern::set_matrix(matrix &m)
+{
+    return cairo_pattern_set_matrix(m_raw, *m);
+}
+
+void pattern::set_filter(filter f)
+{
+    return cairo_pattern_set_filter(m_raw, static_cast<cairo_filter_t>(f));
 }
 
 

@@ -32,7 +32,12 @@ enum class format {
 };
 
 enum class filter {
-    nearest = CAIRO_FILTER_NEAREST,
+    fast     = CAIRO_FILTER_FAST,
+    good     = CAIRO_FILTER_GOOD,
+    best     = CAIRO_FILTER_BEST,
+    nearest  = CAIRO_FILTER_NEAREST,
+    bilinear = CAIRO_FILTER_BILINEAR,
+    gaussian = CAIRO_FILTER_GAUSSIAN,
 };
 
 enum class font_slant {

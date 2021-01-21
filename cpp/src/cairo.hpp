@@ -84,6 +84,7 @@ public:
 
     void paint();
     void fill();
+    void stroke();
 
     void save();
     void restore();
@@ -258,6 +259,11 @@ void cairo::paint()
 void cairo::fill()
 {
     cairo_fill(m_raw);
+}
+
+void cairo::stroke()
+{
+    cairo_stroke(m_raw);
 }
 
 void cairo::save()

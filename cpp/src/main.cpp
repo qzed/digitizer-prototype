@@ -505,7 +505,7 @@ auto main(int argc, char** argv) -> int
             cr.line_to(t({ mean.x + 0.5 + v2.x, mean.y + 0.5 + v2.y }));
         }
 
-        cairo_stroke(*cr);
+        cr.stroke();
 
         std::ostringstream oss;
         oss << argv[3] << "/out-";

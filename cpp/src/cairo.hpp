@@ -91,6 +91,7 @@ public:
 
     void translate(vec2<f64> s);
     void scale(vec2<f64> s);
+    void rotate(f64 angle);
 
     void move_to(vec2<f64> pos);
     void line_to(vec2<f64> pos);
@@ -285,6 +286,11 @@ void cairo::translate(vec2<f64> v)
 void cairo::scale(vec2<f64> s)
 {
     cairo_scale(m_raw, s.x, s.y);
+}
+
+void cairo::rotate(f64 angle)
+{
+    cairo_rotate(m_raw, angle);
 }
 
 void cairo::move_to(vec2<f64> pos)

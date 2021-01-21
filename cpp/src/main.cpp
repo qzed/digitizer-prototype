@@ -178,7 +178,7 @@ auto main(int argc, char** argv) -> int
     auto out = std::vector<image<f32>>{};
     out.reserve(heatmaps.size());
 
-    auto out_tp = std::vector<std::vector<std::pair<vec2<f32>, mat2s<f32>>>>{};
+    auto out_tp = std::vector<std::vector<std::tuple<f32, f32, vec2<f32>, mat2s<f32>>>>{};
     out_tp.reserve(heatmaps.size());
 
     std::cout << "Processing..." << std::endl;
@@ -411,7 +411,11 @@ auto main(int argc, char** argv) -> int
                 out_tp.back().reserve(16);
                 for (auto const& p : gfparams) {
                     if (p.valid) {
-                        out_tp.back().push_back({ p.mean, p.prec });
+                        auto const x = static_cast<index>(p.mean.x);
+                        auto const y = static_cast<index>(p.mean.y);
+                        auto const cs = cscore.at(img_lbl[{ x, y }] - 1);
+
+                        out_tp.back().push_back({ cs, p.scale, p.mean, p.prec });
                     }
                 }
             }
@@ -448,6 +452,9 @@ auto main(int argc, char** argv) -> int
     auto surface = cairo::image_surface_create(cairo::format::argb32, { width, height });
     auto cr = cairo::cairo::create(surface);
 
+    cr.select_font_face("monospace", cairo::font_slant::normal, cairo::font_weight::normal);
+    cr.set_font_size(12.0);
+
     for (std::size_t i = 0; i < out.size(); ++i) {
         auto const& img_out = out[i];
 
@@ -477,8 +484,10 @@ auto main(int argc, char** argv) -> int
         cr.rectangle({ 0, 0 }, { win_w, win_h });
         cr.fill();
 
+        auto txtbuf = std::array<char, 32>{};
+
         // plot touch-points
-        for (auto const [mean, prec] : out_tp[i]) {
+        for (auto const [confidence, scale, mean, prec] : out_tp[i]) {
             auto const eigen = eigenvectors(inv(prec).value());
 
             // get standard deviation
@@ -524,6 +533,21 @@ auto main(int argc, char** argv) -> int
 
             cr.restore();
             cr.stroke();
+
+            // stats
+            cr.set_source(cmap::srgb { 1.0, 1.0, 1.0 });
+
+            std::snprintf(txtbuf.data(), txtbuf.size(), "c:%.02f", confidence);
+            cr.move_to(t({ mean.x - 3.5, mean.y + 3.0 }));
+            cr.show_text(txtbuf.data());
+
+            std::snprintf(txtbuf.data(), txtbuf.size(), "a:%.02f", std::max(s1, s2) / std::min(s1, s2));
+            cr.move_to(t({ mean.x - 3.5, mean.y + 2.0 }));
+            cr.show_text(txtbuf.data());
+
+            std::snprintf(txtbuf.data(), txtbuf.size(), "s:%.02f", scale);
+            cr.move_to(t({ mean.x - 3.5, mean.y + 1.0 }));
+            cr.show_text(txtbuf.data());
         }
 
         // write file

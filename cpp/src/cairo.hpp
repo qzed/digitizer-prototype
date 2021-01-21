@@ -96,6 +96,7 @@ public:
     void move_to(vec2<f64> pos);
     void line_to(vec2<f64> pos);
     void rectangle(vec2<f64> origin, vec2<f64> size);
+    void arc(vec2<f64> center, f64 radius, f64 angle1, f64 angle2);
 };
 
 
@@ -306,6 +307,11 @@ void cairo::line_to(vec2<f64> pos)
 void cairo::rectangle(vec2<f64> origin, vec2<f64> size)
 {
     cairo_rectangle(m_raw, origin.x, origin.y, size.x, size.y);
+}
+
+void cairo::arc(vec2<f64> center, f64 radius, f64 angle1, f64 angle2)
+{
+    cairo_arc(m_raw, center.x, center.y, radius, angle1, angle2);
 }
 
 

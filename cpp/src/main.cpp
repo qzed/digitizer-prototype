@@ -464,6 +464,7 @@ auto main(int argc, char** argv) -> int
         // plot
         cmap::viridis.map_into(img_out_color, img_out, {{ 0.0f, 0.3f }});
 
+        // plot heatmap
         auto m = cairo::matrix::identity();
         m.translate({ 0.0, img_h });
         m.scale({ img_w / win_w, -img_h / win_h });
@@ -476,6 +477,7 @@ auto main(int argc, char** argv) -> int
         cr.rectangle({ 0, 0 }, { win_w, win_h });
         cr.fill();
 
+        // plot touch-points
         cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
 
         for (auto const [mean, prec] : out_tp[i]) {
@@ -488,12 +490,14 @@ auto main(int argc, char** argv) -> int
             auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 
+            // mean
             cr.move_to(t({ mean.x + 0.1, mean.y + 0.5 }));
             cr.line_to(t({ mean.x + 0.9, mean.y + 0.5 }));
 
             cr.move_to(t({ mean.x + 0.5, mean.y + 0.1 }));
             cr.line_to(t({ mean.x + 0.5, mean.y + 0.9 }));
 
+            // standard deviation
             cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
             cr.line_to(t({ mean.x + 0.5 + v1.x, mean.y + 0.5 + v1.y }));
 

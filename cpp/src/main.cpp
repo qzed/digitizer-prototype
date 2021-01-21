@@ -457,6 +457,10 @@ auto main(int argc, char** argv) -> int
         auto const win_w = static_cast<f64>(width);
         auto const win_h = static_cast<f64>(height);
 
+        auto const t = [&](vec2<f64> p) -> vec2<f64> {
+            return { p.x * (win_w / img_w), win_h - p.y * (win_h / img_h) };
+        };
+
         // plot
         cmap::viridis.map_into(img_out_color, img_out, {{ 0.0f, 0.3f }});
 
@@ -484,17 +488,17 @@ auto main(int argc, char** argv) -> int
             auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 
-            cr.move_to({ (mean.x + 0.1) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
-            cr.line_to({ (mean.x + 0.9) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
+            cr.move_to(t({ mean.x + 0.1, mean.y + 0.5 }));
+            cr.line_to(t({ mean.x + 0.9, mean.y + 0.5 }));
 
-            cr.move_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.1) * (win_h / img_h) });
-            cr.line_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.9) * (win_h / img_h) });
+            cr.move_to(t({ mean.x + 0.5, mean.y + 0.1 }));
+            cr.line_to(t({ mean.x + 0.5, mean.y + 0.9 }));
 
-            cr.move_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
-            cr.line_to({ (mean.x + 0.5 + v1.x) * (win_w / img_w), win_h - (mean.y + 0.5 + v1.y) * (win_h / img_h) });
+            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
+            cr.line_to(t({ mean.x + 0.5 + v1.x, mean.y + 0.5 + v1.y }));
 
-            cr.move_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
-            cr.line_to({ (mean.x + 0.5 + v2.x) * (win_w / img_w), win_h - (mean.y + 0.5 + v2.y) * (win_h / img_h) });
+            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
+            cr.line_to(t({ mean.x + 0.5 + v2.x, mean.y + 0.5 + v2.y }));
         }
 
         cairo_stroke(*cr);

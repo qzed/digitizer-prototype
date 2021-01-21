@@ -451,19 +451,25 @@ auto main(int argc, char** argv) -> int
     for (std::size_t i = 0; i < out.size(); ++i) {
         auto const& img_out = out[i];
 
+        auto const img_w = static_cast<f64>(img_out.shape().x);
+        auto const img_h = static_cast<f64>(img_out.shape().y);
+
+        auto const win_w = static_cast<f64>(width);
+        auto const win_h = static_cast<f64>(height);
+
         // plot
         cmap::viridis.map_into(img_out_color, img_out, {{ 0.0f, 0.3f }});
 
         auto m = cairo::matrix::identity();
-        m.translate({0.0, 48.0});
-        m.scale({72.0 / width, -48.0 / height});
+        m.translate({ 0.0, img_h });
+        m.scale({ img_w / win_w, -img_h / win_h });
 
         auto p = cairo::pattern::create_for_surface(src);
         p.set_matrix(m);
         p.set_filter(cairo::filter::nearest);
 
         cr.set_source(p);
-        cr.rectangle({ 0, 0 }, { static_cast<f64>(width), static_cast<f64>(height) });
+        cr.rectangle({ 0, 0 }, { win_w, win_h });
         cr.fill();
 
         cr.set_source(cmap::srgb { 1.0, 0.0, 0.0 });
@@ -477,17 +483,17 @@ auto main(int argc, char** argv) -> int
             auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
             auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
 
-            cr.move_to({(mean.x + 0.1) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
-            cr.line_to({(mean.x + 0.9) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
+            cr.move_to({ (mean.x + 0.1) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
+            cr.line_to({ (mean.x + 0.9) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
 
-            cr.move_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.1) * (height / 48.0)});
-            cr.line_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.9) * (height / 48.0)});
+            cr.move_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.1) * (win_h / img_h) });
+            cr.line_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.9) * (win_h / img_h) });
 
-            cr.move_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
-            cr.line_to({(mean.x + 0.5 + v1.x) * (width / 72.0), height - (mean.y + 0.5 + v1.y) * (height / 48.0)});
+            cr.move_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
+            cr.line_to({ (mean.x + 0.5 + v1.x) * (win_w / img_w), win_h - (mean.y + 0.5 + v1.y) * (win_h / img_h) });
 
-            cr.move_to({(mean.x + 0.5) * (width / 72.0), height - (mean.y + 0.5) * (height / 48.0)});
-            cr.line_to({(mean.x + 0.5 + v2.x) * (width / 72.0), height - (mean.y + 0.5 + v2.y) * (height / 48.0)});
+            cr.move_to({ (mean.x + 0.5) * (win_w / img_w), win_h - (mean.y + 0.5) * (win_h / img_h) });
+            cr.line_to({ (mean.x + 0.5 + v2.x) * (win_w / img_w), win_h - (mean.y + 0.5 + v2.y) * (win_h / img_h) });
         }
 
         cairo_stroke(*cr);

@@ -4,6 +4,7 @@ project(
     default_options: [
         'cpp_std=c++17',
         'buildtype=debugoptimized',
+        'warning_level=3',
     ]
 )
 
@@ -41,6 +42,9 @@ endif
 if get_option('simd_type') != ''
     add_project_arguments('-m' + get_option('simd_type'), language: 'cpp')
 endif
+
+# don't warn about unused parameters for now
+add_project_arguments('-Wno-unused-parameter', language: 'cpp')
 
 cairo_dep = dependency('cairo')
 

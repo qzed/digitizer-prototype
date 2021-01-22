@@ -24,7 +24,7 @@ auto normalize(T const& value, std::pair<T, T> range) -> f32
     return std::clamp(v / n, 0.0f, 1.0f);
 }
 
-}   /* namespace impl */
+} /* namespace impl */
 
 
 class cmap {
@@ -1242,4 +1242,4 @@ inline const lut<256> viridis {
     srgb { 0.993248, 0.906157, 0.143936 },
 };
 
-}   /* namespace gfx::cmap */
+} /* namespace gfx::cmap */

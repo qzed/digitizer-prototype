@@ -210,4 +210,4 @@ inline auto registry::entries() const -> std::vector<entry> const&
     return m_entries;
 }
 
-}   /* namespace eval::perf */
+} /* namespace eval::perf */

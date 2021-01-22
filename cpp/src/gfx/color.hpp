@@ -44,4 +44,4 @@ constexpr auto srgba::from(f32 r, f32 g, f32 b) -> srgba
     return {r, g, b, 1.0};
 }
 
-}   /* namespace gfx */
+} /* namespace gfx */

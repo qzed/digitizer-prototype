@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../math.hpp"
-
 #include "../utils/access.hpp"
 
 #include <array>
@@ -43,7 +42,6 @@ constexpr auto mat6<T>::identity() -> mat6<T>
         _0, _0, _0, _0, _0, _1,
     };
 }
-
 
 template<typename T>
 constexpr auto mat6<T>::operator[] (index2 i) -> T&
@@ -195,7 +193,6 @@ void lu_solve(mat6<T> const& lu, vec6<index> const& p, vec6<T> const& b, vec6<T>
     x[0] = y[0] - lu[{0, 5}] * x[5] - lu[{0, 4}] * x[4] - lu[{0, 3}] * x[3] - lu[{0, 2}] * x[2] - lu[{0, 1}] * x[1];
     x[0] /= lu[{0, 0}];
 }
-
 
 /**
  * ge_solve() - Solve a system of linear equations via Gaussian elimination.

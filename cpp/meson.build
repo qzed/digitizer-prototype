@@ -8,6 +8,8 @@ project(
     ]
 )
 
+
+# options
 opt_access_checks = true
 opt_fast_math = false
 
@@ -46,6 +48,10 @@ endif
 # don't warn about unused parameters for now
 add_project_arguments('-Wno-unused-parameter', language: 'cpp')
 
+
+# dependencies
 cairo_dep = dependency('cairo')
 
+
+# binaries
 executable('main', 'src/main.cpp', dependencies: [cairo_dep])

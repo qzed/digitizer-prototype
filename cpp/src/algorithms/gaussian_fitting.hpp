@@ -28,7 +28,7 @@ struct vec6 {
 
 
 template<class T>
-constexpr auto mat6<T>::identity() -> mat6<T>
+inline constexpr auto mat6<T>::identity() -> mat6<T>
 {
     auto const _0 = static_cast<T>(0);
     auto const _1 = static_cast<T>(1);
@@ -44,7 +44,7 @@ constexpr auto mat6<T>::identity() -> mat6<T>
 }
 
 template<typename T>
-constexpr auto mat6<T>::operator[] (index2 i) -> T&
+inline constexpr auto mat6<T>::operator[] (index2 i) -> T&
 {
     return utils::access::access(data, i.x * 6 + i.y,
                                  i.x >= 0 && i.x < 6 && i.y >= 0 && i.y < 6,
@@ -52,7 +52,7 @@ constexpr auto mat6<T>::operator[] (index2 i) -> T&
 }
 
 template<typename T>
-constexpr auto mat6<T>::operator[] (index2 i) const -> T const&
+inline constexpr auto mat6<T>::operator[] (index2 i) const -> T const&
 {
     return utils::access::access(data, i.x * 6 + i.y,
                                  i.x >= 0 && i.x < 6 && i.y >= 0 && i.y < 6,
@@ -61,13 +61,13 @@ constexpr auto mat6<T>::operator[] (index2 i) const -> T const&
 
 
 template<typename T>
-constexpr auto vec6<T>::operator[] (index i) -> T&
+inline constexpr auto vec6<T>::operator[] (index i) -> T&
 {
     return utils::access::access(data, i);
 }
 
 template<typename T>
-constexpr auto vec6<T>::operator[] (index i) const -> T const&
+inline constexpr auto vec6<T>::operator[] (index i) const -> T const&
 {
     return utils::access::access(data, i);
 }

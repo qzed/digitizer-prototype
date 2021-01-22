@@ -18,13 +18,13 @@ template<>
 auto zero() -> f32
 {
     return 0.0;
-};
+}
 
 template<>
 auto zero() -> f64
 {
     return 0.0f;
-};
+}
 
 
 template<typename T>
@@ -99,13 +99,13 @@ template<>
 auto zero() -> vec2<f32>
 {
     return { 0.0f, 0.0f };
-};
+}
 
 template<>
 auto zero() -> vec2<f64>
 {
     return { 0.0, 0.0 };
-};
+}
 
 
 template<typename T>
@@ -137,13 +137,13 @@ template<>
 auto zero() -> mat2<f32>
 {
     return { 0.0f, 0.0f, 0.0f, 0.0f };
-};
+}
 
 template<>
 auto zero() -> mat2<f64>
 {
     return { 0.0, 0.0, 0.0, 0.0 };
-};
+}
 
 
 template<typename T>
@@ -216,13 +216,13 @@ template<>
 auto zero() -> mat2s<f32>
 {
     return { 0.0f, 0.0f, 0.0f };
-};
+}
 
 template<>
 auto zero() -> mat2s<f64>
 {
     return { 0.0, 0.0, 0.0 };
-};
+}
 
 
 using index_t = i32;

@@ -84,7 +84,7 @@ public:
 
 inline auto grayscale_t::map_value(f32 value) const -> srgb {
     return srgb::from(value, value, value);
-};
+}
 
 
 /*
@@ -136,7 +136,7 @@ inline auto cubehelix_t::map_value(f32 value) const -> srgb {
 
     // need to clip as color may be out of range under certain parameters
     return srgb::from(std::clamp(r, 0.f, 1.f), std::clamp(g, 0.f, 1.f), std::clamp(b, 0.f, 1.f));
-};
+}
 
 inline auto cubehelix(f32 start=0.5f, f32 rotations=-1.5f, f32 hue=1.2f, f32 gamma=1.0f) -> cubehelix_t
 {
@@ -174,7 +174,7 @@ auto lut<N>::map_value(f32 value) const -> srgb {
     auto const cb = m_table[static_cast<std::size_t>(b)];
 
     return (v - a) * cb + (1.0f - (v - a)) * ca;
-};
+}
 
 
 inline const grayscale_t grayscale {};

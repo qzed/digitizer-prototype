@@ -5,15 +5,15 @@
 #include "hessian.hpp"
 
 
-template<>
-void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
-{
-    assert(in.shape() == out.shape());
+namespace impl {
 
+template<typename T>
+void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
+{
     // kernels
-    auto const& kxx = kernels::sobel3_xx<f32>;
-    auto const& kyy = kernels::sobel3_yy<f32>;
-    auto const& kxy = kernels::sobel3_xy<f32>;
+    auto const& kxx = kernels::sobel3_xx<T>;
+    auto const& kyy = kernels::sobel3_yy<T>;
+    auto const& kxy = kernels::sobel3_xy<T>;
 
     // strides for data access
     index const s_left      = -1;
@@ -42,7 +42,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
     // x = 0, y = 0
     {
-        auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_center] * kxx[k_center];
         h.xy += in[i + s_center] * kxy[k_center];
@@ -66,7 +66,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
     // 0 < x < n - 1, y = 0
     for (; i < in.shape().x - 1; ++i) {
-        auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_left] * kxx[k_left];
         h.xy += in[i + s_left] * kxy[k_left];
@@ -97,7 +97,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
     // x = n - 1, y = 0
     {
-        auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_left] * kxx[k_left];
         h.xy += in[i + s_left] * kxy[k_left];
@@ -123,7 +123,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
     while (i < in.shape().x * (in.shape().y - 1)) {
         // x = 0
         {
-            auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+            auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
             h.xx += in[i + s_top] * kxx[k_top];
             h.xy += in[i + s_top] * kxy[k_top];
@@ -156,7 +156,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
         // 0 < x < n - 1
         auto const limit = i + in.shape().x - 2;
         for (; i < limit; ++i) {
-            auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+            auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
             h.xx += in[i + s_top_left] * kxx[k_top_left];
             h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -199,7 +199,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
         // x = n - 1
         {
-            auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+            auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
             h.xx += in[i + s_top_left] * kxx[k_top_left];
             h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -232,7 +232,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
     // x = 0, y = n - 1
     {
-        auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_top] * kxx[k_top];
         h.xy += in[i + s_top] * kxy[k_top];
@@ -256,7 +256,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
     // 0 < x < n - 1, y = n - 1
     for (; i < prod(in.shape()) - 1; ++i) {
-        auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_top_left] * kxx[k_top_left];
         h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -287,7 +287,7 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
 
     // x = n - 1, y = n - 1
     {
-        auto h = mat2s<f32> { 0.0f, 0.0f, 0.0f };
+        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_top_left] * kxx[k_top_left];
         h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -308,3 +308,5 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
         out[i] = h;
     }
 }
+
+} /* namespace impl */

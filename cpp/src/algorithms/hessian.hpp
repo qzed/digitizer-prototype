@@ -5,12 +5,14 @@
 #include "../kernels.hpp"
 #include "convolution.hpp"
 
+#include "hessian.opt.zero.hpp"
+
+
+namespace impl {
 
 template<typename B=border::zero, typename T>
-void hessian(image<mat2s<T>>& out, image<T> const& in)
+void hessian_generic(image<mat2s<T>>& out, image<T> const& in)
 {
-    assert(in.shape() == out.shape());
-
     auto const& kxx = kernels::sobel3_xx<T>;
     auto const& kyy = kernels::sobel3_yy<T>;
     auto const& kxy = kernels::sobel3_xy<T>;
@@ -42,4 +44,17 @@ void hessian(image<mat2s<T>>& out, image<T> const& in)
     }
 }
 
-#include "hessian.opt.hpp"
+} /* namespace impl */
+
+
+template<typename B=border::zero, typename T>
+void hessian(image<mat2s<T>>& out, image<T> const& in)
+{
+    assert(in.shape() == out.shape());
+
+    if constexpr (std::is_same_v<B, border::zero>) {
+        impl::hessian_zero<T>(out, in);
+    } else {
+        impl::hessian_generic<B, T>(out, in);
+    }
+}

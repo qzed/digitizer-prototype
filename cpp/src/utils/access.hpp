@@ -3,10 +3,6 @@
 #include <stdexcept>
 
 
-// TODO: remove
-// #define IPTSD_CONFIG_CHECK_ACCESS 1
-
-
 namespace utils::access {
 
 enum class access_mode {
@@ -15,7 +11,7 @@ enum class access_mode {
 };
 
 
-#ifdef IPTSD_CONFIG_CHECK_ACCESS
+#ifdef IPTSD_CONFIG_ACCESS_CHECKS
 inline static constexpr access_mode mode = access_mode::checked;
 #else
 inline static constexpr access_mode mode = access_mode::unchecked;

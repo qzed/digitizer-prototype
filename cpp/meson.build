@@ -11,6 +11,10 @@ project(
     ]
 )
 
+if get_option('access_checks')
+    add_project_arguments('-DIPTSD_CONFIG_ACCESS_CHECKS', language: 'cpp')
+endif
+
 cairo_dep = dependency('cairo')
 
 executable('main', 'src/main.cpp', dependencies: [cairo_dep])

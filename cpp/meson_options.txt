@@ -1,0 +1,2 @@
+option('access_checks', type: 'boolean', value: false,
+       description: 'Enable memory access checks to debug and prevent segfaults')

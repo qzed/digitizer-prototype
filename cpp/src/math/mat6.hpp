@@ -12,8 +12,8 @@ struct mat6 {
 
     constexpr static auto identity() -> mat6<T>;
 
-    constexpr auto operator[] (index2 i) -> T&;
-    constexpr auto operator[] (index2 i) const -> T const&;
+    constexpr auto operator[] (index2_t i) -> T&;
+    constexpr auto operator[] (index2_t i) const -> T const&;
 };
 
 
@@ -34,7 +34,7 @@ inline constexpr auto mat6<T>::identity() -> mat6<T>
 }
 
 template<typename T>
-inline constexpr auto mat6<T>::operator[] (index2 i) -> T&
+inline constexpr auto mat6<T>::operator[] (index2_t i) -> T&
 {
     return utils::access::access(data, i.x * 6 + i.y,
                                  i.x >= 0 && i.x < 6 && i.y >= 0 && i.y < 6,
@@ -42,7 +42,7 @@ inline constexpr auto mat6<T>::operator[] (index2 i) -> T&
 }
 
 template<typename T>
-inline constexpr auto mat6<T>::operator[] (index2 i) const -> T const&
+inline constexpr auto mat6<T>::operator[] (index2_t i) const -> T const&
 {
     return utils::access::access(data, i.x * 6 + i.y,
                                  i.x >= 0 && i.x < 6 && i.y >= 0 && i.y < 6,

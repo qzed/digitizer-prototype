@@ -23,7 +23,7 @@ namespace math {
  * PA.
  */
 template<class T>
-auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index>& p, T eps) -> bool
+auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index_t>& p, T eps) -> bool
 {
     // initialization
     lu = a;
@@ -32,15 +32,15 @@ auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index>& p, T eps) -> bool
     // TODO: optimize/unroll?
 
     // decomposition
-    for (index c = 0; c < 6 - 1; ++c) {
+    for (index_t c = 0; c < 6 - 1; ++c) {
         // partial pivoting for current column:
         // swap row r >= c with largest absolute value at [r, c] (i.e. in column) with row c
         {
             // step 1: find element with largest absolute value in column
-            index r = 0;
+            index_t r = 0;
             T v = zero<T>();
 
-            for (index i = c; i < 6; ++i) {
+            for (index_t i = c; i < 6; ++i) {
                 auto const vi = std::abs(lu[{i, c}]);
 
                 if (v < vi) {
@@ -56,7 +56,7 @@ auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index>& p, T eps) -> bool
 
             // step 2: permutate, swap row r and c
             if (r != c) {
-                for (index i = 0; i < 6; ++i) {
+                for (index_t i = 0; i < 6; ++i) {
                     std::swap(lu[{r, i}], lu[{c, i}]);      // swap U[r, :] and U[c, :]
                 }
                 std::swap(p[r], p[c]);
@@ -64,12 +64,12 @@ auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index>& p, T eps) -> bool
         }
 
         // LU-decomposition step:
-        for (index r = c + 1; r < 6; ++r) {
+        for (index_t r = c + 1; r < 6; ++r) {
             // L[r, c] = U[r, c] / U[c, c]
             lu[{r, c}] = lu[{r, c}] / lu[{c, c}];
 
             // U[r, :] = U[r, :] - (U[r, c] / U[c, c]) * U[c, :]
-            for (index k = c + 1; k < 6; ++k) {
+            for (index_t k = c + 1; k < 6; ++k) {
                 lu[{r, k}] = lu[{r, k}] - lu[{r, c}] * lu[{c, k}];
             }
         }
@@ -96,7 +96,7 @@ auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index>& p, T eps) -> bool
  * solving Ly = Pb for a temporary vector y and then Ux = y for the desired x.
  */
 template<class T>
-void lu_solve(mat6<T> const& lu, vec6<index> const& p, vec6<T> const& b, vec6<T>& x)
+void lu_solve(mat6<T> const& lu, vec6<index_t> const& p, vec6<T> const& b, vec6<T>& x)
 {
     // step 0: compute Pb
     auto pb = vec6<T> { b[p[0]], b[p[1]], b[p[2]], b[p[3]], b[p[4]], b[p[5]] };
@@ -146,15 +146,15 @@ auto ge_solve(mat6<T> a, vec6<T> b, vec6<T>& x, T eps) -> bool
     // TODO: optimize/unroll?
 
     // step 1: Gaussian elimination
-    for (index c = 0; c < 6 - 1; ++c) {
+    for (index_t c = 0; c < 6 - 1; ++c) {
         // partial pivoting for current column:
         // swap row r >= c with largest absolute value at [r, c] (i.e. in column) with row c
         {
             // step 1: find element with largest absolute value in column
-            index r = 0;
+            index_t r = 0;
             T v = zero<T>();
 
-            for (index i = c; i < 6; ++i) {
+            for (index_t i = c; i < 6; ++i) {
                 auto const vi = std::abs(a[{i, c}]);
 
                 if (v < vi) {
@@ -170,7 +170,7 @@ auto ge_solve(mat6<T> a, vec6<T> b, vec6<T>& x, T eps) -> bool
 
             // step 2: permutate, swap row r and c
             if (r != c) {
-                for (index i = c; i < 6; ++i) {
+                for (index_t i = c; i < 6; ++i) {
                     std::swap(a[{r, i}], a[{c, i}]);        // swap A[r, :] and A[c, :]
                 }
                 std::swap(b[r], b[c]);                      // swap b[r] and b[c]
@@ -178,14 +178,14 @@ auto ge_solve(mat6<T> a, vec6<T> b, vec6<T>& x, T eps) -> bool
         }
 
         // Gaussian elimination step
-        for (index r = c + 1; r < 6; ++r) {
+        for (index_t r = c + 1; r < 6; ++r) {
             auto const v = a[{r, c}] / a[{c, c}];
 
             // b[r] = b[r] - (A[r, c] / A[c, c]) * b[c]
             b[r] = b[r] - v * b[c];
 
             // A[r, :] = A[r, :] - (A[r, c] / A[c, c]) * A[c, :]
-            for (index k = c + 1; k < 6; ++k) {
+            for (index_t k = c + 1; k < 6; ++k) {
                 a[{r, k}] = a[{r, k}] - v * a[{c, k}];
             }
         }

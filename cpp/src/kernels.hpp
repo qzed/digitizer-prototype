@@ -42,7 +42,7 @@ inline constexpr kernel<T, 3, 3> sobel3_xy {
 };
 
 
-template<class T, index Nx, index Ny>
+template<class T, index_t Nx, index_t Ny>
 auto gaussian(T sigma) -> kernel<T, Nx, Ny>
 {
     static_assert(Nx % 2 == 1);
@@ -52,8 +52,8 @@ auto gaussian(T sigma) -> kernel<T, Nx, Ny>
 
     T sum = static_cast<T>(0.0);
 
-    for (index j = 0; j < Ny; j++) {
-        for (index i = 0; i < Nx; i++) {
+    for (index_t j = 0; j < Ny; j++) {
+        for (index_t i = 0; i < Nx; i++) {
             auto const x = l2norm<T>({
                 static_cast<T>(i - (Nx - 1) / 2),
                 static_cast<T>(j - (Ny - 1) / 2)

@@ -14,29 +14,29 @@ void structure_tensor_3x3_zero(image<mat2s<f32>>& out, image<f32> const& in,
     assert(in.shape() == out.shape());
 
     // strides for data access
-    index const s_left      = -1;
-    index const s_center    =  0;
-    index const s_right     =  1;
-    index const s_top       = -stride(in.shape());
-    index const s_top_left  = s_top + s_left;
-    index const s_top_right = s_top + s_right;
-    index const s_bot       = -s_top;
-    index const s_bot_left  = s_bot + s_left;
-    index const s_bot_right = s_bot + s_right;
+    index_t const s_left      = -1;
+    index_t const s_center    =  0;
+    index_t const s_right     =  1;
+    index_t const s_top       = -stride(in.shape());
+    index_t const s_top_left  = s_top + s_left;
+    index_t const s_top_right = s_top + s_right;
+    index_t const s_bot       = -s_top;
+    index_t const s_bot_left  = s_bot + s_left;
+    index_t const s_bot_right = s_bot + s_right;
 
     // strides for kernel access
-    index const k_top_left  = 0;
-    index const k_top       = 1;
-    index const k_top_right = 2;
-    index const k_left      = 3;
-    index const k_center    = 4;
-    index const k_right     = 5;
-    index const k_bot_left  = 6;
-    index const k_bot       = 7;
-    index const k_bot_right = 8;
+    index_t const k_top_left  = 0;
+    index_t const k_top       = 1;
+    index_t const k_top_right = 2;
+    index_t const k_left      = 3;
+    index_t const k_center    = 4;
+    index_t const k_right     = 5;
+    index_t const k_bot_left  = 6;
+    index_t const k_bot       = 7;
+    index_t const k_bot_right = 8;
 
     // processing...
-    index i = 0;
+    index_t i = 0;
 
     // x = 0, y = 0
     {

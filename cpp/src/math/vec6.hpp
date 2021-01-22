@@ -10,19 +10,19 @@ template<class T>
 struct vec6 {
     std::array<T, 6> data;
 
-    constexpr auto operator[] (index i) -> T&;
-    constexpr auto operator[] (index i) const -> T const&;
+    constexpr auto operator[] (index_t i) -> T&;
+    constexpr auto operator[] (index_t i) const -> T const&;
 };
 
 
 template<typename T>
-inline constexpr auto vec6<T>::operator[] (index i) -> T&
+inline constexpr auto vec6<T>::operator[] (index_t i) -> T&
 {
     return utils::access::access(data, i);
 }
 
 template<typename T>
-inline constexpr auto vec6<T>::operator[] (index i) const -> T const&
+inline constexpr auto vec6<T>::operator[] (index_t i) const -> T const&
 {
     return utils::access::access(data, i);
 }

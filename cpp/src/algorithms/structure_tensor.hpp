@@ -10,20 +10,20 @@
 
 namespace impl {
 
-template<typename Bx, typename By, typename T, index Nx, index Ny>
+template<typename Bx, typename By, typename T, index_t Nx, index_t Ny>
 void structure_tensor_generic(image<mat2s<T>>& out, image<T> const& in,
                               kernel<T, Nx, Ny> const& kx, kernel<T, Nx, Ny> const& ky)
 {
-    index const dx = (Nx - 1) / 2;
-    index const dy = (Ny - 1) / 2;
+    index_t const dx = (Nx - 1) / 2;
+    index_t const dy = (Ny - 1) / 2;
 
-    for (index cy = 0; cy < in.shape().y; ++cy) {
-        for (index cx = 0; cx < in.shape().x; ++cx) {
+    for (index_t cy = 0; cy < in.shape().y; ++cy) {
+        for (index_t cx = 0; cx < in.shape().x; ++cx) {
             T gx = zero<T>();
             T gy = zero<T>();
 
-            for (index iy = 0; iy < Ny; ++iy) {
-                for (index ix = 0; ix < Nx; ++ix) {
+            for (index_t iy = 0; iy < Ny; ++iy) {
+                for (index_t ix = 0; ix < Nx; ++ix) {
                     gx += Bx::value(in, {cx - dx + ix, cy - dy + iy}) * kx[{ix, iy}];
                     gy += By::value(in, {cx - dx + ix, cy - dy + iy}) * ky[{ix, iy}];
                 }
@@ -39,7 +39,7 @@ void structure_tensor_generic(image<mat2s<T>>& out, image<T> const& in,
 } /* namespace impl */
 
 
-template<typename Bx=border::zero, typename By=border::zero, typename T, index Nx=3, index Ny=3>
+template<typename Bx=border::zero, typename By=border::zero, typename T, index_t Nx=3, index_t Ny=3>
 void structure_tensor(image<mat2s<T>>& out, image<T> const& in,
                       kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
                       kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)

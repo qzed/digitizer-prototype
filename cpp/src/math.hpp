@@ -225,36 +225,36 @@ auto zero() -> mat2s<f64>
 };
 
 
-using index = i32;
-using index2 = vec2<index>;
+using index_t = i32;
+using index2_t = vec2<index_t>;
 
-constexpr auto ravel(index2 const& shape, index2 const& i) noexcept -> index
+constexpr auto ravel(index2_t const& shape, index2_t const& i) noexcept -> index_t
 {
     return i.y * shape.x + i.x;
 }
 
-constexpr auto unravel(index2 const& shape, index const& i) noexcept -> index2
+constexpr auto unravel(index2_t const& shape, index_t const& i) noexcept -> index2_t
 {
     return { i % shape.x, i / shape.x };
 }
 
-constexpr auto stride(index2 const& shape) noexcept -> index
+constexpr auto stride(index2_t const& shape) noexcept -> index_t
 {
     return shape.x;
 }
 
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 struct kernel {
     std::array<T, Nx * Ny> data;
 
     using Scalar = T;
 
-    constexpr auto operator[] (index2 const& i) const noexcept -> T const&;
-    constexpr auto operator[] (index2 const& i) noexcept -> T&;
+    constexpr auto operator[] (index2_t const& i) const noexcept -> T const&;
+    constexpr auto operator[] (index2_t const& i) noexcept -> T&;
 
-    constexpr auto operator[] (index const& i) const noexcept -> T const&;
-    constexpr auto operator[] (index const& i) noexcept -> T&;
+    constexpr auto operator[] (index_t const& i) const noexcept -> T const&;
+    constexpr auto operator[] (index_t const& i) noexcept -> T&;
 
     auto begin() noexcept -> T*;
     auto end() noexcept -> T*;
@@ -265,22 +265,22 @@ struct kernel {
     auto cbegin() const noexcept -> T const*;
     auto cend() const noexcept -> T const*;
 
-    constexpr auto shape() const noexcept -> index2;
+    constexpr auto shape() const noexcept -> index2_t;
 };
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto operator<< (std::ostream& os, kernel<T, Nx, Ny> const& k) -> std::ostream&
 {
     os << "[[" << k[{0, 0}];
 
-    for (index x = 1; x < Nx; ++x) {
+    for (index_t x = 1; x < Nx; ++x) {
         os << ", " << k[{x, 0}];
     }
 
-    for (index y = 1; y < Ny; ++y) {
+    for (index_t y = 1; y < Ny; ++y) {
         os << "], [" << k[{0, y}];
 
-        for (index x = 1; x < Nx; ++x) {
+        for (index_t x = 1; x < Nx; ++x) {
             os << ", " << k[{x, y}];
         }
     }
@@ -288,68 +288,68 @@ auto operator<< (std::ostream& os, kernel<T, Nx, Ny> const& k) -> std::ostream&
     return os << "]]";
 }
 
-template<typename T, index Nx, index Ny>
-constexpr auto kernel<T, Nx, Ny>::operator[] (index2 const& i) const noexcept -> T const&
+template<typename T, index_t Nx, index_t Ny>
+constexpr auto kernel<T, Nx, Ny>::operator[] (index2_t const& i) const noexcept -> T const&
 {
     return utils::access::access(this->data, ravel({Nx, Ny}, i));
 }
 
-template<typename T, index Nx, index Ny>
-constexpr auto kernel<T, Nx, Ny>::operator[] (index2 const& i) noexcept -> T&
+template<typename T, index_t Nx, index_t Ny>
+constexpr auto kernel<T, Nx, Ny>::operator[] (index2_t const& i) noexcept -> T&
 {
     return utils::access::access(this->data, ravel({Nx, Ny}, i));
 }
 
-template<typename T, index Nx, index Ny>
-constexpr auto kernel<T, Nx, Ny>::operator[] (index const& i) const noexcept -> T const&
+template<typename T, index_t Nx, index_t Ny>
+constexpr auto kernel<T, Nx, Ny>::operator[] (index_t const& i) const noexcept -> T const&
 {
     return utils::access::access(this->data, i);
 }
 
-template<typename T, index Nx, index Ny>
-constexpr auto kernel<T, Nx, Ny>::operator[] (index const& i) noexcept -> T&
+template<typename T, index_t Nx, index_t Ny>
+constexpr auto kernel<T, Nx, Ny>::operator[] (index_t const& i) noexcept -> T&
 {
     return utils::access::access(this->data, i);
 }
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::begin() noexcept -> T*
 {
     return &this->data[0];
 }
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::end() noexcept -> T*
 {
     return &this->data[Nx * Ny];
 }
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::begin() const noexcept -> T const*
 {
     return &this->data[0];
 }
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::end() const noexcept -> T const*
 {
     return &this->data[Nx * Ny];
 }
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::cbegin() const noexcept -> T const*
 {
     return &this->data[0];
 }
 
-template<typename T, index Nx, index Ny>
+template<typename T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::cend() const noexcept -> T const*
 {
     return &this->data[Nx * Ny];
 }
 
-template<typename T, index Nx, index Ny>
-constexpr auto kernel<T, Nx, Ny>::shape() const noexcept -> index2
+template<typename T, index_t Nx, index_t Ny>
+constexpr auto kernel<T, Nx, Ny>::shape() const noexcept -> index2_t
 {
     return { Nx, Ny };
 }
@@ -358,13 +358,13 @@ constexpr auto kernel<T, Nx, Ny>::shape() const noexcept -> index2
 template<typename T>
 class image {
 private:
-    index2 m_shape;
+    index2_t m_shape;
     std::vector<T> m_data;
 
 public:
     using Scalar = T;
 
-    image(index2 const& shape);
+    image(index2_t const& shape);
 
     image(image<T> const& other) noexcept = default;
     image(image<T>&& other) noexcept = default;
@@ -372,13 +372,13 @@ public:
     auto operator= (image<T> const& rhs) noexcept -> image<T>& = default;
     auto operator= (image<T>&& rhs) noexcept -> image<T>& = default;
 
-    auto operator[] (index2 const& i) const noexcept -> T const&;
-    auto operator[] (index2 const& i) noexcept -> T&;
+    auto operator[] (index2_t const& i) const noexcept -> T const&;
+    auto operator[] (index2_t const& i) noexcept -> T&;
 
-    auto operator[] (index const& i) const noexcept -> T const&;
-    auto operator[] (index const& i) noexcept -> T&;
+    auto operator[] (index_t const& i) const noexcept -> T const&;
+    auto operator[] (index_t const& i) noexcept -> T&;
 
-    auto shape() const noexcept -> index2 const&;
+    auto shape() const noexcept -> index2_t const&;
 
     auto data() noexcept -> T*;
     auto data() const noexcept -> T const*;
@@ -394,37 +394,37 @@ public:
 };
 
 template<typename T>
-image<T>::image(index2 const& shape)
+image<T>::image(index2_t const& shape)
     : m_shape { shape }
     , m_data(static_cast<std::size_t>(m_shape.x * m_shape.y))
 {}
 
 template<typename T>
-auto image<T>::operator[] (index2 const& i) const noexcept -> T const&
+auto image<T>::operator[] (index2_t const& i) const noexcept -> T const&
 {
     return utils::access::access(m_data, ravel(m_shape, i));
 }
 
 template<typename T>
-auto image<T>::operator[] (index2 const& i) noexcept -> T&
+auto image<T>::operator[] (index2_t const& i) noexcept -> T&
 {
     return utils::access::access(m_data, ravel(m_shape, i));
 }
 
 template<typename T>
-auto image<T>::operator[] (index const& i) const noexcept -> T const&
+auto image<T>::operator[] (index_t const& i) const noexcept -> T const&
 {
     return utils::access::access(m_data, i);
 }
 
 template<typename T>
-auto image<T>::operator[] (index const& i) noexcept -> T&
+auto image<T>::operator[] (index_t const& i) noexcept -> T&
 {
     return utils::access::access(m_data, i);
 }
 
 template<typename T>
-auto image<T>::shape() const noexcept -> index2 const&
+auto image<T>::shape() const noexcept -> index2_t const&
 {
     return m_shape;
 }

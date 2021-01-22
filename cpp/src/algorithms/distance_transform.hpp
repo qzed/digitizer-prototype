@@ -11,7 +11,7 @@ namespace impl {
 
 template<typename T>
 struct q_item {
-    index idx;
+    index_t idx;
     T cost;
 };
 
@@ -53,31 +53,31 @@ auto operator> (struct q_item<T> const& a, struct q_item<T> const& b) noexcept -
 
 
 template<typename T>
-auto is_masked(T& mask, index i) -> bool
+auto is_masked(T& mask, index_t i) -> bool
 {
     return !mask(i);
 }
 
 template<typename T>
-auto is_foreground(T& bin, index i) -> bool
+auto is_foreground(T& bin, index_t i) -> bool
 {
     return bin(i);
 }
 
 template<typename B, typename M>
-auto is_compute(B& bin, M& mask, index i) -> bool
+auto is_compute(B& bin, M& mask, index_t i) -> bool
 {
     return !is_foreground(bin, i) && !is_masked(mask, i);
 }
 
 template<typename V, typename T>
-auto get_cost(T& cost, index i, vec2<int> d) -> V
+auto get_cost(T& cost, index_t i, vec2<int> d) -> V
 {
     return cost(i, d);
 }
 
 template<typename T, typename Q, typename B, typename M, typename C>
-inline void evaluate(image<T>& out, Q& queue, B& bin, M& mask, C& cost, index i, index stride, index2 dir, T limit)
+inline void evaluate(image<T>& out, Q& queue, B& bin, M& mask, C& cost, index_t i, index_t stride, index2_t dir, T limit)
 {
     if (!is_compute(bin, mask, i + stride))
         return;
@@ -98,17 +98,17 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
     static_assert(N == 4 || N == 8);
 
     // strides
-    index const s_left      = -1;
-    index const s_right     =  1;
-    index const s_top       = -stride(out.shape());
-    index const s_top_left  = s_top + s_left;
-    index const s_top_right = s_top + s_right;
-    index const s_bot       = stride(out.shape());
-    index const s_bot_left  = s_bot + s_left;
-    index const s_bot_right = s_bot + s_right;
+    index_t const s_left      = -1;
+    index_t const s_right     =  1;
+    index_t const s_top       = -stride(out.shape());
+    index_t const s_top_left  = s_top + s_left;
+    index_t const s_top_right = s_top + s_right;
+    index_t const s_bot       = stride(out.shape());
+    index_t const s_bot_left  = s_bot + s_left;
+    index_t const s_bot_right = s_bot + s_right;
 
     // step 1: initialize output, queue all non-masked pixels
-    index i = 0;
+    index_t i = 0;
 
     // x = 0, y = 0
     if (!impl::is_foreground(bin, i)) {

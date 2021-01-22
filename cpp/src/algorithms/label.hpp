@@ -23,27 +23,27 @@
 
 namespace impl {
 
-inline auto is_root(image<u16> const& forest, u16 index) -> bool
+inline auto is_root(image<u16> const& forest, u16 idx) -> bool
 {
-    return index == forest[index];
+    return idx == forest[idx];
 }
 
-inline auto find_root(image<u16> const& forest, u16 index) -> u16
+inline auto find_root(image<u16> const& forest, u16 idx) -> u16
 {
-    while (!is_root(forest, index)) {
-        index = forest[index];
+    while (!is_root(forest, idx)) {
+        idx = forest[idx];
     }
 
-    return index;
+    return idx;
 }
 
-inline void set_root(image<u16>& forest, u16 index, u16 new_root)
+inline void set_root(image<u16>& forest, u16 idx, u16 new_root)
 {
-    while (!is_root(forest, index)) {
-        index = std::exchange(forest[index], new_root);
+    while (!is_root(forest, idx)) {
+        idx = std::exchange(forest[idx], new_root);
     }
 
-    forest[index] = new_root;
+    forest[idx] = new_root;
 }
 
 inline auto merge(image<u16>& forest, u16 t1_index, u16 t1_root, u16 t2_index, u16 bg) -> std::pair<u16, u16>
@@ -68,7 +68,7 @@ inline auto merge(image<u16>& forest, u16 t1_index, u16 t1_root, u16 t2_index, u
 inline auto resolve(image<u16>& forest, u16 background) -> u16
 {
     u16 n_labels = 0;
-    for (index i = 0; i < prod(forest.shape()); ++i) {
+    for (index_t i = 0; i < prod(forest.shape()); ++i) {
         if (i != background) {
             if (!is_root(forest, i)) {
                 forest[i] = forest[forest[i]];
@@ -86,7 +86,7 @@ inline auto resolve(image<u16>& forest, u16 background) -> u16
 template<typename T>
 inline auto find_background(image<T> const& data, T threshold) -> u16
 {
-    for (index i = 0; i < prod(data.shape()); ++i) {
+    for (index_t i = 0; i < prod(data.shape()); ++i) {
         if (data[i] <= threshold) {
             return i;
         }
@@ -103,16 +103,16 @@ auto label(image<u16>& out, image<T> const& data, T threshold) -> u16
     static_assert(C == 4 || C == 8);
 
     // strides
-    index const s_left = 1;
-    index const s_up = stride(data.shape());
-    index const s_up_left = s_up + 1;
-    index const s_up_right = s_up - 1;
+    index_t const s_left = 1;
+    index_t const s_up = stride(data.shape());
+    index_t const s_up_left = s_up + 1;
+    index_t const s_up_right = s_up - 1;
 
     // pass 0: find first backgorund node
     auto const background = impl::find_background(data, threshold);
 
     // pass 1: build forest
-    index i;
+    index_t i;
 
     // x = 0, y = 0
     out[0] = 0;

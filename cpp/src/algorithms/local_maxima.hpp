@@ -9,7 +9,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
 {
     static_assert(C == 4 || C == 8);
 
-    index i = 0;
+    index_t i = 0;
 
     /*
      * We use the following kernel to compare entries:
@@ -24,14 +24,14 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
      */
 
     // strides
-    index const s_left       = -1;
-    index const s_right      =  1;
-    index const s_top_center = -stride(data.shape());
-    index const s_top_left   = s_top_center + s_left;
-    index const s_top_right  = s_top_center + s_right;
-    index const s_bot_center = stride(data.shape());
-    index const s_bot_left   = s_bot_center + s_left;
-    index const s_bot_right  = s_bot_center + s_right;
+    index_t const s_left       = -1;
+    index_t const s_right      =  1;
+    index_t const s_top_center = -stride(data.shape());
+    index_t const s_top_left   = s_top_center + s_left;
+    index_t const s_top_right  = s_top_center + s_right;
+    index_t const s_bot_center = stride(data.shape());
+    index_t const s_bot_left   = s_bot_center + s_left;
+    index_t const s_bot_right  = s_bot_center + s_right;
 
     // x = 0, y = 0
     if (data[i] > threshold) {

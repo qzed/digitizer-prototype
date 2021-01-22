@@ -15,16 +15,16 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
     auto const stride_k = stride({ 3, 3 });
 
     // access helpers
-    auto const k = [&](index dx, index dy) constexpr -> S {
+    auto const k = [&](index_t dx, index_t dy) constexpr -> S {
         return kern[4 + dy * stride_k + dx];
     };
 
-    auto const d = [&](index i, index dx, index dy) constexpr -> T {
+    auto const d = [&](index_t i, index_t dx, index_t dy) constexpr -> T {
         return data[i + dy * stride_d + dx];
     };
 
     // processing...
-    index i = 0;
+    index_t i = 0;
 
     // y = 0
     {

@@ -159,12 +159,12 @@ auto main(int argc, char** argv) -> int
     auto kern_st = kernels::gaussian<f32, 5, 5>(1.0);
     auto kern_hs = kernels::gaussian<f32, 5, 5>(1.0);
 
-    auto maximas = std::vector<index>{};
+    auto maximas = std::vector<index_t>{};
     auto cstats = std::vector<component_stats>{};
     auto cscore = std::vector<f32>{};
 
     auto gfparams = std::vector<gfit::parameters<f32>>{};
-    auto gfwindow = index2 { 11, 11 };
+    auto gfwindow = index2_t { 11, 11 };
     gfit::reserve(gfparams, 32, gfwindow);
 
     auto wdt_qbuf = std::vector<impl::q_item<f32>> {};
@@ -241,7 +241,7 @@ auto main(int argc, char** argv) -> int
                 f32 const wr = 0.9;
                 f32 const wh = 1.1;
 
-                for (index i = 0; i < prod(img_pp.shape()); ++i) {
+                for (index_t i = 0; i < prod(img_pp.shape()); ++i) {
                     img_obj[i] = wh * img_pp[i] - wr * img_rdg[i];
                 }
             }
@@ -269,7 +269,7 @@ auto main(int argc, char** argv) -> int
                 cstats.clear();
                 cstats.assign(num_labels, component_stats { 0, 0, 0, 0 });
 
-                for (index i = 0; i < prod(img_pp.shape()); ++i) {
+                for (index_t i = 0; i < prod(img_pp.shape()); ++i) {
                     auto const label = img_lbl[i];
 
                     if (label == 0)
@@ -292,7 +292,7 @@ auto main(int argc, char** argv) -> int
                 }
 
                 cscore.assign(num_labels, 0.0f);
-                for (index i = 0; i < num_labels; ++i) {
+                for (index_t i = 0; i < num_labels; ++i) {
                     auto const c = 100.f;
 
                     auto const& stats = cstats.at(i);
@@ -312,7 +312,7 @@ auto main(int argc, char** argv) -> int
 
                 auto const th_inc = 0.6f;
 
-                auto const wdt_cost = [&](index i, vec2<int> d) -> f32 {
+                auto const wdt_cost = [&](index_t i, vec2<int> d) -> f32 {
                     f32 const c_dist = 0.1f;
                     f32 const c_ridge = 9.0f;
                     f32 const c_grad = 1.0f;
@@ -325,15 +325,15 @@ auto main(int argc, char** argv) -> int
                     return c_ridge * ridge + c_grad * grad + c_dist * dist;
                 };
 
-                auto const wdt_mask = [&](index i) -> bool {
+                auto const wdt_mask = [&](index_t i) -> bool {
                     return img_pp[i] > 0.0f && img_lbl[i] == 0;
                 };
 
-                auto const wdt_inc_bin = [&](index i) -> bool {
+                auto const wdt_inc_bin = [&](index_t i) -> bool {
                     return img_lbl[i] > 0 && cscore.at(img_lbl[i] - 1) > th_inc;
                 };
 
-                auto const wdt_exc_bin = [&](index i) -> bool {
+                auto const wdt_exc_bin = [&](index_t i) -> bool {
                     return img_lbl[i] > 0 && cscore.at(img_lbl[i] - 1) <= th_inc;
                 };
 
@@ -345,7 +345,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_flt);
 
-                for (index i = 0; i < prod(img_pp.shape()); ++i) {
+                for (index_t i = 0; i < prod(img_pp.shape()); ++i) {
                     auto const sigma = 1.0f;
 
                     // img_out[i] = std::numeric_limits<f32>::max() == img_dm1[i] ? 0.0f : img_dm1[i];
@@ -410,8 +410,8 @@ auto main(int argc, char** argv) -> int
                 out_tp.back().reserve(16);
                 for (auto const& p : gfparams) {
                     if (p.valid) {
-                        auto const x = static_cast<index>(p.mean.x);
-                        auto const y = static_cast<index>(p.mean.y);
+                        auto const x = static_cast<index_t>(p.mean.x);
+                        auto const y = static_cast<index_t>(p.mean.y);
                         auto const cs = cscore.at(img_lbl[{ x, y }] - 1);
 
                         out_tp.back().push_back({ cs, p.scale, p.mean, p.prec });

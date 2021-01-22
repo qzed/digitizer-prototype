@@ -15,7 +15,7 @@ class token {
 private:
     friend class registry;
 
-    token(std::size_t index);
+    token(std::size_t index_t);
 
 private:
     std::size_t m_index;
@@ -87,8 +87,8 @@ private:
 };
 
 
-inline token::token(std::size_t index)
-    : m_index{index}
+inline token::token(std::size_t i)
+    : m_index{i}
 {}
 
 

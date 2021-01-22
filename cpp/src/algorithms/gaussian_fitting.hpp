@@ -20,8 +20,8 @@ inline constexpr auto const range = vec2<T> { static_cast<T>(1), static_cast<T>(
 
 
 struct bbox {
-    index xmin, xmax;
-    index ymin, ymax;
+    index_t xmin, xmax;
+    index_t ymin, ymax;
 };
 
 template<class T>
@@ -63,8 +63,8 @@ inline void assemble_system(mat6<S>& m, vec6<S>& rhs, bbox const& b, image<T> co
     std::fill(m.data.begin(), m.data.end(), zero<S>());
     std::fill(rhs.data.begin(), rhs.data.end(), zero<S>());
 
-    for (index iy = b.ymin; iy <= b.ymax; ++iy) {
-        for (index ix = b.xmin; ix <= b.xmax; ++ix) {
+    for (index_t iy = b.ymin; iy <= b.ymax; ++iy) {
+        for (index_t ix = b.xmin; ix <= b.xmax; ++ix) {
             auto const x = static_cast<S>(ix) * scale.x - range<S>.x;
             auto const y = static_cast<S>(iy) * scale.y - range<S>.y;
 
@@ -168,8 +168,8 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
             continue;
         }
 
-        for (index iy = p.bounds.ymin; iy <= p.bounds.ymax; ++iy) {
-            for (index ix = p.bounds.xmin; ix <= p.bounds.xmax; ++ix) {
+        for (index_t iy = p.bounds.ymin; iy <= p.bounds.ymax; ++iy) {
+            for (index_t ix = p.bounds.xmin; ix <= p.bounds.xmax; ++ix) {
                 auto const x = static_cast<T>(ix) * scale.x - range<T>.x;
                 auto const y = static_cast<T>(iy) * scale.y - range<T>.y;
 
@@ -186,8 +186,8 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
             continue;
         }
 
-        for (index y = p.bounds.ymin; y <= p.bounds.ymax; ++y) {
-            for (index x = p.bounds.xmin; x <= p.bounds.xmax; ++x) {
+        for (index_t y = p.bounds.ymin; y <= p.bounds.ymax; ++y) {
+            for (index_t x = p.bounds.xmin; x <= p.bounds.xmax; ++x) {
                 total[{x, y}] += p.weights[{x - p.bounds.xmin, y - p.bounds.ymin}];
             }
         }
@@ -199,8 +199,8 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
             continue;
         }
 
-        for (index y = p.bounds.ymin; y <= p.bounds.ymax; ++y) {
-            for (index x = p.bounds.xmin; x <= p.bounds.xmax; ++x) {
+        for (index_t y = p.bounds.ymin; y <= p.bounds.ymax; ++y) {
+            for (index_t x = p.bounds.xmin; x <= p.bounds.xmax; ++x) {
                 if (total[{x, y}] > static_cast<T>(0)) {
                     p.weights[{x - p.bounds.xmin, y - p.bounds.ymin}] /= total[{x, y}];
                 }
@@ -215,7 +215,7 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
 // TODO: vector as parameter container is not good... drops image memory when resized
 
 template<class T>
-void reserve(std::vector<parameters<T>>& params, std::size_t n, index2 shape)
+void reserve(std::vector<parameters<T>>& params, std::size_t n, index2_t shape)
 {
     if (n > params.size()) {
         params.resize(n, parameters<T> {

@@ -286,7 +286,7 @@ auto main(int argc, char** argv) -> int
                 }
 
                 for (auto m : maximas) {
-                    if (likely(img_lbl[m] > 0)) {
+                    if (img_lbl[m] > 0) {
                         cstats.at(img_lbl[m] - 1).maximas += 1;
                     }
                 }

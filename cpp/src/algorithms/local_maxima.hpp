@@ -2,7 +2,6 @@
 
 #include "../types.hpp"
 #include "../math.hpp"
-#include "../compiler.hpp"
 
 
 template<int C=8, typename T, typename O>
@@ -45,7 +44,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
             max &= data[i + s_bot_right] <= data[i];
         }
 
-        if (unlikely(max)) {
+        if (max) {
             *output_iter++ = i;
         }
     }
@@ -71,7 +70,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
             max &= data[i + s_bot_right] <= data[i];
         }
 
-        if (unlikely(max)) {
+        if (max) {
             *output_iter++ = i;
         }
     }
@@ -88,7 +87,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
 
         max &= data[i + s_bot_center] <= data[i];
 
-        if (unlikely(max)) {
+        if (max) {
             *output_iter++ = i;
         }
     }
@@ -113,7 +112,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
                 max &= data[i + s_bot_right] <= data[i];
             }
 
-            if (unlikely(max)) {
+            if (max) {
                 *output_iter++ = i;
             }
         }
@@ -148,7 +147,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
                 max &= data[i + s_bot_right] <= data[i];
             }
 
-            if (unlikely(max)) {
+            if (max) {
                 *output_iter++ = i;
             }
         }
@@ -171,7 +170,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
 
             max &= data[i + s_bot_center] <= data[i];
 
-            if (unlikely(max)) {
+            if (max) {
                 *output_iter++ = i;
             }
         }
@@ -189,7 +188,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
             max &= data[i + s_top_right] < data[i];
         }
 
-        if (unlikely(max)) {
+        if (max) {
             *output_iter++ = i;
         }
     }
@@ -215,7 +214,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
             max &= data[i + s_top_right] < data[i];
         }
 
-        if (unlikely(max)) {
+        if (max) {
             *output_iter++ = i;
         }
     }
@@ -232,7 +231,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
 
         max &= data[i + s_top_center] < data[i];
 
-        if (unlikely(max)) {
+        if (max) {
             *output_iter++ = i;
         }
     }

@@ -23,7 +23,7 @@ namespace math {
  * PA.
  */
 template<class T>
-auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index_t>& p, T eps) -> bool
+auto lu_decomp(mat6_t<T> const& a, mat6_t<T>& lu, vec6<index_t>& p, T eps) -> bool
 {
     // initialization
     lu = a;
@@ -96,7 +96,7 @@ auto lu_decomp(mat6<T> const& a, mat6<T>& lu, vec6<index_t>& p, T eps) -> bool
  * solving Ly = Pb for a temporary vector y and then Ux = y for the desired x.
  */
 template<class T>
-void lu_solve(mat6<T> const& lu, vec6<index_t> const& p, vec6<T> const& b, vec6<T>& x)
+void lu_solve(mat6_t<T> const& lu, vec6<index_t> const& p, vec6<T> const& b, vec6<T>& x)
 {
     // step 0: compute Pb
     auto pb = vec6<T> { b[p[0]], b[p[1]], b[p[2]], b[p[3]], b[p[4]], b[p[5]] };
@@ -141,7 +141,7 @@ void lu_solve(mat6<T> const& lu, vec6<index_t> const& p, vec6<T> const& b, vec6<
  * with partial pivoting.
  */
 template<class T>
-auto ge_solve(mat6<T> a, vec6<T> b, vec6<T>& x, T eps) -> bool
+auto ge_solve(mat6_t<T> a, vec6<T> b, vec6<T>& x, T eps) -> bool
 {
     // TODO: optimize/unroll?
 

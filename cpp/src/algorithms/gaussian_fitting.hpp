@@ -11,7 +11,7 @@
 
 namespace gfit {
 
-using math::mat6;
+using math::mat6_t;
 using math::vec6;
 
 
@@ -51,7 +51,7 @@ auto gaussian_like(vec2<T> x, vec2<T> mean, mat2s<T> prec) -> T
 
 
 template<class T, class S>
-inline void assemble_system(mat6<S>& m, vec6<S>& rhs, bbox const& b, image<T> const& data, image<S> const& w)
+inline void assemble_system(mat6_t<S>& m, vec6<S>& rhs, bbox const& b, image<T> const& data, image<S> const& w)
 {
     auto const eps = std::numeric_limits<S>::epsilon();
 
@@ -265,7 +265,7 @@ void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp
 
         // fit individual parameters
         for (auto& p : params) {
-            auto sys = mat6<S>{};
+            auto sys = mat6_t<S>{};
             auto rhs = vec6<S>{};
             auto chi = vec6<S>{};
 

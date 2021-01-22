@@ -532,7 +532,7 @@ inline void matrix::scale(vec2<f64> s)
 }
 
 
-template<typename T>
+template<class T>
 constexpr auto pixel_format() -> format;
 
 template<>
@@ -570,7 +570,7 @@ inline auto format_stride_for_width(format fmt, int width) -> int
     return stride;
 }
 
-template<typename T>
+template<class T>
 inline auto image_surface_create(image<T>& image) -> surface
 {
     auto const format = pixel_format<T>();

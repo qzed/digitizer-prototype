@@ -15,7 +15,7 @@ namespace gfx::cmap {
 
 namespace impl {
 
-template<typename T>
+template<class T>
 auto normalize(T const& value, std::pair<T, T> range) -> f32
 {
     auto v = static_cast<f32>(value - range.first);
@@ -33,17 +33,17 @@ public:
 
     virtual auto map_value(f32 value) const -> srgb = 0;
 
-    template<typename T, typename P>
+    template<class T, class P>
     auto map(T const& value, std::pair<T, T> range) const -> P;
 
-    template<typename T, typename P>
+    template<class T, class P>
     auto map(image<T> const& img, std::optional<std::pair<T, T>> range = std::nullopt) const -> image<P>;
 
-    template<typename T, typename P>
+    template<class T, class P>
     void map_into(image<P>& dest, image<T> const& img, std::optional<std::pair<T, T>> range = std::nullopt) const;
 };
 
-template<typename T, typename P>
+template<class T, class P>
 auto cmap::map(T const& value, std::pair<T, T> range) const -> P
 {
     auto m = this->map_value(impl::normalize(value, range));
@@ -51,7 +51,7 @@ auto cmap::map(T const& value, std::pair<T, T> range) const -> P
     return P::from(m.r, m.g, m.b);
 }
 
-template<typename T, typename P>
+template<class T, class P>
 auto cmap::map(image<T> const& img, std::optional<std::pair<T, T>> range) const -> image<P>
 {
     auto out = image<P>{img.shape()};
@@ -60,7 +60,7 @@ auto cmap::map(image<T> const& img, std::optional<std::pair<T, T>> range) const 
     return out;
 }
 
-template<typename T, typename P>
+template<class T, class P>
 void cmap::map_into(image<P>& dest, image<T> const& img, std::optional<std::pair<T, T>> range) const
 {
     auto r = range.has_value() ? *range : minmax(img);
@@ -147,7 +147,7 @@ inline auto cubehelix(f32 start=0.5f, f32 rotations=-1.5f, f32 hue=1.2f, f32 gam
 template<std::size_t N>
 class lut : public cmap {
 public:
-    template<typename... Args>
+    template<class... Args>
     lut(Args&&... t);
 
     auto map_value(f32 value) const -> srgb;
@@ -157,7 +157,7 @@ private:
 };
 
 template<std::size_t N>
-template<typename... Args>
+template<class... Args>
 lut<N>::lut(Args&&... args)
     : m_table{std::forward<Args>(args)...}
 {}

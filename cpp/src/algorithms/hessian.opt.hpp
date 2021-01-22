@@ -11,9 +11,9 @@ void hessian<border::zero, f32>(image<mat2s<f32>>& out, image<f32> const& in)
     assert(in.shape() == out.shape());
 
     // kernels
-    auto const& kxx = kernels::sobel3_xx;
-    auto const& kyy = kernels::sobel3_yy;
-    auto const& kxy = kernels::sobel3_xy;
+    auto const& kxx = kernels::sobel3_xx<f32>;
+    auto const& kyy = kernels::sobel3_yy<f32>;
+    auto const& kxy = kernels::sobel3_xy<f32>;
 
     // strides for data access
     index const s_left      = -1;

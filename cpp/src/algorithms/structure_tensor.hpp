@@ -8,8 +8,8 @@
 
 template<typename Bx=border::zero, typename By=border::zero, typename T, index Nx=3, index Ny=3>
 void structure_tensor_prep(image<mat2s<T>>& out, image<T> const& in,
-                           kernel<T, Nx, Ny> const& kx=kernels::sobel3_x,
-                           kernel<T, Nx, Ny> const& ky=kernels::sobel3_y)
+                           kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
+                           kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)
 {
     assert(in.shape() == out.shape());
 

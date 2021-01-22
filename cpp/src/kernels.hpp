@@ -6,34 +6,39 @@
 
 namespace kernels {
 
-inline constexpr kernel<f32, 3, 3> sobel3_x {
-    1.0, 0.0, -1.0,
-    2.0, 0.0, -2.0,
-    1.0, 0.0, -1.0,
+template<class T>
+inline constexpr kernel<T, 3, 3> sobel3_x {
+     1,  0, -1,
+     2,  0, -2,
+     1,  0, -1,
 };
 
-inline constexpr kernel<f32, 3, 3> sobel3_y {
-     1.0,  2.0,  1.0,
-     0.0,  0.0,  0.0,
-    -1.0, -2.0, -1.0,
+template<class T>
+inline constexpr kernel<T, 3, 3> sobel3_y {
+     1,  2,  1,
+     0,  0,  0,
+    -1, -2, -1,
 };
 
-inline constexpr kernel<f32, 3, 3> sobel3_xx {
-    1.0, -2.0, 1.0,
-    2.0, -4.0, 2.0,
-    1.0, -2.0, 1.0,
+template<class T>
+inline constexpr kernel<T, 3, 3> sobel3_xx {
+     1, -2,  1,
+     2, -4,  2,
+     1, -2,  1,
 };
 
-inline constexpr kernel<f32, 3, 3> sobel3_yy {
-     1.0,  2.0,  1.0,
-    -2.0, -4.0, -2.0,
-     1.0,  2.0,  1.0,
+template<class T>
+inline constexpr kernel<T, 3, 3> sobel3_yy {
+     1,  2,  1,
+    -2, -4, -2,
+     1,  2,  1,
 };
 
-inline constexpr kernel<f32, 3, 3> sobel3_xy {
-     1.0, 0.0, -1.0,
-     0.0, 0.0,  0.0,
-    -1.0, 0.0,  1.0,
+template<class T>
+inline constexpr kernel<T, 3, 3> sobel3_xy {
+     1,  0, -1,
+     0,  0,  0,
+    -1,  0,  1,
 };
 
 

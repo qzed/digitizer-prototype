@@ -11,9 +11,9 @@ void hessian(image<mat2s<T>>& out, image<T> const& in)
 {
     assert(in.shape() == out.shape());
 
-    auto const& kxx = kernels::sobel3_xx;
-    auto const& kyy = kernels::sobel3_yy;
-    auto const& kxy = kernels::sobel3_xy;
+    auto const& kxx = kernels::sobel3_xx<T>;
+    auto const& kyy = kernels::sobel3_yy<T>;
+    auto const& kxy = kernels::sobel3_xy<T>;
 
     index const nx = kxx.shape().x;
     index const ny = kxx.shape().y;

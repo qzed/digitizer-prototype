@@ -5,10 +5,11 @@
 #include "structure_tensor.hpp"
 
 
-template<>
-void structure_tensor_prep<border::zero, border::zero, f32, 3, 3>(
-            image<mat2s<f32>>& out, image<f32> const& in,
-            kernel<f32, 3, 3> const& kx, kernel<f32, 3, 3> const& ky)
+namespace impl {
+
+template<typename T>
+void structure_tensor_3x3_zero(image<mat2s<f32>>& out, image<f32> const& in,
+                               kernel<f32, 3, 3> const& kx, kernel<f32, 3, 3> const& ky)
 {
     assert(in.shape() == out.shape());
 
@@ -256,3 +257,5 @@ void structure_tensor_prep<border::zero, border::zero, f32, 3, 3>(
         out[i] = { gx * gx, gx * gy, gy * gy };
     }
 }
+
+} /* namespace impl */

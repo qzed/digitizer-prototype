@@ -202,7 +202,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_st);
 
-                structure_tensor_prep(img_m2_1, img_pp);
+                structure_tensor(img_m2_1, img_pp);
                 conv(img_m2_2, img_m2_1, kern_st);
             }
 

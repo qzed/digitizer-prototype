@@ -87,6 +87,63 @@ inline auto grayscale_t::map_value(f32 value) const -> srgb {
 };
 
 
+/*
+ * Cubehelix colormap.
+ *
+ * See https://arxiv.org/abs/1108.5083.
+ * Colormap developed by D. A. Green.
+ */
+class cubehelix_t : public cmap {
+public:
+    cubehelix_t(f32 start=0.5f, f32 rotations=-1.5f, f32 hue=1.2f, f32 gamma=1.0f);
+    auto map_value(f32 value) const -> srgb;
+
+private:
+    f32 m_start;
+    f32 m_rotations;
+    f32 m_hue;
+    f32 m_gamma;
+};
+
+inline cubehelix_t::cubehelix_t(f32 start, f32 rotations, f32 hue, f32 gamma)
+    : m_start{start}
+    , m_rotations{rotations}
+    , m_hue{hue}
+    , m_gamma{gamma}
+{}
+
+inline auto cubehelix_t::map_value(f32 value) const -> srgb {
+    // constants
+    auto const rc = -0.14861f;
+    auto const rs =  1.78277f;
+    auto const gc = -0.29227f;
+    auto const gs = -0.90649f;
+    auto const bc =  1.97294f;
+    auto const bs =  0.00000f;
+
+    // calculation
+    auto const v = std::pow(value, m_gamma);
+
+    auto const phi = 2.f * 3.1415926f * (m_start / 3.f + m_rotations * value);
+    auto const a = m_hue * v * (1.f - v) / 2.f;
+
+    auto const c_phi = std::cos(phi);
+    auto const s_phi = std::sin(phi);
+
+    auto const r = v + a * (rc * c_phi + rs * s_phi);
+    auto const g = v + a * (gc * c_phi + gs * s_phi);
+    auto const b = v + a * (bc * c_phi + bs * s_phi);
+
+    // need to clip as color may be out of range under certain parameters
+    return srgb::from(std::clamp(r, 0.f, 1.f), std::clamp(g, 0.f, 1.f), std::clamp(b, 0.f, 1.f));
+};
+
+inline auto cubehelix(f32 start=0.5f, f32 rotations=-1.5f, f32 hue=1.2f, f32 gamma=1.0f) -> cubehelix_t
+{
+    return cubehelix_t { start, rotations, hue, gamma };
+}
+
+
 template<std::size_t N>
 class lut : public cmap {
 public:

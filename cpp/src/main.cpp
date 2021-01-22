@@ -471,7 +471,8 @@ auto main(int argc, char** argv) -> int
         };
 
         // plot
-        gfx::cmap::viridis.map_into(img_out_color, img_out, {{ 0.1f, 0.7f }});
+        gfx::cmap::cubehelix(0.1, -0.6, 1.0, 2.0)
+                .map_into(img_out_color, img_out, {{ 0.1f, 0.7f }});
 
         // plot heatmap
         auto m = gfx::cairo::matrix::identity();

@@ -522,6 +522,10 @@ void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp
 
     // down-scaling
     for (auto& p : params) {
+        if (!p.valid) {
+            continue;
+        }
+
         // scale and center mean
         p.mean.x = p.mean.x * scale.x - range<S>.x;
         p.mean.y = p.mean.y * scale.y - range<S>.y;
@@ -567,6 +571,10 @@ void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp
 
     // undo down-scaling
     for (auto& p : params) {
+        if (!p.valid) {
+            continue;
+        }
+
         // un-scale and re-adjust mean
         p.mean.x = (p.mean.x + range<S>.x) / scale.x;
         p.mean.y = (p.mean.y + range<S>.y) / scale.y;

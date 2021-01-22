@@ -1,2 +1,11 @@
-option('access_checks', type: 'boolean', value: false,
+option('access_checks', type: 'feature', value: 'auto',
        description: 'Enable memory access checks to debug and prevent segfaults')
+
+option('fast_math', type: 'feature', value: 'auto',
+       description: 'Enable -ffast-math')
+
+option('cpu_type', type: 'string', value: 'core-avx2',
+       description: 'Enable optimizations for specific CPU type (-mtune=<cpu_type>)')
+
+option('simd_type', type: 'string', value: 'avx2',
+       description: 'Enable SIMD optimizations (-m<simd_type>)')

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 
 
 using i8  = std::int8_t;
@@ -51,6 +52,11 @@ inline constexpr auto index2_t::product() const -> index_t
     return this->x * this->y;
 }
 
+
+inline auto operator<< (std::ostream& os, index2_t const& i) -> std::ostream&
+{
+    return os << "[" << i.x << ", " << i.y << "]";
+}
 
 inline constexpr auto operator== (index2_t const& a, index2_t const& b) -> bool
 {

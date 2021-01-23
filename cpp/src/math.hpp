@@ -455,7 +455,7 @@ void transform_inplace(T& obj, F op)
 template<typename T>
 auto sum(T const& obj) -> typename T::Scalar
 {
-    return std::accumulate(obj.begin(), obj.end(), static_cast<typename T::Scalar>(0));
+    return std::accumulate(obj.begin(), obj.end(), math::num<typename T::Scalar>::zero);
 }
 
 template<typename T>
@@ -468,7 +468,7 @@ template<typename T>
 void sub0(T& obj, typename T::Scalar s)
 {
     transform_inplace(obj, [&](auto const& x) {
-        return std::max(x - s, static_cast<typename T::Scalar>(0));
+        return std::max(x - s, math::num<typename T::Scalar>::zero);
     });
 }
 

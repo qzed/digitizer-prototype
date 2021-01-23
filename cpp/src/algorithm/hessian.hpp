@@ -4,12 +4,12 @@
 #include "math.hpp"
 #include "kernels.hpp"
 
-#include "algorithms/border.hpp"
+#include "algorithm/border.hpp"
 
 #include "math/num.hpp"
 #include "math/mat2.hpp"
 
-#include "algorithms/hessian.opt.zero.hpp"
+#include "algorithm/hessian.opt.zero.hpp"
 
 
 namespace impl {

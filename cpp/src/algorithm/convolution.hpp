@@ -3,10 +3,10 @@
 #include "types.hpp"
 #include "math.hpp"
 
-#include "algorithms/border.hpp"
+#include "algorithm/border.hpp"
 
-#include "algorithms/convolution.opt.3x3-extend.hpp"
-#include "algorithms/convolution.opt.5x5-extend.hpp"
+#include "algorithm/convolution.opt.3x3-extend.hpp"
+#include "algorithm/convolution.opt.5x5-extend.hpp"
 
 
 namespace impl {

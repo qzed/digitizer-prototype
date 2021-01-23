@@ -2,7 +2,7 @@
  * Optimized version of convolution.hpp. Do not include directly.
  */
 
-#include "algorithms/convolution.hpp"
+#include "algorithm/convolution.hpp"
 
 
 namespace impl {

@@ -3,13 +3,13 @@
 #include "types.hpp"
 #include "kernels.hpp"
 
-#include "algorithms/convolution.hpp"
-#include "algorithms/distance_transform.hpp"
-#include "algorithms/gaussian_fitting.hpp"
-#include "algorithms/hessian.hpp"
-#include "algorithms/label.hpp"
-#include "algorithms/local_maxima.hpp"
-#include "algorithms/structure_tensor.hpp"
+#include "algorithm/convolution.hpp"
+#include "algorithm/distance_transform.hpp"
+#include "algorithm/gaussian_fitting.hpp"
+#include "algorithm/hessian.hpp"
+#include "algorithm/label.hpp"
+#include "algorithm/local_maxima.hpp"
+#include "algorithm/structure_tensor.hpp"
 
 #include "eval/perf.hpp"
 

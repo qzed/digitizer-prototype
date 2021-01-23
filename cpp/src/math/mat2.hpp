@@ -19,6 +19,7 @@ struct eigen2_t {
 
 template<class T>
 struct mat2s_t {
+public:
     T xx, xy, yy;
 
 public:

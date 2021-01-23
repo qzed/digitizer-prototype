@@ -9,8 +9,13 @@ namespace math {
 
 template<class T>
 struct mat6_t {
+public:
     std::array<T, 6 * 6> data;
 
+public:
+    using value_type = T;
+
+public:
     constexpr static auto identity() -> mat6_t<T>;
 
     constexpr auto operator[] (index2_t i) -> T&;

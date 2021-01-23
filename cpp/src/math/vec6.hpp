@@ -8,8 +8,13 @@ namespace math {
 
 template<class T>
 struct vec6_t {
+public:
     std::array<T, 6> data;
 
+public:
+    using value_type = T;
+
+public:
     constexpr auto operator[] (index_t i) -> T&;
     constexpr auto operator[] (index_t i) const -> T const&;
 };

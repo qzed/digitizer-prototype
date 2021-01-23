@@ -24,4 +24,4 @@ struct num<f64> {
     static inline constexpr f64 eps  = 1e-40;
 };
 
-}
+} /* namespace math */

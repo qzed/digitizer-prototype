@@ -27,4 +27,12 @@ inline constexpr auto vec6_t<T>::operator[] (index_t i) const -> T const&
     return utils::access::access(data, i);
 }
 
+
+template<class T>
+struct num<vec6_t<T>> {
+    static inline constexpr vec6_t<T> zero = {
+            num<T>::zero, num<T>::zero, num<T>::zero,
+            num<T>::zero, num<T>::zero, num<T>::zero };
+};
+
 } /* namespace math */

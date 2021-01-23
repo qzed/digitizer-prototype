@@ -493,7 +493,14 @@ auto main(int argc, char** argv) -> int
 
         // plot touch-points
         for (auto const [confidence, scale, mean, prec] : out_tp[i]) {
-            auto const eigen = eigenvectors(inv(prec).value());
+            auto const sigma = inv(prec);
+
+            if (!sigma.has_value()) {
+                std::cout << "warning: failed to invert sigma\n";
+                continue;
+            }
+
+            auto const eigen = eigenvectors(sigma.value());
 
             // get standard deviation
             auto const nstd = 1.0;

@@ -3,6 +3,7 @@
 #include "../types.hpp"
 #include "../math.hpp"
 
+#include <algorithm>
 #include <type_traits>
 
 
@@ -52,8 +53,18 @@ constexpr auto mirror_y::value(image<T> const& img, index2_t const& i) -> T
 
 
 struct extend {
-    /* TODO (clip) */
+    template<typename T>
+    static constexpr auto value(image<T> const& img, index2_t const& i) -> T;
 };
+
+template<typename T>
+constexpr auto extend::value(image<T> const& img, index2_t const& i) -> T
+{
+    index_t const x = std::clamp(i.x, 0, img.shape().x - 1);
+    index_t const y = std::clamp(i.y, 0, img.shape().y - 1);
+
+    return img[{x, y}];
+}
 
 
 struct zero {

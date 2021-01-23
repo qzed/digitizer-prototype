@@ -5,6 +5,7 @@
 #include "math/mat6.hpp"
 #include "math/sle6.hpp"
 #include "math/vec6.hpp"
+#include "math/num.hpp"
 
 #include <array>
 
@@ -131,7 +132,7 @@ inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T
 }
 
 template<class T>
-bool extract_params(vec6_t<T> const& chi, T& scale, vec2<T>& mean, mat2s<T>& prec, T eps)
+bool extract_params(vec6_t<T> const& chi, T& scale, vec2<T>& mean, mat2s<T>& prec, T eps=math::num<T>::eps)
 {
     prec.xx = -static_cast<T>(2) * chi[0];
     prec.xy = -static_cast<T>(2) * chi[1];
@@ -235,7 +236,7 @@ void reserve(std::vector<parameters<T>>& params, std::size_t n, index2_t shape)
 
 template<class T, class S>
 void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp,
-         unsigned int n_iter, S eps=static_cast<S>(1e-20))
+         unsigned int n_iter, S eps=math::num<S>::eps)
 {
     auto const scale = vec2<S> {
         static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),

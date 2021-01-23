@@ -24,7 +24,7 @@ namespace math {
  * PA.
  */
 template<class T>
-auto lu_decomp(mat6_t<T> const& a, mat6_t<T>& lu, vec6_t<index_t>& p, T eps) -> bool
+auto lu_decomp(mat6_t<T> const& a, mat6_t<T>& lu, vec6_t<index_t>& p, T eps=num<T>::eps) -> bool
 {
     // initialization
     lu = a;
@@ -142,7 +142,7 @@ void lu_solve(mat6_t<T> const& lu, vec6_t<index_t> const& p, vec6_t<T> const& b,
  * with partial pivoting.
  */
 template<class T>
-auto ge_solve(mat6_t<T> a, vec6_t<T> b, vec6_t<T>& x, T eps) -> bool
+auto ge_solve(mat6_t<T> a, vec6_t<T> b, vec6_t<T>& x, T eps=num<T>::eps) -> bool
 {
     // TODO: optimize/unroll?
 

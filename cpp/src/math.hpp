@@ -1,8 +1,11 @@
 #pragma once
 
 #include "types.hpp"
-#include "utils/access.hpp"
+
 #include "math/poly2.hpp"
+#include "math/num.hpp"
+
+#include "utils/access.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -483,7 +486,7 @@ auto det(mat2s<T> const& m) -> T
 }
 
 template<typename T>
-auto inv(mat2s<T> const& m, T eps=zero<T>()) -> std::optional<mat2s<T>>
+auto inv(mat2s<T> const& m, T eps=math::num<T>::eps) -> std::optional<mat2s<T>>
 {
     auto const d = det(m);
 
@@ -501,7 +504,7 @@ struct eigen {
 };
 
 template<typename M, typename S = typename M::Scalar>
-auto eigenvalues(M const& m, S eps=static_cast<S>(1e-20)) -> std::array<S, 2>
+auto eigenvalues(M const& m, S eps=math::num<S>::eps) -> std::array<S, 2>
 {
     return math::solve_quadratic<S>(1, -trace(m), det(m), eps);
 }
@@ -528,7 +531,7 @@ auto eigenvector(mat2s<T> const& m, T ew) -> vec2<T>
 
 
 template<typename M, typename S = typename M::Scalar>
-auto eigenvectors(M const& m, S eps=static_cast<S>(1e-20)) -> eigen<S>
+auto eigenvectors(M const& m, S eps=math::num<S>::eps) -> eigen<S>
 {
     auto const [ew1, ew2] = eigenvalues(m, eps);
 

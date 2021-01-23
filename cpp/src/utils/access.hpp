@@ -24,6 +24,16 @@ inline static constexpr access_mode mode = access_mode::unchecked;
 
 namespace impl {
 
+/*
+ * Note: These functions have been extracted specifically to ensure that
+ * performance with access checks enabled does not suffer too much. We
+ * generally expect access to be valid, so tell the compiler to never inline
+ * these functions and put them on a cold path.
+ *
+ * This improves performance significantly for tightly repeated container
+ * accesses.
+ */
+
 [[noreturn, gnu::cold, gnu::noinline]]
 inline auto blow_up(index_t size, index_t i) {
     auto buf = std::array<char, 128> {};

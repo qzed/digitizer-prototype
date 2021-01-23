@@ -2,7 +2,8 @@
 
 #include "types.hpp"
 
-#include <sstream>
+#include <array>
+#include <cstdio>
 #include <stdexcept>
 
 
@@ -21,40 +22,61 @@ inline static constexpr access_mode mode = access_mode::unchecked;
 #endif
 
 
+namespace impl {
+
+[[noreturn, gnu::cold, gnu::noinline]]
+inline auto blow_up(index_t size, index_t i) {
+    auto buf = std::array<char, 128> {};
+
+    std::snprintf(buf.data(), buf.size(), "invalid access: size is %d, index is %d", size, i);
+
+    throw std::out_of_range { buf.data() };
+}
+
+[[noreturn, gnu::cold, gnu::noinline]]
+inline auto blow_up(index2_t shape, index2_t i) {
+    auto buf = std::array<char, 128> {};
+
+    std::snprintf(buf.data(), buf.size(), "invalid access: size is [%d, %d], index is [%d, %d]",
+                  shape.x, shape.y, i.x, i.y);
+
+    throw std::out_of_range { buf.data() };
+}
+
+} /* namespace impl */
+
+
+[[gnu::always_inline]]
 inline void ensure(index_t size, index_t i)
 {
     if constexpr (mode == access_mode::unchecked) {
         return;
     }
 
-    if (0 <= i && i < size) {
+    if (0 <= i && i < size) [[gnu::likely]] {
         return;
     }
 
-    auto s = std::ostringstream{};
-    s << "invalid access: size is " << size << ", index is " << i;
-
-    throw std::out_of_range { s.str() };
+    impl::blow_up(size, i);
 }
 
+[[gnu::always_inline]]
 inline void ensure(index2_t shape, index2_t i)
 {
     if constexpr (mode == access_mode::unchecked) {
         return;
     }
 
-    if (0 <= i.x && i.x < shape.x && 0 <= i.y && i.y < shape.y) {
+    if (0 <= i.x && i.x < shape.x && 0 <= i.y && i.y < shape.y) [[gnu::likely]] {
         return;
     }
 
-    auto s = std::ostringstream{};
-    s << "invalid access: size is " << shape << ", index is " << i;
-
-    throw std::out_of_range { s.str() };
+    impl::blow_up(shape, i);
 }
 
 
 template<class V, class T>
+[[gnu::always_inline]]
 inline constexpr auto access(T const& data, index_t size, index_t i) -> V const&
 {
     ensure(size, i);
@@ -63,6 +85,7 @@ inline constexpr auto access(T const& data, index_t size, index_t i) -> V const&
 }
 
 template<class V, class T>
+[[gnu::always_inline]]
 inline constexpr auto access(T& data, index_t size, index_t i) -> V&
 {
     ensure(size, i);
@@ -71,6 +94,7 @@ inline constexpr auto access(T& data, index_t size, index_t i) -> V&
 }
 
 template<class V, class T, class F>
+[[gnu::always_inline]]
 inline constexpr auto access(T const& data, F ravel, index2_t shape, index2_t i) -> V const&
 {
     ensure(shape, i);
@@ -79,6 +103,7 @@ inline constexpr auto access(T const& data, F ravel, index2_t shape, index2_t i)
 }
 
 template<class V, class T, class F>
+[[gnu::always_inline]]
 inline constexpr auto access(T& data, F ravel, index2_t shape, index2_t i) -> V&
 {
     ensure(shape, i);

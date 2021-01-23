@@ -1,11 +1,12 @@
 #pragma once
 
-#include "../types.hpp"
-#include "../math.hpp"
+#include "types.hpp"
+#include "math.hpp"
 
-#include "border.hpp"
+#include "algorithms/border.hpp"
 
-#include <type_traits>
+#include "algorithms/convolution.opt.3x3-extend.hpp"
+#include "algorithms/convolution.opt.5x5-extend.hpp"
 
 
 namespace impl {
@@ -34,9 +35,6 @@ void conv_5x5_extend(image<T>& out, image<T> const& in, kernel<S, 5, 5> const& k
 
 } /* namespace impl */
 
-
-#include "convolution.opt.3x3-extend.hpp"
-#include "convolution.opt.5x5-extend.hpp"
 
 template<typename B=border::extend, typename T, typename S, index_t Nx, index_t Ny>
 void conv(image<T>& out, image<T> const& in, kernel<S, Nx, Ny> const& k)

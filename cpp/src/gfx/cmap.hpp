@@ -1,11 +1,10 @@
 #pragma once
 
-#include "color.hpp"
+#include "types.hpp"
+#include "math.hpp"
 
-#include "../types.hpp"
-#include "../math.hpp"
-
-#include "../math/num.hpp"
+#include "gfx/color.hpp"
+#include "math/num.hpp"
 
 #include <algorithm>
 #include <cassert>

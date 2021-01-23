@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../math.hpp"
-#include "../utils/access.hpp"
+#include "math.hpp"
+#include "utils/access.hpp"
 
 
 namespace math {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "num.hpp"
+#include "math/num.hpp"
 
 #include <array>
 #include <cmath>

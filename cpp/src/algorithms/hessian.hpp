@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../types.hpp"
-#include "../math.hpp"
-#include "../kernels.hpp"
+#include "types.hpp"
+#include "math.hpp"
+#include "kernels.hpp"
 
-#include "border.hpp"
+#include "algorithms/border.hpp"
 
-#include "hessian.opt.zero.hpp"
+#include "algorithms/hessian.opt.zero.hpp"
 
 
 namespace impl {

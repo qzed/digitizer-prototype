@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../math.hpp"
+#include "math.hpp"
 
-#include "../math/vec6.hpp"
-#include "../math/mat6.hpp"
+#include "math/vec6.hpp"
+#include "math/mat6.hpp"
 
-#include "../utils/access.hpp"
+#include "utils/access.hpp"
 
 
 namespace math {

@@ -2,7 +2,7 @@
  * Optimized version of hessian.hpp. Do not include directly.
  */
 
-#include "hessian.hpp"
+#include "algorithms/hessian.hpp"
 
 
 namespace impl {

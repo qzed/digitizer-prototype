@@ -2,7 +2,7 @@
  * Optimized version of structure_tensor.hpp. Do not include directly.
  */
 
-#include "structure_tensor.hpp"
+#include "algorithms/structure_tensor.hpp"
 
 
 namespace impl {

@@ -54,4 +54,10 @@ cairo_dep = dependency('cairo')
 
 
 # binaries
-executable('main', 'src/main.cpp', dependencies: [cairo_dep])
+src_main = [
+    'src/main.cpp'
+]
+
+inc_main = include_directories('src')
+
+executable('main', src_main, dependencies: [cairo_dep], include_directories: inc_main)

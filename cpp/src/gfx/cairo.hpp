@@ -1,9 +1,9 @@
 #pragma once
 
-#include "cmap.hpp"
-#include "color.hpp"
+#include "math.hpp"
 
-#include "../math.hpp"
+#include "gfx/cmap.hpp"
+#include "gfx/color.hpp"
 
 #include <exception>
 #include <filesystem>

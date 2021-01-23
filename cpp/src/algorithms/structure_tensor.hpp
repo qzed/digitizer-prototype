@@ -6,13 +6,16 @@
 
 #include "algorithms/border.hpp"
 
+#include "math/num.hpp"
+#include "math/mat2.hpp"
+
 #include "algorithms/structure_tensor.opt.3x3-zero.hpp"
 
 
 namespace impl {
 
 template<typename Bx, typename By, typename T, index_t Nx, index_t Ny>
-void structure_tensor_generic(image<mat2s<T>>& out, image<T> const& in,
+void structure_tensor_generic(image<math::mat2s_t<T>>& out, image<T> const& in,
                               kernel<T, Nx, Ny> const& kx, kernel<T, Nx, Ny> const& ky)
 {
     index_t const dx = (Nx - 1) / 2;
@@ -41,7 +44,7 @@ void structure_tensor_generic(image<mat2s<T>>& out, image<T> const& in,
 
 
 template<typename Bx=border::zero, typename By=border::zero, typename T, index_t Nx=3, index_t Ny=3>
-void structure_tensor(image<mat2s<T>>& out, image<T> const& in,
+void structure_tensor(image<math::mat2s_t<T>>& out, image<T> const& in,
                       kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
                       kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)
 {

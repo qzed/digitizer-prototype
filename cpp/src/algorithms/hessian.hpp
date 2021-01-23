@@ -6,13 +6,16 @@
 
 #include "algorithms/border.hpp"
 
+#include "math/num.hpp"
+#include "math/mat2.hpp"
+
 #include "algorithms/hessian.opt.zero.hpp"
 
 
 namespace impl {
 
 template<typename B=border::zero, typename T>
-void hessian_generic(image<mat2s<T>>& out, image<T> const& in)
+void hessian_generic(image<math::mat2s_t<T>>& out, image<T> const& in)
 {
     auto const& kxx = kernels::sobel3_xx<T>;
     auto const& kyy = kernels::sobel3_yy<T>;
@@ -49,7 +52,7 @@ void hessian_generic(image<mat2s<T>>& out, image<T> const& in)
 
 
 template<typename B=border::zero, typename T>
-void hessian(image<mat2s<T>>& out, image<T> const& in)
+void hessian(image<math::mat2s_t<T>>& out, image<T> const& in)
 {
     assert(in.shape() == out.shape());
 

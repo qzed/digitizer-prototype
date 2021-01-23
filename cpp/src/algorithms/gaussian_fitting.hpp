@@ -2,9 +2,13 @@
 
 #include "math.hpp"
 
+#include "math/vec2.hpp"
+#include "math/mat2.hpp"
+
+#include "math/vec6.hpp"
 #include "math/mat6.hpp"
 #include "math/sle6.hpp"
-#include "math/vec6.hpp"
+
 #include "math/num.hpp"
 
 #include <array>
@@ -13,6 +17,8 @@
 namespace gfit {
 
 using math::vec2_t;
+using math::mat2s_t;
+
 using math::vec6_t;
 using math::mat6_t;
 
@@ -31,7 +37,7 @@ struct parameters {
     bool        valid;      // flag to invalidate parameters
     T           scale;      // alpha
     vec2_t<T>   mean;       // mu
-    mat2s<T>    prec;       // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
+    mat2s_t<T>  prec;       // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
     bbox        bounds;     // local bounds for sampling
     image<T>    weights;    // local weights for sampling
 };
@@ -46,9 +52,9 @@ namespace impl {
  * @prec: Precision matrix, i.e. the invariance of the covariance matrix.
  */
 template<class T>
-auto gaussian_like(vec2_t<T> x, vec2_t<T> mean, mat2s<T> prec) -> T
+auto gaussian_like(vec2_t<T> x, vec2_t<T> mean, mat2s_t<T> prec) -> T
 {
-    return std::exp(-xtmx(prec, x - mean) / static_cast<T>(2));
+    return std::exp(-prec.vtmv(x - mean) / static_cast<T>(2));
 }
 
 
@@ -133,14 +139,12 @@ inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T
 }
 
 template<class T>
-bool extract_params(vec6_t<T> const& chi, T& scale, vec2_t<T>& mean, mat2s<T>& prec, T eps=math::num<T>::eps)
+bool extract_params(vec6_t<T> const& chi, T& scale, vec2_t<T>& mean, mat2s_t<T>& prec, T eps=math::num<T>::eps)
 {
-    prec.xx = -static_cast<T>(2) * chi[0];
-    prec.xy = -static_cast<T>(2) * chi[1];
-    prec.yy = -static_cast<T>(2) * chi[2];
+    prec = -static_cast<T>(2) * mat2s_t<T> { chi[0], chi[1], chi[2] };
 
     // mu = sigma * b = prec^-1 * B
-    auto const d = det(prec);
+    auto const d = prec.det();
     if (std::abs(d) <= eps) {
         return false;
     }
@@ -148,7 +152,7 @@ bool extract_params(vec6_t<T> const& chi, T& scale, vec2_t<T>& mean, mat2s<T>& p
     mean.x = (prec.yy * chi[3] - prec.xy * chi[4]) / d;
     mean.y = (prec.xx * chi[4] - prec.xy * chi[3]) / d;
 
-    scale = std::exp(chi[5] + xtmx(prec, mean) / static_cast<T>(2));
+    scale = std::exp(chi[5] + prec.vtmv(mean) / static_cast<T>(2));
 
     return true;
 }

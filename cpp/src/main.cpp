@@ -18,6 +18,7 @@
 
 #include "math/num.hpp"
 #include "math/vec2.hpp"
+#include "math/mat2.hpp"
 
 #include <vector>
 #include <numeric>
@@ -145,9 +146,9 @@ auto main(int argc, char** argv) -> int
     auto perf_t_gfit  = perf_reg.create_entry("gaussian-fitting");
 
     auto img_pp  = image<f32> {{ 72, 48 }};
-    auto img_m2_1 = image<mat2s<f32>> { img_pp.shape() };
-    auto img_m2_2 = image<mat2s<f32>> { img_pp.shape() };
-    auto img_stev = image<math::vec2_t<f32>> { img_pp.shape() };
+    auto img_m2_1 = image<math::mat2s_t<f32>> { img_pp.shape() };
+    auto img_m2_2 = image<math::mat2s_t<f32>> { img_pp.shape() };
+    auto img_stev = image<math::vec2_t<f32>>  { img_pp.shape() };
     auto img_rdg = image<f32> { img_pp.shape() };
     auto img_obj = image<f32> { img_pp.shape() };
     auto img_lbl = image<u16> { img_pp.shape() };
@@ -180,7 +181,7 @@ auto main(int argc, char** argv) -> int
     auto out = std::vector<image<f32>>{};
     out.reserve(heatmaps.size());
 
-    auto out_tp = std::vector<std::vector<std::tuple<f32, f32, math::vec2_t<f32>, mat2s<f32>>>>{};
+    auto out_tp = std::vector<std::vector<std::tuple<f32, f32, math::vec2_t<f32>, math::mat2s_t<f32>>>>{};
     out_tp.reserve(heatmaps.size());
 
     std::cout << "Processing..." << std::endl;
@@ -214,7 +215,7 @@ auto main(int argc, char** argv) -> int
                 auto _r = perf_reg.record(perf_t_stev);
 
                 std::transform(img_m2_2.begin(), img_m2_2.end(), img_stev.begin(), [](auto s) {
-                    auto const [ew1, ew2] = eigenvalues(s);
+                    auto const [ew1, ew2] = s.eigenvalues();
                     return math::vec2_t<f32> { ew1, ew2 };
                 });
             }
@@ -232,7 +233,7 @@ auto main(int argc, char** argv) -> int
                 auto _r = perf_reg.record(perf_t_rdg);
 
                 std::transform(img_m2_2.begin(), img_m2_2.end(), img_rdg.begin(), [](auto h) {
-                    auto const [ev1, ev2] = eigenvalues(h);
+                    auto const [ev1, ev2] = h.eigenvalues();
                     return std::max(ev1, 0.0f) + std::max(ev2, 0.0f);
                 });
             }
@@ -494,14 +495,14 @@ auto main(int argc, char** argv) -> int
 
         // plot touch-points
         for (auto const [confidence, scale, mean, prec] : out_tp[i]) {
-            auto const sigma = inv(prec);
+            auto const sigma = prec.inverse();
 
             if (!sigma.has_value()) {
                 std::cout << "warning: failed to invert sigma\n";
                 continue;
             }
 
-            auto const eigen = eigenvectors(sigma.value());
+            auto const eigen = sigma.value().eigen();
 
             // get standard deviation
             auto const nstd = 1.0;

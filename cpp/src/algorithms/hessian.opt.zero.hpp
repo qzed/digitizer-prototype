@@ -8,7 +8,7 @@
 namespace impl {
 
 template<typename T>
-void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
+void hessian_zero(image<mat2s_t<T>>& out, image<T> const& in)
 {
     // kernels
     auto const& kxx = kernels::sobel3_xx<T>;
@@ -42,7 +42,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
     // x = 0, y = 0
     {
-        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+        auto h = math::num<math::mat2s_t<T>>::zero;
 
         h.xx += in[i + s_center] * kxx[k_center];
         h.xy += in[i + s_center] * kxy[k_center];
@@ -66,7 +66,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
     // 0 < x < n - 1, y = 0
     for (; i < in.shape().x - 1; ++i) {
-        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+        auto h = math::num<math::mat2s_t<T>>::zero;
 
         h.xx += in[i + s_left] * kxx[k_left];
         h.xy += in[i + s_left] * kxy[k_left];
@@ -97,7 +97,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
     // x = n - 1, y = 0
     {
-        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+        auto h = math::num<math::mat2s_t<T>>::zero;
 
         h.xx += in[i + s_left] * kxx[k_left];
         h.xy += in[i + s_left] * kxy[k_left];
@@ -123,7 +123,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
     while (i < in.shape().x * (in.shape().y - 1)) {
         // x = 0
         {
-            auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+            auto h = math::num<math::mat2s_t<T>>::zero;
 
             h.xx += in[i + s_top] * kxx[k_top];
             h.xy += in[i + s_top] * kxy[k_top];
@@ -156,7 +156,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
         // 0 < x < n - 1
         auto const limit = i + in.shape().x - 2;
         for (; i < limit; ++i) {
-            auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+            auto h = math::num<math::mat2s_t<T>>::zero;
 
             h.xx += in[i + s_top_left] * kxx[k_top_left];
             h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -199,7 +199,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
         // x = n - 1
         {
-            auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+            auto h = math::num<math::mat2s_t<T>>::zero;
 
             h.xx += in[i + s_top_left] * kxx[k_top_left];
             h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -232,7 +232,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
     // x = 0, y = n - 1
     {
-        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+        auto h = math::num<math::mat2s_t<T>>::zero;
 
         h.xx += in[i + s_top] * kxx[k_top];
         h.xy += in[i + s_top] * kxy[k_top];
@@ -256,7 +256,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
     // 0 < x < n - 1, y = n - 1
     for (; i < in.shape().product() - 1; ++i) {
-        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+        auto h = math::num<math::mat2s_t<T>>::zero;
 
         h.xx += in[i + s_top_left] * kxx[k_top_left];
         h.xy += in[i + s_top_left] * kxy[k_top_left];
@@ -287,7 +287,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
 
     // x = n - 1, y = n - 1
     {
-        auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
+        auto h = math::num<math::mat2s_t<T>>::zero;
 
         h.xx += in[i + s_top_left] * kxx[k_top_left];
         h.xy += in[i + s_top_left] * kxy[k_top_left];

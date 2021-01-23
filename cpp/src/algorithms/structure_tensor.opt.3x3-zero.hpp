@@ -8,7 +8,7 @@
 namespace impl {
 
 template<typename T>
-void structure_tensor_3x3_zero(image<mat2s<f32>>& out, image<f32> const& in,
+void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const& in,
                                kernel<f32, 3, 3> const& kx, kernel<f32, 3, 3> const& ky)
 {
     assert(in.shape() == out.shape());

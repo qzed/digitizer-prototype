@@ -2,6 +2,7 @@
 
 #include "types.hpp"
 
+#include "math/mat2.hpp"
 #include "math/num.hpp"
 #include "math/poly2.hpp"
 #include "math/vec2.hpp"
@@ -17,6 +18,7 @@
 
 
 using math::vec2_t;
+using math::mat2s_t;
 
 
 template<typename T>
@@ -46,6 +48,18 @@ auto zero() -> vec2_t<f64>
     return math::num<vec2_t<f64>>::zero;
 }
 
+template<>
+auto zero() -> mat2s_t<f32>
+{
+    return math::num<mat2s_t<f32>>::zero;
+}
+
+template<>
+auto zero() -> math::mat2s_t<f64>
+{
+    return math::num<mat2s_t<f64>>::zero;
+}
+
 
 inline constexpr auto ravel(index2_t const& shape, index2_t const& i) -> index_t
 {
@@ -60,77 +74,6 @@ inline constexpr auto unravel(index2_t const& shape, index_t const& i) -> index2
 inline constexpr auto stride(index2_t const& shape) -> index_t
 {
     return shape.x;
-}
-
-
-template<typename T>
-struct mat2s {
-    T xx, xy, yy;
-
-    using Scalar = T;
-
-    static constexpr auto identity() -> mat2s<T>;
-
-    constexpr auto operator+= (mat2s<T> const& rhs) noexcept -> mat2s<T>&;
-};
-
-template<typename T>
-constexpr auto mat2s<T>::identity() -> mat2s<T>
-{
-    return { static_cast<T>(1), static_cast<T>(0), static_cast<T>(1) };
-}
-
-template<typename T>
-constexpr auto mat2s<T>::operator+= (mat2s<T> const& rhs) noexcept -> mat2s<T>&
-{
-    this->xx += rhs.xx;
-    this->xy += rhs.xy;
-    this->yy += rhs.yy;
-    return *this;
-}
-
-template<typename T>
-auto operator<< (std::ostream& os, mat2s<T> const& m) -> std::ostream&
-{
-    return os << "[[" << m.xx << ", " << m.xy << "], [" << m.xy << ", " << m.yy << "]]";
-}
-
-template<typename U, typename V>
-constexpr auto operator+ (mat2s<U> const& a, mat2s<V> const& b) noexcept -> mat2s<decltype(a.xx + b.xx)>
-{
-    return { a.xx + b.xx, a.xy + b.xy, a.yy + b.yy };
-}
-
-template<typename T>
-constexpr auto operator* (mat2s<T> const& a, T s) noexcept -> mat2s<T>
-{
-    return { a.xx * s, a.xy * s, a.yy * s };
-}
-
-template<typename U, typename V>
-constexpr auto mul(mat2s<U> const& a, mat2s<V> const& b) noexcept -> mat2s<decltype(a.xx * b.xx)>
-{
-    return { a.xx * b.xx, a.xy * b.xy, a.yy * b.yy };
-}
-
-
-template<typename T>
-constexpr auto xtmx(mat2s<T> const& m, vec2_t<T> const& v) noexcept -> T
-{
-    return v.x * v.x * m.xx + static_cast<T>(2) * v.x * v.y * m.xy + v.y * v.y * m.yy;
-}
-
-
-template<>
-auto zero() -> mat2s<f32>
-{
-    return { 0.0f, 0.0f, 0.0f };
-}
-
-template<>
-auto zero() -> mat2s<f64>
-{
-    return { 0.0, 0.0, 0.0 };
 }
 
 
@@ -401,75 +344,4 @@ void sub0(T& obj, typename T::Scalar s)
     transform_inplace(obj, [&](auto const& x) {
         return std::max(x - s, math::num<typename T::Scalar>::zero);
     });
-}
-
-
-template<typename T>
-auto trace(mat2s<T> const& m) -> T
-{
-    return m.xx + m.yy;
-}
-
-template<typename T>
-auto det(mat2s<T> const& m) -> T
-{
-    return m.xx * m.yy - m.xy * m.xy;
-}
-
-template<typename T>
-auto inv(mat2s<T> const& m, T eps=math::num<T>::eps) -> std::optional<mat2s<T>>
-{
-    auto const d = det(m);
-
-    if (std::abs(d) <= eps)
-        return std::nullopt;
-
-    return {{ m.yy / d, -m.xy / d, m.xx / d }};
-}
-
-
-template<typename T>
-struct eigen {
-    std::array<T, 2>         w;
-    std::array<vec2_t<T>, 2> v;
-};
-
-template<typename M, typename S = typename M::Scalar>
-auto eigenvalues(M const& m, S eps=math::num<S>::eps) -> std::array<S, 2>
-{
-    return math::solve_quadratic<S>(1, -trace(m), det(m), eps);
-}
-
-template<class T>
-auto eigenvector(mat2s<T> const& m, T ew) -> vec2_t<T>
-{
-    auto ev = vec2_t<T>{};
-
-    /*
-     * This 'if' should prevent two problems:
-     * 1. Cancellation due to small values in subtraction.
-     * 2. The vector being { 0, 0 }.
-     */
-    if (std::abs(m.xx - ew) > std::abs(m.yy - ew)) {
-        ev = { -m.xy, m.xx - ew };
-    } else {
-        ev = { m.yy - ew, -m.xy };
-    }
-
-    return ev / ev.norm_l2();
-}
-
-
-template<typename M, typename S = typename M::Scalar>
-auto eigenvectors(M const& m, S eps=math::num<S>::eps) -> eigen<S>
-{
-    auto const [ew1, ew2] = eigenvalues(m, eps);
-
-    auto ev1 = eigenvector(m, ew1);
-    auto ev2 = eigenvector(m, ew2);
-
-    return {
-        { ew1, ew2 },
-        { ev1, ev2 },
-    };
 }

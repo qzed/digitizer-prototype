@@ -214,7 +214,7 @@ void structure_tensor_3x3_zero(image<mat2s<f32>>& out, image<f32> const& in,
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < prod(in.shape()) - 1; ++i) {
+    for (; i < in.shape().product() - 1; ++i) {
         f32 gx = 0.0f, gy = 0.0f;
 
         gx += in[i + s_top_left] * kx[k_top_left];

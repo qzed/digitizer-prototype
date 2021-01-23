@@ -68,7 +68,7 @@ inline auto merge(image<u16>& forest, u16 t1_index, u16 t1_root, u16 t2_index, u
 inline auto resolve(image<u16>& forest, u16 background) -> u16
 {
     u16 n_labels = 0;
-    for (index_t i = 0; i < prod(forest.shape()); ++i) {
+    for (index_t i = 0; i < forest.shape().product(); ++i) {
         if (i != background) {
             if (!is_root(forest, i)) {
                 forest[i] = forest[forest[i]];
@@ -86,7 +86,7 @@ inline auto resolve(image<u16>& forest, u16 background) -> u16
 template<typename T>
 inline auto find_background(image<T> const& data, T threshold) -> u16
 {
-    for (index_t i = 0; i < prod(data.shape()); ++i) {
+    for (index_t i = 0; i < data.shape().product(); ++i) {
         if (data[i] <= threshold) {
             return i;
         }
@@ -132,7 +132,7 @@ auto label(image<u16>& out, image<T> const& data, T threshold) -> u16
     }
 
     // 0 < y < n
-    while (i < prod(data.shape())) {
+    while (i < data.shape().product()) {
 
         // x = 0
         if (data[i] <= threshold) {

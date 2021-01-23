@@ -243,7 +243,7 @@ auto main(int argc, char** argv) -> int
                 f32 const wr = 0.9;
                 f32 const wh = 1.1;
 
-                for (index_t i = 0; i < prod(img_pp.shape()); ++i) {
+                for (index_t i = 0; i < img_pp.shape().product(); ++i) {
                     img_obj[i] = wh * img_pp[i] - wr * img_rdg[i];
                 }
             }
@@ -271,7 +271,7 @@ auto main(int argc, char** argv) -> int
                 cstats.clear();
                 cstats.assign(num_labels, component_stats { 0, 0, 0, 0 });
 
-                for (index_t i = 0; i < prod(img_pp.shape()); ++i) {
+                for (index_t i = 0; i < img_pp.shape().product(); ++i) {
                     auto const label = img_lbl[i];
 
                     if (label == 0)
@@ -314,7 +314,7 @@ auto main(int argc, char** argv) -> int
 
                 auto const th_inc = 0.6f;
 
-                auto const wdt_cost = [&](index_t i, vec2<int> d) -> f32 {
+                auto const wdt_cost = [&](index_t i, index2_t d) -> f32 {
                     f32 const c_dist = 0.1f;
                     f32 const c_ridge = 9.0f;
                     f32 const c_grad = 1.0f;
@@ -347,7 +347,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_flt);
 
-                for (index_t i = 0; i < prod(img_pp.shape()); ++i) {
+                for (index_t i = 0; i < img_pp.shape().product(); ++i) {
                     auto const sigma = 1.0f;
 
                     // img_out[i] = std::numeric_limits<f32>::max() == img_dm1[i] ? 0.0f : img_dm1[i];

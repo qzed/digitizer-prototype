@@ -255,7 +255,7 @@ void hessian_zero(image<mat2s<T>>& out, image<T> const& in)
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < prod(in.shape()) - 1; ++i) {
+    for (; i < in.shape().product() - 1; ++i) {
         auto h = mat2s<T> { 0.0f, 0.0f, 0.0f };
 
         h.xx += in[i + s_top_left] * kxx[k_top_left];

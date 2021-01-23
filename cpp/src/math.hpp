@@ -31,6 +31,22 @@ auto zero() -> f64
 }
 
 
+inline constexpr auto ravel(index2_t const& shape, index2_t const& i) -> index_t
+{
+    return i.y * shape.x + i.x;
+}
+
+inline constexpr auto unravel(index2_t const& shape, index_t const& i) -> index2_t
+{
+    return { i % shape.x, i / shape.x };
+}
+
+inline constexpr auto stride(index2_t const& shape) -> index_t
+{
+    return shape.x;
+}
+
+
 template<typename T>
 struct vec2 {
     T x, y;
@@ -170,7 +186,6 @@ constexpr auto xtmx(mat2s<T> const& m, vec2<T> const& v) noexcept -> T
 }
 
 
-
 template<>
 auto zero() -> mat2s<f32>
 {
@@ -181,25 +196,6 @@ template<>
 auto zero() -> mat2s<f64>
 {
     return { 0.0, 0.0, 0.0 };
-}
-
-
-using index_t = i32;
-using index2_t = vec2<index_t>;
-
-constexpr auto ravel(index2_t const& shape, index2_t const& i) noexcept -> index_t
-{
-    return i.y * shape.x + i.x;
-}
-
-constexpr auto unravel(index2_t const& shape, index_t const& i) noexcept -> index2_t
-{
-    return { i % shape.x, i / shape.x };
-}
-
-constexpr auto stride(index2_t const& shape) noexcept -> index_t
-{
-    return shape.x;
 }
 
 
@@ -461,7 +457,7 @@ auto sum(T const& obj) -> typename T::Scalar
 template<typename T>
 auto average(T const& obj) -> typename T::Scalar
 {
-    return sum(obj) / static_cast<typename T::Scalar>(prod(obj.shape()));
+    return sum(obj) / static_cast<typename T::Scalar>(obj.shape().product());
 }
 
 template<typename T>

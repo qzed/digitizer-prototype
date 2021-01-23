@@ -71,7 +71,7 @@ auto is_compute(B& bin, M& mask, index_t i) -> bool
 }
 
 template<typename V, typename T>
-auto get_cost(T& cost, index_t i, vec2<int> d) -> V
+auto get_cost(T& cost, index_t i, index2_t d) -> V
 {
     return cost(i, d);
 }
@@ -366,7 +366,7 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < prod(out.shape()) - 1; ++i) {
+    for (; i < out.shape().product() - 1; ++i) {
         if (impl::is_foreground(bin, i)) {
             out[i] = static_cast<T>(0);
             continue;

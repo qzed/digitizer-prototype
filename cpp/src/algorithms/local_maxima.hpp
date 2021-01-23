@@ -195,7 +195,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < prod(data.shape()) - 1; ++i) {
+    for (; i < data.shape().product() - 1; ++i) {
         if (data[i] <= threshold)
             continue;
 

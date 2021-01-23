@@ -17,10 +17,6 @@
 #include <numeric>
 
 
-using math::vec2_t;
-using math::mat2s_t;
-
-
 inline constexpr auto ravel(index2_t const& shape, index2_t const& i) -> index_t
 {
     return i.y * shape.x + i.x;

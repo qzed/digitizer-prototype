@@ -8,7 +8,7 @@
 namespace impl {
 
 template<typename T>
-void hessian_zero(image<mat2s_t<T>>& out, image<T> const& in)
+void hessian_zero(image<math::mat2s_t<T>>& out, image<T> const& in)
 {
     // kernels
     auto const& kxx = kernels::sobel3_xx<T>;

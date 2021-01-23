@@ -66,4 +66,3 @@ inline constexpr auto operator- (index2_t const& a, index2_t const& b) -> index2
 {
     return { a.x - b.x, a.y - b.y };
 }
-

@@ -12,12 +12,13 @@
 
 namespace gfit {
 
-using math::mat6_t;
+using math::vec2_t;
 using math::vec6_t;
+using math::mat6_t;
 
 
 template<class T>
-inline constexpr auto const range = vec2<T> { static_cast<T>(1), static_cast<T>(1) };
+inline constexpr auto const range = vec2_t<T> { static_cast<T>(1), static_cast<T>(1) };
 
 
 struct bbox {
@@ -29,7 +30,7 @@ template<class T>
 struct parameters {
     bool        valid;      // flag to invalidate parameters
     T           scale;      // alpha
-    vec2<T>     mean;       // mu
+    vec2_t<T>   mean;       // mu
     mat2s<T>    prec;       // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
     bbox        bounds;     // local bounds for sampling
     image<T>    weights;    // local weights for sampling
@@ -45,7 +46,7 @@ namespace impl {
  * @prec: Precision matrix, i.e. the invariance of the covariance matrix.
  */
 template<class T>
-auto gaussian_like(vec2<T> x, vec2<T> mean, mat2s<T> prec) -> T
+auto gaussian_like(vec2_t<T> x, vec2_t<T> mean, mat2s<T> prec) -> T
 {
     return std::exp(-xtmx(prec, x - mean) / static_cast<T>(2));
 }
@@ -56,7 +57,7 @@ inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T
 {
     auto const eps = std::numeric_limits<S>::epsilon();
 
-    auto const scale = vec2<S> {
+    auto const scale = vec2_t<S> {
         static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),
         static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
     };
@@ -132,7 +133,7 @@ inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T
 }
 
 template<class T>
-bool extract_params(vec6_t<T> const& chi, T& scale, vec2<T>& mean, mat2s<T>& prec, T eps=math::num<T>::eps)
+bool extract_params(vec6_t<T> const& chi, T& scale, vec2_t<T>& mean, mat2s<T>& prec, T eps=math::num<T>::eps)
 {
     prec.xx = -static_cast<T>(2) * chi[0];
     prec.xy = -static_cast<T>(2) * chi[1];
@@ -156,7 +157,7 @@ bool extract_params(vec6_t<T> const& chi, T& scale, vec2<T>& mean, mat2s<T>& pre
 template<class T>
 inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& total)
 {
-    auto const scale = vec2<T> {
+    auto const scale = vec2_t<T> {
         static_cast<T>(2) * range<T>.x / static_cast<T>(total.shape().x),
         static_cast<T>(2) * range<T>.y / static_cast<T>(total.shape().y),
     };
@@ -238,7 +239,7 @@ template<class T, class S>
 void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp,
          unsigned int n_iter, S eps=math::num<S>::eps)
 {
-    auto const scale = vec2<S> {
+    auto const scale = vec2_t<S> {
         static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),
         static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
     };

@@ -17,6 +17,7 @@
 #include "gfx/cmap.hpp"
 
 #include "math/num.hpp"
+#include "math/vec2.hpp"
 
 #include <vector>
 #include <numeric>
@@ -146,7 +147,7 @@ auto main(int argc, char** argv) -> int
     auto img_pp  = image<f32> {{ 72, 48 }};
     auto img_m2_1 = image<mat2s<f32>> { img_pp.shape() };
     auto img_m2_2 = image<mat2s<f32>> { img_pp.shape() };
-    auto img_stev = image<vec2<f32>> { img_pp.shape() };
+    auto img_stev = image<math::vec2_t<f32>> { img_pp.shape() };
     auto img_rdg = image<f32> { img_pp.shape() };
     auto img_obj = image<f32> { img_pp.shape() };
     auto img_lbl = image<u16> { img_pp.shape() };
@@ -179,7 +180,7 @@ auto main(int argc, char** argv) -> int
     auto out = std::vector<image<f32>>{};
     out.reserve(heatmaps.size());
 
-    auto out_tp = std::vector<std::vector<std::tuple<f32, f32, vec2<f32>, mat2s<f32>>>>{};
+    auto out_tp = std::vector<std::vector<std::tuple<f32, f32, math::vec2_t<f32>, mat2s<f32>>>>{};
     out_tp.reserve(heatmaps.size());
 
     std::cout << "Processing..." << std::endl;
@@ -214,7 +215,7 @@ auto main(int argc, char** argv) -> int
 
                 std::transform(img_m2_2.begin(), img_m2_2.end(), img_stev.begin(), [](auto s) {
                     auto const [ew1, ew2] = eigenvalues(s);
-                    return vec2<f32> { ew1, ew2 };
+                    return math::vec2_t<f32> { ew1, ew2 };
                 });
             }
 
@@ -468,7 +469,7 @@ auto main(int argc, char** argv) -> int
         auto const win_w = static_cast<f64>(width);
         auto const win_h = static_cast<f64>(height);
 
-        auto const t = [&](vec2<f64> p) -> vec2<f64> {
+        auto const t = [&](math::vec2_t<f64> p) -> math::vec2_t<f64> {
             return { p.x * (win_w / img_w), win_h - p.y * (win_h / img_h) };
         };
 
@@ -508,8 +509,8 @@ auto main(int argc, char** argv) -> int
             auto const s2 = nstd * std::sqrt(eigen.w[1]);
 
             // eigenvectors scaled with standard deviation
-            auto const v1 = vec2<f64> { eigen.v[0].x * s1, eigen.v[0].y * s1 };
-            auto const v2 = vec2<f64> { eigen.v[1].x * s2, eigen.v[1].y * s2 };
+            auto const v1 = eigen.v[0].cast<f64>() * s1;
+            auto const v2 = eigen.v[1].cast<f64>() * s2;
 
             // standard deviation
             cr.set_source(gfx::srgba { 0.0, 0.0, 0.0, 0.33 });

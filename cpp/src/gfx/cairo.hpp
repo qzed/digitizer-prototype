@@ -1,9 +1,9 @@
 #pragma once
 
-#include "math.hpp"
-
 #include "gfx/cmap.hpp"
 #include "gfx/color.hpp"
+
+#include "math/vec2.hpp"
 
 #include <exception>
 #include <filesystem>
@@ -13,6 +13,8 @@
 
 
 namespace gfx::cairo {
+
+using math::vec2_t;
 
 using status_t = cairo_status_t;
 
@@ -87,7 +89,7 @@ public:
     void set_source(pattern& p);
     void set_source(srgb rgb);
     void set_source(srgba rgba);
-    void set_source(surface& src, vec2<f64> origin);
+    void set_source(surface& src, vec2_t<f64> origin);
     auto get_source() -> pattern;
 
     void set_source_filter(filter f);
@@ -99,14 +101,14 @@ public:
     void save();
     void restore();
 
-    void translate(vec2<f64> s);
-    void scale(vec2<f64> s);
+    void translate(vec2_t<f64> s);
+    void scale(vec2_t<f64> s);
     void rotate(f64 angle);
 
-    void move_to(vec2<f64> pos);
-    void line_to(vec2<f64> pos);
-    void rectangle(vec2<f64> origin, vec2<f64> size);
-    void arc(vec2<f64> center, f64 radius, f64 angle1, f64 angle2);
+    void move_to(vec2_t<f64> pos);
+    void line_to(vec2_t<f64> pos);
+    void rectangle(vec2_t<f64> origin, vec2_t<f64> size);
+    void arc(vec2_t<f64> center, f64 radius, f64 angle1, f64 angle2);
 
     void select_font_face(char const* family, font_slant slant, font_weight weight);
     void set_font_size(f64 size);
@@ -177,8 +179,8 @@ public:
     auto raw() -> cairo_matrix_t*;
     auto operator* () -> cairo_matrix_t*;
 
-    void translate(vec2<f64> v);
-    void scale(vec2<f64> v);
+    void translate(vec2_t<f64> v);
+    void scale(vec2_t<f64> v);
 
 private:
     cairo_matrix_t m_raw;
@@ -274,7 +276,7 @@ inline void cairo::set_source(srgba c)
     cairo_set_source_rgba(m_raw, c.r, c.g, c.b, c.a);
 }
 
-inline void cairo::set_source(surface& src, vec2<f64> origin)
+inline void cairo::set_source(surface& src, vec2_t<f64> origin)
 {
     cairo_set_source_surface(m_raw, *src, origin.x, origin.y);
 }
@@ -314,12 +316,12 @@ inline void cairo::restore()
     cairo_restore(m_raw);
 }
 
-inline void cairo::translate(vec2<f64> v)
+inline void cairo::translate(vec2_t<f64> v)
 {
     cairo_translate(m_raw, v.x, v.y);
 }
 
-inline void cairo::scale(vec2<f64> s)
+inline void cairo::scale(vec2_t<f64> s)
 {
     cairo_scale(m_raw, s.x, s.y);
 }
@@ -329,22 +331,22 @@ inline void cairo::rotate(f64 angle)
     cairo_rotate(m_raw, angle);
 }
 
-inline void cairo::move_to(vec2<f64> pos)
+inline void cairo::move_to(vec2_t<f64> pos)
 {
     cairo_move_to(m_raw, pos.x, pos.y);
 }
 
-inline void cairo::line_to(vec2<f64> pos)
+inline void cairo::line_to(vec2_t<f64> pos)
 {
     cairo_line_to(m_raw, pos.x, pos.y);
 }
 
-inline void cairo::rectangle(vec2<f64> origin, vec2<f64> size)
+inline void cairo::rectangle(vec2_t<f64> origin, vec2_t<f64> size)
 {
     cairo_rectangle(m_raw, origin.x, origin.y, size.x, size.y);
 }
 
-inline void cairo::arc(vec2<f64> center, f64 radius, f64 angle1, f64 angle2)
+inline void cairo::arc(vec2_t<f64> center, f64 radius, f64 angle1, f64 angle2)
 {
     cairo_arc(m_raw, center.x, center.y, radius, angle1, angle2);
 }
@@ -521,12 +523,12 @@ inline auto matrix::operator* () -> cairo_matrix_t*
     return &m_raw;
 }
 
-inline void matrix::translate(vec2<f64> v)
+inline void matrix::translate(vec2_t<f64> v)
 {
     cairo_matrix_translate(&m_raw, v.x, v.y);
 }
 
-inline void matrix::scale(vec2<f64> s)
+inline void matrix::scale(vec2_t<f64> s)
 {
     cairo_matrix_scale(&m_raw, s.x, s.y);
 }
@@ -548,7 +550,7 @@ inline constexpr auto pixel_format<srgb>() -> format
 }
 
 
-inline auto image_surface_create(format fmt, vec2<i32> shape) -> surface
+inline auto image_surface_create(format fmt, vec2_t<i32> shape) -> surface
 {
     surface s { cairo_image_surface_create(static_cast<cairo_format_t>(fmt), shape.x, shape.y) };
 

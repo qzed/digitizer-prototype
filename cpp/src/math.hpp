@@ -2,8 +2,9 @@
 
 #include "types.hpp"
 
-#include "math/poly2.hpp"
 #include "math/num.hpp"
+#include "math/poly2.hpp"
+#include "math/vec2.hpp"
 
 #include "utils/access.hpp"
 
@@ -13,6 +14,9 @@
 #include <cassert>
 #include <cmath>
 #include <numeric>
+
+
+using math::vec2_t;
 
 
 template<typename T>
@@ -30,6 +34,18 @@ auto zero() -> f64
     return 0.0f;
 }
 
+template<>
+auto zero() -> vec2_t<f32>
+{
+    return math::num<vec2_t<f32>>::zero;
+}
+
+template<>
+auto zero() -> vec2_t<f64>
+{
+    return math::num<vec2_t<f64>>::zero;
+}
+
 
 inline constexpr auto ravel(index2_t const& shape, index2_t const& i) -> index_t
 {
@@ -44,87 +60,6 @@ inline constexpr auto unravel(index2_t const& shape, index_t const& i) -> index2
 inline constexpr auto stride(index2_t const& shape) -> index_t
 {
     return shape.x;
-}
-
-
-template<typename T>
-struct vec2 {
-    T x, y;
-
-    using Scalar = T;
-};
-
-template<typename T>
-auto operator<< (std::ostream& os, vec2<T> const& v) -> std::ostream&
-{
-    return os << "[" << v.x << ", " << v.y << "]";
-}
-
-template<typename U, typename V>
-auto operator== (vec2<U> const& a, vec2<V> const& b) noexcept -> bool
-{
-    return a.x == b.x && a.y == b.y;
-}
-
-template<typename U, typename V>
-auto operator!= (vec2<U> const& a, vec2<V> const& b) noexcept -> bool
-{
-    return !(a == b);
-}
-
-template<typename U, typename V>
-auto operator+ (vec2<U> const& a, vec2<V> const& b) noexcept -> vec2<decltype(a.x + b.x)>
-{
-    return { a.x + b.x, a.y + b.y };
-}
-
-template<typename U, typename V>
-auto operator- (vec2<U> const& a, vec2<V> const& b) noexcept -> vec2<decltype(a.x - b.x)>
-{
-    return { a.x - b.x, a.y - b.y };
-}
-
-template<typename U, typename V>
-auto mul (vec2<U> const& a, vec2<V> const& b) noexcept -> vec2<decltype(a.x * b.x)>
-{
-    return { a.x * b.x, a.y * b.y };
-}
-
-template<typename U>
-auto sum (vec2<U> const& a) noexcept
-{
-    return a.x + a.y;
-}
-
-template<typename U>
-auto prod (vec2<U> const& a) noexcept
-{
-    return a.x * a.y;
-}
-
-template<typename U>
-auto l2norm (vec2<U> const& a) noexcept -> U
-{
-    return std::sqrt(a.x * a.x + a.y * a.y);
-}
-
-template<typename U, typename V>
-auto dot (vec2<U> const& a, vec2<V> const& b) noexcept
-{
-    return sum(mul(a, b));
-}
-
-
-template<>
-auto zero() -> vec2<f32>
-{
-    return { 0.0f, 0.0f };
-}
-
-template<>
-auto zero() -> vec2<f64>
-{
-    return { 0.0, 0.0 };
 }
 
 
@@ -180,7 +115,7 @@ constexpr auto mul(mat2s<U> const& a, mat2s<V> const& b) noexcept -> mat2s<declt
 
 
 template<typename T>
-constexpr auto xtmx(mat2s<T> const& m, vec2<T> const& v) noexcept -> T
+constexpr auto xtmx(mat2s<T> const& m, vec2_t<T> const& v) noexcept -> T
 {
     return v.x * v.x * m.xx + static_cast<T>(2) * v.x * v.y * m.xy + v.y * v.y * m.yy;
 }
@@ -495,8 +430,8 @@ auto inv(mat2s<T> const& m, T eps=math::num<T>::eps) -> std::optional<mat2s<T>>
 
 template<typename T>
 struct eigen {
-    std::array<T, 2>       w;
-    std::array<vec2<T>, 2> v;
+    std::array<T, 2>         w;
+    std::array<vec2_t<T>, 2> v;
 };
 
 template<typename M, typename S = typename M::Scalar>
@@ -506,9 +441,9 @@ auto eigenvalues(M const& m, S eps=math::num<S>::eps) -> std::array<S, 2>
 }
 
 template<class T>
-auto eigenvector(mat2s<T> const& m, T ew) -> vec2<T>
+auto eigenvector(mat2s<T> const& m, T ew) -> vec2_t<T>
 {
-    auto ev = vec2<T>{};
+    auto ev = vec2_t<T>{};
 
     /*
      * This 'if' should prevent two problems:
@@ -521,8 +456,7 @@ auto eigenvector(mat2s<T> const& m, T ew) -> vec2<T>
         ev = { m.yy - ew, -m.xy };
     }
 
-    auto const n = l2norm(ev);
-    return { ev.x / n, ev.y / n };
+    return ev / ev.norm_l2();
 }
 
 

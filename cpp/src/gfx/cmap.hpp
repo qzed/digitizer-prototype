@@ -1,7 +1,6 @@
 #pragma once
 
 #include "types.hpp"
-#include "math.hpp"
 
 #include "gfx/color.hpp"
 #include "math/num.hpp"

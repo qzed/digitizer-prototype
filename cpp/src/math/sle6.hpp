@@ -4,6 +4,7 @@
 
 #include "math/vec6.hpp"
 #include "math/mat6.hpp"
+#include "math/num.hpp"
 
 #include "utils/access.hpp"
 
@@ -38,7 +39,7 @@ auto lu_decomp(mat6_t<T> const& a, mat6_t<T>& lu, vec6_t<index_t>& p, T eps) -> 
         {
             // step 1: find element with largest absolute value in column
             index_t r = 0;
-            T v = zero<T>();
+            T v = num<T>::zero;
 
             for (index_t i = c; i < 6; ++i) {
                 auto const vi = std::abs(lu[{i, c}]);
@@ -152,7 +153,7 @@ auto ge_solve(mat6_t<T> a, vec6_t<T> b, vec6_t<T>& x, T eps) -> bool
         {
             // step 1: find element with largest absolute value in column
             index_t r = 0;
-            T v = zero<T>();
+            T v = num<T>::zero;
 
             for (index_t i = c; i < 6; ++i) {
                 auto const vi = std::abs(a[{i, c}]);

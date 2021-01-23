@@ -5,6 +5,8 @@
 #include "../types.hpp"
 #include "../math.hpp"
 
+#include "../math/num.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -124,7 +126,7 @@ inline auto cubehelix_t::map_value(f32 value) const -> srgb {
     // calculation
     auto const v = std::pow(value, m_gamma);
 
-    auto const phi = 2.f * 3.1415926f * (m_start / 3.f + m_rotations * value);
+    auto const phi = 2.f * math::num<f32>::pi * (m_start / 3.f + m_rotations * value);
     auto const a = m_hue * v * (1.f - v) / 2.f;
 
     auto const c_phi = std::cos(phi);

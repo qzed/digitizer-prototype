@@ -16,6 +16,8 @@
 #include "gfx/cairo.hpp"
 #include "gfx/cmap.hpp"
 
+#include "math/num.hpp"
+
 #include <vector>
 #include <numeric>
 #include <fstream>
@@ -532,7 +534,7 @@ auto main(int argc, char** argv) -> int
             cr.translate(t({ mean.x + 0.5, mean.y + 0.5 }));
             cr.rotate(std::atan2(v1.x, v1.y));
             cr.scale({s2 * win_w / img_w, s1 * win_h / img_h});
-            cr.arc({ 0.0, 0.0 }, 1.0, 0.0, 2.0 * 3.141592);
+            cr.arc({ 0.0, 0.0 }, 1.0, 0.0, 2.0 * math::num<f64>::pi);
 
             cr.restore();
             cr.stroke();

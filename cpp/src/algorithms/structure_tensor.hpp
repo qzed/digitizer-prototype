@@ -3,7 +3,8 @@
 #include "../types.hpp"
 #include "../math.hpp"
 #include "../kernels.hpp"
-#include "convolution.hpp"
+
+#include "border.hpp"
 
 #include "structure_tensor.opt.3x3-zero.hpp"
 

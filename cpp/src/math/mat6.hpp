@@ -42,17 +42,21 @@ inline constexpr auto mat6_t<T>::identity() -> mat6_t<T>
 template<class T>
 inline constexpr auto mat6_t<T>::operator[] (index2_t i) -> T&
 {
-    return utils::access::access(data, i.x * 6 + i.y,
-                                 i.x >= 0 && i.x < 6 && i.y >= 0 && i.y < 6,
-                                 "invalid matrix access");
+    auto const ravel = [](index2_t shape, index2_t i) {
+        return i.x * shape.y + i.y;
+    };
+
+    return utils::access::access<T>(data, ravel, { 6, 6 }, i);
 }
 
 template<class T>
 inline constexpr auto mat6_t<T>::operator[] (index2_t i) const -> T const&
 {
-    return utils::access::access(data, i.x * 6 + i.y,
-                                 i.x >= 0 && i.x < 6 && i.y >= 0 && i.y < 6,
-                                 "invalid matrix access");
+    auto const ravel = [](index2_t shape, index2_t i) {
+        return i.x * shape.y + i.y;
+    };
+
+    return utils::access::access<T>(data, ravel, { 6, 6 }, i);
 }
 
 } /* namespace math */

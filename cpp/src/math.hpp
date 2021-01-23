@@ -80,25 +80,25 @@ auto operator<< (std::ostream& os, kernel<T, Nx, Ny> const& k) -> std::ostream&
 template<typename T, index_t Nx, index_t Ny>
 constexpr auto kernel<T, Nx, Ny>::operator[] (index2_t const& i) const noexcept -> T const&
 {
-    return utils::access::access(this->data, ravel({Nx, Ny}, i));
+    return utils::access::access<T>(this->data, ravel, { Nx, Ny }, i);
 }
 
 template<typename T, index_t Nx, index_t Ny>
 constexpr auto kernel<T, Nx, Ny>::operator[] (index2_t const& i) noexcept -> T&
 {
-    return utils::access::access(this->data, ravel({Nx, Ny}, i));
+    return utils::access::access<T>(this->data, ravel, { Nx, Ny }, i);
 }
 
 template<typename T, index_t Nx, index_t Ny>
 constexpr auto kernel<T, Nx, Ny>::operator[] (index_t const& i) const noexcept -> T const&
 {
-    return utils::access::access(this->data, i);
+    return utils::access::access<T>(this->data, Nx * Ny, i);
 }
 
 template<typename T, index_t Nx, index_t Ny>
 constexpr auto kernel<T, Nx, Ny>::operator[] (index_t const& i) noexcept -> T&
 {
-    return utils::access::access(this->data, i);
+    return utils::access::access<T>(this->data, Nx * Ny, i);
 }
 
 template<typename T, index_t Nx, index_t Ny>
@@ -191,25 +191,25 @@ image<T>::image(index2_t const& shape)
 template<typename T>
 auto image<T>::operator[] (index2_t const& i) const noexcept -> T const&
 {
-    return utils::access::access(m_data, ravel(m_shape, i));
+    return utils::access::access<T>(m_data, ravel, m_shape, i);
 }
 
 template<typename T>
 auto image<T>::operator[] (index2_t const& i) noexcept -> T&
 {
-    return utils::access::access(m_data, ravel(m_shape, i));
+    return utils::access::access<T>(m_data, ravel, m_shape, i);
 }
 
 template<typename T>
 auto image<T>::operator[] (index_t const& i) const noexcept -> T const&
 {
-    return utils::access::access(m_data, i);
+    return utils::access::access<T>(m_data, m_data.size(), i);
 }
 
 template<typename T>
 auto image<T>::operator[] (index_t const& i) noexcept -> T&
 {
-    return utils::access::access(m_data, i);
+    return utils::access::access<T>(m_data, m_data.size(), i);
 }
 
 template<typename T>

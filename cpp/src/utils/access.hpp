@@ -1,5 +1,8 @@
 #pragma once
 
+#include "types.hpp"
+
+#include <sstream>
 #include <stdexcept>
 
 
@@ -18,81 +21,69 @@ inline static constexpr access_mode mode = access_mode::unchecked;
 #endif
 
 
-template<class T, class I>
-inline constexpr auto checked(T& collection, I i) -> typename T::value_type&
+inline void ensure(index_t size, index_t i)
 {
-    return collection.at(i);
-}
-
-template<class T, class I>
-inline constexpr auto checked(T const& collection, I i) -> typename T::value_type const&
-{
-    return collection.at(i);
-}
-
-
-template<class T, class I>
-inline constexpr auto unchecked(T& collection, I i) -> typename T::value_type&
-{
-    return collection[i];
-}
-
-template<class T, class I>
-inline constexpr auto unchecked(T const& collection, I i) -> typename T::value_type const&
-{
-    return collection[i];
-}
-
-
-template<class T, class I>
-inline constexpr auto access(T& collection, I i) -> typename T::value_type&
-{
-    if constexpr (mode == access_mode::checked) {
-        return checked(collection, i);
-    } else {
-        return unchecked(collection, i);
+    if constexpr (mode == access_mode::unchecked) {
+        return;
     }
+
+    if (0 <= i && i < size) {
+        return;
+    }
+
+    auto s = std::ostringstream{};
+    s << "invalid access: size is " << size << ", index is " << i;
+
+    throw std::out_of_range { s.str() };
 }
 
-template<class T, class I>
-inline constexpr auto access(T const& collection, I i) -> typename T::value_type const&
+inline void ensure(index2_t shape, index2_t i)
 {
-    if constexpr (mode == access_mode::checked) {
-        return checked(collection, i);
-    } else {
-        return unchecked(collection, i);
+    if constexpr (mode == access_mode::unchecked) {
+        return;
     }
+
+    if (0 <= i.x && i.x < shape.x && 0 <= i.y && i.y < shape.y) {
+        return;
+    }
+
+    auto s = std::ostringstream{};
+    s << "invalid access: size is " << shape << ", index is " << i;
+
+    throw std::out_of_range { s.str() };
 }
 
 
-template<class T, class I>
-inline constexpr auto access(T& collection, I i, bool cond, char const* msg) -> typename T::value_type&
+template<class V, class T>
+inline constexpr auto access(T const& data, index_t size, index_t i) -> V const&
 {
-    if constexpr (mode == access_mode::checked) {
-        if (!cond) {
-            throw std::out_of_range { msg };
-        }
+    ensure(size, i);
 
-        return checked(collection, i);
-
-    } else {
-        return unchecked(collection, i);
-    }
+    return data[i];
 }
 
-template<class T, class I>
-inline constexpr auto access(T const& collection, I i, bool cond, char const* msg) -> typename T::value_type const&
+template<class V, class T>
+inline constexpr auto access(T& data, index_t size, index_t i) -> V&
 {
-    if constexpr (mode == access_mode::checked) {
-        if (!cond) {
-            throw std::out_of_range { msg };
-        }
+    ensure(size, i);
 
-        return checked(collection, i);
+    return data[i];
+}
 
-    } else {
-        return unchecked(collection, i);
-    }
+template<class V, class T, class F>
+inline constexpr auto access(T const& data, F ravel, index2_t shape, index2_t i) -> V const&
+{
+    ensure(shape, i);
+
+    return data[ravel(shape, i)];
+}
+
+template<class V, class T, class F>
+inline constexpr auto access(T& data, F ravel, index2_t shape, index2_t i) -> V&
+{
+    ensure(shape, i);
+
+    return data[ravel(shape, i)];
 }
 
 } /* namespace utils::access */

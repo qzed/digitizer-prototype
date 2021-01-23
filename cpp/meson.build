@@ -23,7 +23,7 @@ endif
 
 if get_option('access_checks').disabled()
     opt_access_checks = false
-elif get_option('fast_math').auto()
+elif get_option('access_checks').auto()
     if not get_option('debug') and get_option('optimization') in ['2', '3']
         opt_access_checks = false
     endif

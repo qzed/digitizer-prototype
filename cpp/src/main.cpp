@@ -448,8 +448,8 @@ auto main(int argc, char** argv) -> int
     // plot
     std::cout << "Plotting..." << std::endl;
 
-    auto width = 900;
-    auto height = 600;
+    auto const width  = 900;
+    auto const height = 600;
 
     auto const dir_out = std::filesystem::path { argv[3] };
     std::filesystem::create_directories(dir_out);

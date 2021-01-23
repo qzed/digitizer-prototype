@@ -15,13 +15,13 @@ struct vec6_t {
 };
 
 
-template<typename T>
+template<class T>
 inline constexpr auto vec6_t<T>::operator[] (index_t i) -> T&
 {
     return utils::access::access(data, i);
 }
 
-template<typename T>
+template<class T>
 inline constexpr auto vec6_t<T>::operator[] (index_t i) const -> T const&
 {
     return utils::access::access(data, i);

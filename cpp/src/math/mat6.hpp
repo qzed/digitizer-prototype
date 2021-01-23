@@ -33,7 +33,7 @@ inline constexpr auto mat6_t<T>::identity() -> mat6_t<T>
     };
 }
 
-template<typename T>
+template<class T>
 inline constexpr auto mat6_t<T>::operator[] (index2_t i) -> T&
 {
     return utils::access::access(data, i.x * 6 + i.y,
@@ -41,7 +41,7 @@ inline constexpr auto mat6_t<T>::operator[] (index2_t i) -> T&
                                  "invalid matrix access");
 }
 
-template<typename T>
+template<class T>
 inline constexpr auto mat6_t<T>::operator[] (index2_t i) const -> T const&
 {
     return utils::access::access(data, i.x * 6 + i.y,

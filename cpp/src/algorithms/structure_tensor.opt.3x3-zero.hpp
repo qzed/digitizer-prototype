@@ -8,8 +8,8 @@
 namespace impl {
 
 template<typename T>
-void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const& in,
-                               kernel<f32, 3, 3> const& kx, kernel<f32, 3, 3> const& ky)
+void structure_tensor_3x3_zero(image<math::mat2s_t<T>>& out, image<T> const& in,
+                               kernel<T, 3, 3> const& kx, kernel<T, 3, 3> const& ky)
 {
     assert(in.shape() == out.shape());
 
@@ -40,7 +40,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
     // x = 0, y = 0
     {
-        f32 gx = 0.0f, gy = 0.0f;
+        T gx = math::num<T>::zero;
+        T gy = math::num<T>::zero;
 
         gx += in[i + s_center] * kx[k_center];
         gy += in[i + s_center] * ky[k_center];
@@ -60,7 +61,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
     // 0 < x < n - 1, y = 0
     for (; i < in.shape().x - 1; ++i) {
-        f32 gx = 0.0f, gy = 0.0f;
+        T gx = math::num<T>::zero;
+        T gy = math::num<T>::zero;
 
         gx += in[i + s_left] * kx[k_left];
         gy += in[i + s_left] * ky[k_left];
@@ -85,7 +87,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
     // x = n - 1, y = 0
     {
-        f32 gx = 0.0f, gy = 0.0f;
+        T gx = math::num<T>::zero;
+        T gy = math::num<T>::zero;
 
         gx += in[i + s_left] * kx[k_left];
         gy += in[i + s_left] * ky[k_left];
@@ -107,7 +110,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
     while (i < in.shape().x * (in.shape().y - 1)) {
         // x = 0
         {
-            f32 gx = 0.0f, gy = 0.0f;
+            T gx = math::num<T>::zero;
+            T gy = math::num<T>::zero;
 
             gx += in[i + s_top] * kx[k_top];
             gy += in[i + s_top] * ky[k_top];
@@ -134,7 +138,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
         // 0 < x < n - 1
         auto const limit = i + in.shape().x - 2;
         for (; i < limit; ++i) {
-            f32 gx = 0.0f, gy = 0.0f;
+            T gx = math::num<T>::zero;
+            T gy = math::num<T>::zero;
 
             gx += in[i + s_top_left] * kx[k_top_left];
             gy += in[i + s_top_left] * ky[k_top_left];
@@ -168,7 +173,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
         // x = n - 1
         {
-            f32 gx = 0.0f, gy = 0.0f;
+            T gx = math::num<T>::zero;
+            T gy = math::num<T>::zero;
 
             gx += in[i + s_top_left] * kx[k_top_left];
             gy += in[i + s_top_left] * ky[k_top_left];
@@ -195,7 +201,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
     // x = 0, y = n - 1
     {
-        f32 gx = 0.0f, gy = 0.0f;
+        T gx = math::num<T>::zero;
+        T gy = math::num<T>::zero;
 
         gx += in[i + s_top] * kx[k_top];
         gy += in[i + s_top] * ky[k_top];
@@ -215,7 +222,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
     // 0 < x < n - 1, y = n - 1
     for (; i < in.shape().product() - 1; ++i) {
-        f32 gx = 0.0f, gy = 0.0f;
+        T gx = math::num<T>::zero;
+        T gy = math::num<T>::zero;
 
         gx += in[i + s_top_left] * kx[k_top_left];
         gy += in[i + s_top_left] * ky[k_top_left];
@@ -240,7 +248,8 @@ void structure_tensor_3x3_zero(image<math::mat2s_t<f32>>& out, image<f32> const&
 
     // x = n - 1, y = n - 1
     {
-        f32 gx = 0.0f, gy = 0.0f;
+        T gx = math::num<T>::zero;
+        T gy = math::num<T>::zero;
 
         gx += in[i + s_top_left] * kx[k_top_left];
         gy += in[i + s_top_left] * ky[k_top_left];

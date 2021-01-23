@@ -109,44 +109,6 @@ auto zero() -> vec2<f64>
 
 
 template<typename T>
-struct mat2 {
-    T xx, xy, yx, yy;
-
-    using Scalar = T;
-};
-
-template<typename T>
-auto operator<< (std::ostream& os, mat2<T> const& m) -> std::ostream&
-{
-    return os << "[[" << m.xx << ", " << m.xy << "], [" << m.yx << ", " << m.yy << "]]";
-}
-
-template<typename U, typename V>
-constexpr auto operator+ (mat2<U> const& a, mat2<V> const& b) noexcept -> mat2<decltype(a.xx + b.xx)>
-{
-    return { a.xx + b.xx, a.xy + b.xy, a.yx + b.yx, a.yy + b.yy };
-}
-
-template<typename U, typename V>
-constexpr auto mul (mat2<U> const& a, mat2<V> const& b) noexcept -> mat2<decltype(a.xx * b.xx)>
-{
-    return { a.xx * b.xx, a.xy * b.xy, a.yx * b.yx, a.yy * b.yy };
-}
-
-template<>
-auto zero() -> mat2<f32>
-{
-    return { 0.0f, 0.0f, 0.0f, 0.0f };
-}
-
-template<>
-auto zero() -> mat2<f64>
-{
-    return { 0.0, 0.0, 0.0, 0.0 };
-}
-
-
-template<typename T>
 struct mat2s {
     T xx, xy, yy;
 
@@ -194,13 +156,6 @@ template<typename U, typename V>
 constexpr auto mul(mat2s<U> const& a, mat2s<V> const& b) noexcept -> mat2s<decltype(a.xx * b.xx)>
 {
     return { a.xx * b.xx, a.xy * b.xy, a.yy * b.yy };
-}
-
-
-template<typename U, typename V>
-constexpr auto outer(vec2<U> const& a, vec2<V> const& b) noexcept -> mat2<decltype(a.x * b.x)>
-{
-    return { a.x * b.x, a.x * b.y, a.y * b.x, a.y * b.y };
 }
 
 
@@ -515,21 +470,9 @@ void sub0(T& obj, typename T::Scalar s)
 
 
 template<typename T>
-auto trace(mat2<T> const& m) -> T
-{
-    return m.xx + m.yy;
-}
-
-template<typename T>
 auto trace(mat2s<T> const& m) -> T
 {
     return m.xx + m.yy;
-}
-
-template<typename T>
-auto det(mat2<T> const& m) -> T
-{
-    return m.xx * m.yy - m.xy * m.yx;
 }
 
 template<typename T>
@@ -548,18 +491,6 @@ auto inv(mat2s<T> const& m, T eps=zero<T>()) -> std::optional<mat2s<T>>
 
     return {{ m.yy / d, -m.xy / d, m.xx / d }};
 }
-
-template<typename T>
-auto inv(mat2<T> const& m, T eps=zero<T>()) -> std::optional<mat2s<T>>
-{
-    auto const d = det(m);
-
-    if (std::abs(d) <= eps)
-        return std::nullopt;
-
-    return {{ m.yy / d, -m.xy / d, -m.yx / d, m.xx / d }};
-}
-
 
 
 template<typename T>
@@ -581,7 +512,6 @@ auto solve_quadratic(T a, T b, T c, T eps=static_cast<T>(1e-20)) -> std::array<T
 
     return { r1, r2 };
 }
-
 
 
 template<typename T>

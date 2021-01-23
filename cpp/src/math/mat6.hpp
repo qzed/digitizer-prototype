@@ -1,5 +1,7 @@
 #pragma once
 
+#include "num.hpp"
+
 #include "../math.hpp"
 #include "../utils/access.hpp"
 
@@ -20,8 +22,8 @@ struct mat6_t {
 template<class T>
 inline constexpr auto mat6_t<T>::identity() -> mat6_t<T>
 {
-    auto const _0 = static_cast<T>(0);
-    auto const _1 = static_cast<T>(1);
+    auto const _0 = num<T>::zero;
+    auto const _1 = num<T>::one;
 
     return {
         _1, _0, _0, _0, _0, _0,

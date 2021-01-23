@@ -19,7 +19,7 @@ void conv_generic(image<T>& out, image<T> const& in, kernel<S, Nx, Ny> const& k)
 
     for (index_t cy = 0; cy < in.shape().y; ++cy) {
         for (index_t cx = 0; cx < in.shape().x; ++cx) {
-            out[{cx, cy}] = zero<T>();
+            out[{cx, cy}] = math::num<T>::zero;
 
             for (index_t iy = 0; iy < Ny; ++iy) {
                 for (index_t ix = 0; ix < Nx; ++ix) {

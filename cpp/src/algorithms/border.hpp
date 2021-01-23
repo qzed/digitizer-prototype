@@ -33,7 +33,7 @@ constexpr auto mirror_x::value(image<T> const& img, index2_t const& i) -> T
 {
     index_t const x = i.x >= 0 ? (i.x < img.shape().x ? i.x : 2 * img.shape().x - i.x - 1) : (-1 - i.x);
 
-    return i.y >= 0 && i.y < img.shape().y ? img[{x, i.y}] : zero<T>();
+    return i.y >= 0 && i.y < img.shape().y ? img[{x, i.y}] : math::num<T>::zero;
 }
 
 
@@ -47,7 +47,7 @@ constexpr auto mirror_y::value(image<T> const& img, index2_t const& i) -> T
 {
     index_t const y = i.y >= 0 ? (i.y < img.shape().y ? i.y : 2 * img.shape().y - i.y - 1) : (-1 - i.y);
 
-    return i.x >= 0 && i.x < img.shape().x ? img[{i.x, y}] : zero<T>();
+    return i.x >= 0 && i.x < img.shape().x ? img[{i.x, y}] : math::num<T>::zero;
 }
 
 
@@ -75,7 +75,7 @@ template<class T>
 constexpr auto zero::value(image<T> const& img, index2_t const& i) -> T
 {
     return i.x >= 0 && i.x < img.shape().x && i.y >= 0 && i.y < img.shape().y ?
-        img[{i.x, i.y}] : ::zero<T>();
+        img[{i.x, i.y}] : math::num<T>::zero;
 }
 
 } /* namespace border */

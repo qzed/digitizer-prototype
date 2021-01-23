@@ -30,7 +30,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
     {
         // x = 0
         {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i,  0, -1) * k(-1,  0);      // extended
             v += d(i,  0, -1) * k( 0,  0);      // extended
@@ -50,7 +50,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
         // 0 < x < n
         auto const limit = i + data.shape().x - 2;
         while (i < limit) {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i, -1, -1) * k(-1,  0);      // extended
             v += d(i,  0, -1) * k( 0,  0);      // extended
@@ -69,7 +69,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
 
         // x = n - 1
         {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i, -1, -1) * k(-1,  0);      // extended
             v += d(i,  0, -1) * k( 0,  0);      // extended
@@ -91,7 +91,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
     while (i < data.shape().x * (data.shape().y - 1)) {
         // x = 0
         {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i,  0, -1) * k(-1, -1);      // extended
             v += d(i,  0, -1) * k( 0, -1);
@@ -111,7 +111,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
         // 0 < x < n
         auto const limit = i + data.shape().x - 2;
         while (i < limit) {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i, -1, -1) * k(-1, -1);
             v += d(i,  0, -1) * k( 0, -1);
@@ -130,7 +130,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
 
         // x = n - 1
         {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i, -1, -1) * k(-1, -1);
             v += d(i,  0, -1) * k( 0, -1);
@@ -152,7 +152,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
     {
         // x = 0
         {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i,  0, -1) * k(-1, -1);      // extended
             v += d(i,  0, -1) * k( 0, -1);
@@ -172,7 +172,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
         // 1 < x < n - 2
         auto const limit = i + data.shape().x - 2;
         while (i < limit) {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i, -1, -1) * k(-1, -1);
             v += d(i,  0, -1) * k( 0, -1);
@@ -191,7 +191,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
 
         // x = n - 1
         {
-            T v = zero<T>();
+            T v = math::num<T>::zero;
 
             v += d(i, -1, -1) * k(-1, -1);
             v += d(i,  0, -1) * k( 0, -1);

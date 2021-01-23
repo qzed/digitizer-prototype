@@ -29,9 +29,9 @@ void hessian_generic(image<math::mat2s_t<T>>& out, image<T> const& in)
 
     for (index_t cy = 0; cy < in.shape().y; ++cy) {
         for (index_t cx = 0; cx < in.shape().x; ++cx) {
-            T hxx = zero<T>();
-            T hxy = zero<T>();
-            T hyy = zero<T>();
+            T hxx = math::num<T>::zero;
+            T hxy = math::num<T>::zero;
+            T hyy = math::num<T>::zero;
 
             for (index_t iy = 0; iy < ny; ++iy) {
                 for (index_t ix = 0; ix < nx; ++ix) {

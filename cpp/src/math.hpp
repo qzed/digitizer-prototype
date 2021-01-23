@@ -21,46 +21,6 @@ using math::vec2_t;
 using math::mat2s_t;
 
 
-template<typename T>
-auto zero() -> T;
-
-template<>
-auto zero() -> f32
-{
-    return 0.0;
-}
-
-template<>
-auto zero() -> f64
-{
-    return 0.0f;
-}
-
-template<>
-auto zero() -> vec2_t<f32>
-{
-    return math::num<vec2_t<f32>>::zero;
-}
-
-template<>
-auto zero() -> vec2_t<f64>
-{
-    return math::num<vec2_t<f64>>::zero;
-}
-
-template<>
-auto zero() -> mat2s_t<f32>
-{
-    return math::num<mat2s_t<f32>>::zero;
-}
-
-template<>
-auto zero() -> math::mat2s_t<f64>
-{
-    return math::num<mat2s_t<f64>>::zero;
-}
-
-
 inline constexpr auto ravel(index2_t const& shape, index2_t const& i) -> index_t
 {
     return i.y * shape.x + i.x;

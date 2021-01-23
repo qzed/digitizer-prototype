@@ -23,8 +23,8 @@ void structure_tensor_generic(image<math::mat2s_t<T>>& out, image<T> const& in,
 
     for (index_t cy = 0; cy < in.shape().y; ++cy) {
         for (index_t cx = 0; cx < in.shape().x; ++cx) {
-            T gx = zero<T>();
-            T gy = zero<T>();
+            T gx = math::num<T>::zero;
+            T gy = math::num<T>::zero;
 
             for (index_t iy = 0; iy < Ny; ++iy) {
                 for (index_t ix = 0; ix < Nx; ++ix) {

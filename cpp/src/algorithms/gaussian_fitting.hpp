@@ -68,8 +68,8 @@ inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T
         static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
     };
 
-    std::fill(m.data.begin(), m.data.end(), zero<S>());
-    std::fill(rhs.data.begin(), rhs.data.end(), zero<S>());
+    std::fill(m.data.begin(), m.data.end(), math::num<T>::zero);
+    std::fill(rhs.data.begin(), rhs.data.end(), math::num<T>::zero);
 
     for (index_t iy = b.ymin; iy <= b.ymax; ++iy) {
         for (index_t ix = b.xmin; ix <= b.xmax; ++ix) {
@@ -166,7 +166,7 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
         static_cast<T>(2) * range<T>.y / static_cast<T>(total.shape().y),
     };
 
-    std::fill(total.begin(), total.end(), zero<T>());
+    std::fill(total.begin(), total.end(), math::num<T>::zero);
 
     // compute individual Gaussians in sample windows
     for (auto& p : params) {

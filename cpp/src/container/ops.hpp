@@ -3,6 +3,8 @@
 #include "math/num.hpp"
 
 #include <algorithm>
+#include <cassert>
+#include <numeric>
 #include <utility>
 
 

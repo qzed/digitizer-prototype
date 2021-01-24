@@ -1,13 +1,17 @@
 #pragma once
 
 #include "kernels.hpp"
-#include "math.hpp"
 #include "types.hpp"
+
 #include "algorithm/border.hpp"
+
 #include "container/image.hpp"
+#include "container/kernel.hpp"
 
 #include "math/num.hpp"
 #include "math/mat2.hpp"
+
+#include <cassert>
 
 #include "algorithm/opt/structure_tensor.3x3-zero.hpp"
 
@@ -17,7 +21,8 @@ namespace impl {
 template<typename Bx, typename By, typename T, index_t Nx, index_t Ny>
 void structure_tensor_generic(container::image<math::mat2s_t<T>>& out,
                               container::image<T> const& in,
-                              kernel<T, Nx, Ny> const& kx, kernel<T, Nx, Ny> const& ky)
+                              container::kernel<T, Nx, Ny> const& kx,
+                              container::kernel<T, Nx, Ny> const& ky)
 {
     index_t const dx = (Nx - 1) / 2;
     index_t const dy = (Ny - 1) / 2;
@@ -45,9 +50,10 @@ void structure_tensor_generic(container::image<math::mat2s_t<T>>& out,
 
 
 template<typename Bx=border::zero, typename By=border::zero, typename T, index_t Nx=3, index_t Ny=3>
-void structure_tensor(container::image<math::mat2s_t<T>>& out, container::image<T> const& in,
-                      kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
-                      kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)
+void structure_tensor(container::image<math::mat2s_t<T>>& out,
+                      container::image<T> const& in,
+                      container::kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
+                      container::kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)
 {
     assert(in.size() == out.size());
 

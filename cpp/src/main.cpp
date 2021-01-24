@@ -1,4 +1,3 @@
-#include "math.hpp"
 #include "parser.hpp"
 #include "types.hpp"
 #include "kernels.hpp"
@@ -12,6 +11,7 @@
 #include "algorithm/structure_tensor.hpp"
 
 #include "container/image.hpp"
+#include "container/kernel.hpp"
 #include "container/ops.hpp"
 
 #include "eval/perf.hpp"

@@ -4,6 +4,7 @@
 #include "kernels.hpp"
 
 #include "container/image.hpp"
+#include "container/kernel.hpp"
 
 #include "algorithm/border.hpp"
 
@@ -11,6 +12,8 @@
 #include "math/mat2.hpp"
 
 #include "algorithm/opt/hessian.zero.hpp"
+
+#include <cassert>
 
 
 namespace impl {

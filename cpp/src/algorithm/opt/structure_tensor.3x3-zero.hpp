@@ -10,7 +10,8 @@ namespace impl {
 template<typename T>
 void structure_tensor_3x3_zero(container::image<math::mat2s_t<T>>& out,
                                container::image<T> const& in,
-                               kernel<T, 3, 3> const& kx, kernel<T, 3, 3> const& ky)
+                               container::kernel<T, 3, 3> const& kx,
+                               container::kernel<T, 3, 3> const& ky)
 {
     assert(in.size() == out.size());
 

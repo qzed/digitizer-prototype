@@ -2,6 +2,7 @@
 
 #include "math/num.hpp"
 
+#include <cmath>
 #include <iostream>
 
 

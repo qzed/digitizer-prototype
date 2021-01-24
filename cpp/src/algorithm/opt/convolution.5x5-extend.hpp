@@ -9,7 +9,7 @@ namespace impl {
 
 template<typename T, typename S>
 void conv_5x5_extend(container::image<T>& out, container::image<T> const& data,
-                     kernel<S, 5, 5> const& kern)
+                     container::kernel<S, 5, 5> const& kern)
 {
     // strides
     auto const stride_d = stride(data.size());

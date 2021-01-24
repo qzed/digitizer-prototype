@@ -28,8 +28,6 @@ public:
 public:
     static constexpr auto identity() -> mat2s_t<T>;
 
-    inline constexpr auto operator= (mat2s_t<T> const& rhs) -> mat2s_t<T>& = default;
-
     constexpr auto operator+= (mat2s_t<T> const& m) -> mat2s_t<T>&;
     constexpr auto operator+= (T const& s) -> mat2s_t<T>&;
 

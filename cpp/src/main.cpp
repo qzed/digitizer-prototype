@@ -12,6 +12,7 @@
 #include "algorithm/structure_tensor.hpp"
 
 #include "container/image.hpp"
+#include "container/ops.hpp"
 
 #include "eval/perf.hpp"
 
@@ -208,7 +209,7 @@ auto main(int argc, char** argv) -> int
                 auto const sum = std::accumulate(img_pp.begin(), img_pp.end(), 0.0f);
                 auto const avg = sum / img_pp.size().product();
 
-                std::transform(img_pp.begin(), img_pp.end(), img_pp.begin(), [&](auto const x) {
+                container::ops::transform(img_pp, [&](auto const x) {
                     return std::max(x - avg, 0.0f);
                 });
             }
@@ -225,7 +226,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_stev);
 
-                std::transform(img_m2_2.begin(), img_m2_2.end(), img_stev.begin(), [](auto s) {
+                container::ops::transform(img_m2_2, img_stev, [](auto s) {
                     auto const [ew1, ew2] = s.eigenvalues();
                     return math::vec2_t<f32> { ew1, ew2 };
                 });
@@ -243,7 +244,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_rdg);
 
-                std::transform(img_m2_2.begin(), img_m2_2.end(), img_rdg.begin(), [](auto h) {
+                container::ops::transform(img_m2_2, img_rdg, [](auto h) {
                     auto const [ev1, ev2] = h.eigenvalues();
                     return std::max(ev1, 0.0f) + std::max(ev2, 0.0f);
                 });

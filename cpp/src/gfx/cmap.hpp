@@ -76,7 +76,7 @@ void cmap::map_into(container::image<P>& dest, container::image<T> const& img,
         r = {r.first, r.second + 1};
     }
 
-    std::transform(img.begin(), img.end(), dest.begin(), [&](auto value) -> auto {
+    container::ops::transform(img, dest, [&](auto value) {
         return this->map<T, P>(value, r);
     });
 }

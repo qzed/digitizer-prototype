@@ -25,4 +25,19 @@ inline auto minmax(C const& container) -> std::pair<typename C::value_type, type
     return { *min, *max };
 }
 
+
+template<class S, class T, class F>
+inline void transform(S const& source, T& target, F fn)
+{
+    assert(source.size() == target.size());
+
+    std::transform(source.begin(), source.end(), target.begin(), fn);
+}
+
+template<class C, class F>
+inline void transform(C& container, F fn)
+{
+    std::transform(container.begin(), container.end(), container.begin(), fn);
+}
+
 } /* namespace container::ops */

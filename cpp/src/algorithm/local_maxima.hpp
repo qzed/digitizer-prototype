@@ -23,25 +23,23 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
      * report some multiple times.
      */
 
-    // strides
-    index_t const s_left       = -1;
-    index_t const s_right      =  1;
-    index_t const s_top_center = -data.stride();
-    index_t const s_top_left   = s_top_center + s_left;
-    index_t const s_top_right  = s_top_center + s_right;
-    index_t const s_bot_center = -s_top_center;
-    index_t const s_bot_left   = s_bot_center + s_left;
-    index_t const s_bot_right  = s_bot_center + s_right;
+    // stride
+    auto const stride = data.stride();
+
+    // access helper
+    auto const d = [&](index_t i, index_t dx, index_t dy) constexpr -> T {
+        return data[i + dy * stride + dx];
+    };
 
     // x = 0, y = 0
     if (data[i] > threshold) {
         bool max = true;
 
-        max &= data[i + s_right] <= data[i];
-        max &= data[i + s_bot_center] <= data[i];
+        max &= d(i, 1, 0) <= d(i, 0, 0);
+        max &= d(i, 0, 1) <= d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_bot_right] <= data[i];
+            max &= d(i, 1, 1) <= d(i, 0, 0);
         }
 
         if (max) {
@@ -57,17 +55,17 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
 
         bool max = true;
 
-        max &= data[i + s_left] < data[i];
-        max &= data[i + s_right] <= data[i];
+        max &= d(i, -1, 0) <  d(i, 0, 0);
+        max &= d(i,  1, 0) <= d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_bot_left] <= data[i];
+            max &= d(i, -1, 1) <= d(i, 0, 0);
         }
 
-        max &= data[i + s_bot_center] <= data[i];
+        max &= d(i, 0, 1) <= d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_bot_right] <= data[i];
+            max &= d(i, 1, 1) <= d(i, 0, 0);
         }
 
         if (max) {
@@ -79,13 +77,13 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
     if (data[i] > threshold) {
         bool max = true;
 
-        max &= data[i + s_left] < data[i];
+        max &= d(i, -1, 0) < d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_bot_left] <= data[i];
+            max &= d(i, -1, 1) <= d(i, 0, 0);
         }
 
-        max &= data[i + s_bot_center] <= data[i];
+        max &= d(i, 0, 1) <= d(i, 0, 0);
 
         if (max) {
             *output_iter++ = i;
@@ -99,17 +97,17 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
         if (data[i] > threshold) {
             bool max = true;
 
-            max &= data[i + s_right] <= data[i];
-            max &= data[i + s_top_center] < data[i];
+            max &= d(i, 1,  0) <= d(i, 0, 0);
+            max &= d(i, 0, -1) <  d(i, 0, 0);
 
             if constexpr (C == 8) {
-                max &= data[i + s_top_right] < data[i];
+                max &= d(i, 1, -1) < d(i, 0, 0);
             }
 
-            max &= data[i + s_bot_center] <= data[i];
+            max &= d(i, 0, 1) <= d(i, 0, 0);
 
             if constexpr (C == 8) {
-                max &= data[i + s_bot_right] <= data[i];
+                max &= d(i, 1, 1) <= d(i, 0, 0);
             }
 
             if (max) {
@@ -126,25 +124,24 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
 
             bool max = true;
 
-            max &= data[i + s_left] < data[i];
-            max &= data[i + s_right] <= data[i];
+            max &= d(i, -1, 0) <  d(i, 0, 0);
+            max &= d(i,  1, 0) <= d(i, 0, 0);
 
-            // top left
             if constexpr (C == 8) {
-                max &= data[i + s_top_left] < data[i];
+                max &= d(i, -1, -1) < d(i, 0, 0);
             }
 
-            max &= data[i + s_top_center] < data[i];
+            max &= d(i, 0, -1) < d(i, 0, 0);
 
             if constexpr (C == 8) {
-                max &= data[i + s_top_right] < data[i];
-                max &= data[i + s_bot_left] <= data[i];
+                max &= d(i,  1, -1) <  d(i, 0, 0);
+                max &= d(i, -1,  1) <= d(i, 0, 0);
             }
 
-            max &= data[i + s_bot_center] <= data[i];
+            max &= d(i, 0, 1) <= d(i, 0, 0);
 
             if constexpr (C == 8) {
-                max &= data[i + s_bot_right] <= data[i];
+                max &= d(i, 1, 1) <= d(i, 0, 0);
             }
 
             if (max) {
@@ -156,19 +153,19 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
         if (data[i] > threshold) {
             bool max = true;
 
-            max &= data[i + s_left] < data[i];
+            max &= d(i, -1, 0) < d(i, 0, 0);
 
             if constexpr (C == 8) {
-                max &= data[i + s_top_left] < data[i];
+                max &= d(i, -1, -1) < d(i, 0, 0);
             }
 
-            max &= data[i + s_top_center] < data[i];
+            max &= d(i, 0, -1) < d(i, 0, 0);
 
             if constexpr (C == 8) {
-                max &= data[i + s_bot_left] <= data[i];
+                max &= d(i, -1, 1) <= d(i, 0, 0);
             }
 
-            max &= data[i + s_bot_center] <= data[i];
+            max &= d(i, 0, 1) <= d(i, 0, 0);
 
             if (max) {
                 *output_iter++ = i;
@@ -181,11 +178,11 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
     if (data[i] > threshold) {
         bool max = true;
 
-        max &= data[i + s_right] <= data[i];
-        max &= data[i + s_top_center] < data[i];
+        max &= d(i, 1,  0) <= d(i, 0, 0);
+        max &= d(i, 0, -1) <  d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_top_right] < data[i];
+            max &= d(i,  1, -1) <  d(i, 0, 0);
         }
 
         if (max) {
@@ -201,17 +198,17 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
 
         bool max = true;
 
-        max &= data[i + s_left] < data[i];
-        max &= data[i + s_right] <= data[i];
+        max &= d(i, -1, 0) <  d(i, 0, 0);
+        max &= d(i,  1, 0) <= d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_top_left] < data[i];
+            max &= d(i, -1, -1) < d(i, 0, 0);
         }
 
-        max &= data[i + s_top_center] < data[i];
+        max &= d(i, 0, -1) < d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_top_right] < data[i];
+            max &= d(i,  1, -1) <  d(i, 0, 0);
         }
 
         if (max) {
@@ -223,13 +220,13 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
     if (data[i] > threshold) {
         bool max = true;
 
-        max &= data[i + s_left] < data[i];
+        max &= d(i, -1, 0) < d(i, 0, 0);
 
         if constexpr (C == 8) {
-            max &= data[i + s_top_left] < data[i];
+            max &= d(i, -1, -1) < d(i, 0, 0);
         }
 
-        max &= data[i + s_top_center] < data[i];
+        max &= d(i, 0, -1) < d(i, 0, 0);
 
         if (max) {
             *output_iter++ = i;

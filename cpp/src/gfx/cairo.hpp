@@ -1,8 +1,8 @@
 #pragma once
 
+#include "container/image.hpp"
 #include "gfx/cmap.hpp"
 #include "gfx/color.hpp"
-
 #include "math/vec2.hpp"
 
 #include <exception>
@@ -550,9 +550,9 @@ inline constexpr auto pixel_format<srgb>() -> format
 }
 
 
-inline auto image_surface_create(format fmt, vec2_t<i32> shape) -> surface
+inline auto image_surface_create(format fmt, vec2_t<i32> size) -> surface
 {
-    surface s { cairo_image_surface_create(static_cast<cairo_format_t>(fmt), shape.x, shape.y) };
+    surface s { cairo_image_surface_create(static_cast<cairo_format_t>(fmt), size.x, size.y) };
 
     if (s.status() != CAIRO_STATUS_SUCCESS) {
         throw exception{s.status()};
@@ -573,15 +573,15 @@ inline auto format_stride_for_width(format fmt, int width) -> int
 }
 
 template<class T>
-inline auto image_surface_create(image<T>& image) -> surface
+inline auto image_surface_create(container::image<T>& image) -> surface
 {
     auto const format = pixel_format<T>();
-    auto const shape = image.shape();
+    auto const size = image.size();
     auto const data = reinterpret_cast<u8*>(image.data());
 
-    auto const stride = format_stride_for_width(format, shape.x);
+    auto const stride = format_stride_for_width(format, size.x);
     auto const cf = static_cast<cairo_format_t>(format);
-    auto const ptr = cairo_image_surface_create_for_data(data, cf, shape.x, shape.y, stride);
+    auto const ptr = cairo_image_surface_create_for_data(data, cf, size.x, size.y, stride);
     auto const s = surface(ptr);
 
     if (s.status() != CAIRO_STATUS_SUCCESS) {

@@ -77,7 +77,8 @@ auto get_cost(T& cost, index_t i, index2_t d) -> V
 }
 
 template<typename T, typename Q, typename B, typename M, typename C>
-inline void evaluate(image<T>& out, Q& queue, B& bin, M& mask, C& cost, index_t i, index_t stride, index2_t dir, T limit)
+inline void evaluate(container::image<T>& out, Q& queue, B& bin, M& mask, C& cost, index_t i,
+                     index_t stride, index2_t dir, T limit)
 {
     if (!is_compute(bin, mask, i + stride))
         return;
@@ -93,17 +94,18 @@ inline void evaluate(image<T>& out, Q& queue, B& bin, M& mask, C& cost, index_t 
 
 
 template<int N=8, typename T, typename F, typename M, typename C, typename Q>
-void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, T limit=std::numeric_limits<T>::max())
+void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& cost, Q& q,
+                                 T limit=std::numeric_limits<T>::max())
 {
     static_assert(N == 4 || N == 8);
 
     // strides
     index_t const s_left      = -1;
     index_t const s_right     =  1;
-    index_t const s_top       = -stride(out.shape());
+    index_t const s_top       = -stride(out.size());
     index_t const s_top_left  = s_top + s_left;
     index_t const s_top_right = s_top + s_right;
-    index_t const s_bot       = stride(out.shape());
+    index_t const s_bot       = stride(out.size());
     index_t const s_bot_left  = s_bot + s_left;
     index_t const s_bot_right = s_bot + s_right;
 
@@ -139,7 +141,7 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
     ++i;
 
     // 0 < x < n - 1, y = 0
-    for (; i < out.shape().x - 1; ++i) {
+    for (; i < out.size().x - 1; ++i) {
         if (impl::is_foreground(bin, i)) {
             out[i] = static_cast<T>(0);
             continue;
@@ -206,7 +208,7 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
     ++i;
 
     // 0 < y < n - 1
-    while (i < out.shape().x * (out.shape().y - 1)) {
+    while (i < out.size().x * (out.size().y - 1)) {
         // x = 0
         if (!impl::is_foreground(bin, i)) {
             out[i] = std::numeric_limits<T>::max();
@@ -244,7 +246,7 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
         ++i;
 
         // 0 < x < n - 1
-        auto const limit = i + out.shape().x - 2;
+        auto const limit = i + out.size().x - 2;
         for (; i < limit; ++i) {
             // if this is a foreground pixel, set it to zero and skip the rest
             if (impl::is_foreground(bin, i)) {
@@ -366,7 +368,7 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < out.shape().product() - 1; ++i) {
+    for (; i < out.size().product() - 1; ++i) {
         if (impl::is_foreground(bin, i)) {
             out[i] = static_cast<T>(0);
             continue;
@@ -445,13 +447,13 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
         out[pixel.idx] = pixel.cost;
 
         // evaluate neighbors
-        auto const [x, y] = unravel(out.shape(), pixel.idx);
+        auto const [x, y] = unravel(out.size(), pixel.idx);
 
         if (x > 0) {
             impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_left, { -1, 0 }, limit);
         }
 
-        if (x < out.shape().x - 1) {
+        if (x < out.size().x - 1) {
             impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_right, { 1, 0 }, limit);
         }
 
@@ -462,19 +464,19 @@ void weighted_distance_transform(image<T>& out, F& bin, M& mask, C& cost, Q& q, 
 
             impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_top, { 0, -1 }, limit);
 
-            if (N == 8 && x < out.shape().x - 1) {
+            if (N == 8 && x < out.size().x - 1) {
                 impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_top_right, { 1, -1 }, limit);
             }
         }
 
-        if (y < out.shape().y - 1) {
+        if (y < out.size().y - 1) {
             if (N == 8 && x > 0) {
                 impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_bot_left, { -1, 1 }, limit);
             }
 
             impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_bot, { 0, 1 }, limit);
 
-            if (N == 8 && x < out.shape().x - 1) {
+            if (N == 8 && x < out.size().x - 1) {
                 impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_bot_right, { 1, 1 }, limit);
             }
         }

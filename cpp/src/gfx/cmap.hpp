@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.hpp"
-
+#include "container/image.hpp"
 #include "gfx/color.hpp"
 #include "math/num.hpp"
 
@@ -37,10 +37,12 @@ public:
     auto map(T const& value, std::pair<T, T> range) const -> P;
 
     template<class T, class P>
-    auto map(image<T> const& img, std::optional<std::pair<T, T>> range = std::nullopt) const -> image<P>;
+    auto map(container::image<T> const& img, std::optional<std::pair<T, T>> range=std::nullopt) const
+            -> container::image<P>;
 
     template<class T, class P>
-    void map_into(image<P>& dest, image<T> const& img, std::optional<std::pair<T, T>> range = std::nullopt) const;
+    void map_into(container::image<P>& dest, container::image<T> const& img,
+                  std::optional<std::pair<T, T>> range=std::nullopt) const;
 };
 
 template<class T, class P>
@@ -52,20 +54,29 @@ auto cmap::map(T const& value, std::pair<T, T> range) const -> P
 }
 
 template<class T, class P>
-auto cmap::map(image<T> const& img, std::optional<std::pair<T, T>> range) const -> image<P>
+auto cmap::map(container::image<T> const& img, std::optional<std::pair<T, T>> range) const
+        -> container::image<P>
 {
-    auto out = image<P>{img.shape()};
+    auto out = container::image<P>{img.size()};
 
     this->map_into(out, img, range);
     return out;
 }
 
 template<class T, class P>
-void cmap::map_into(image<P>& dest, image<T> const& img, std::optional<std::pair<T, T>> range) const
+void cmap::map_into(container::image<P>& dest, container::image<T> const& img,
+                    std::optional<std::pair<T, T>> range) const
 {
-    auto r = range.has_value() ? *range : minmax(img);
+    auto r = [&]() -> std::pair<T, T> {
+        if (range.has_value()) {
+            return *range;
+        };
 
-    assert(dest.shape() == img.shape());
+        auto [min, max] = std::minmax_element(img.begin(), img.end());
+        return { *min, *max };
+    }();
+
+    assert(dest.size() == img.size());
 
     if (r.second - r.first <= 0) {
         r = {r.first, r.second + 1};
@@ -138,7 +149,8 @@ inline auto cubehelix_t::map_value(f32 value) const -> srgb {
     return srgb::from(std::clamp(r, 0.f, 1.f), std::clamp(g, 0.f, 1.f), std::clamp(b, 0.f, 1.f));
 }
 
-inline auto cubehelix(f32 start=0.5f, f32 rotations=-1.5f, f32 hue=1.2f, f32 gamma=1.0f) -> cubehelix_t
+inline auto cubehelix(f32 start=0.5f, f32 rotations=-1.5f, f32 hue=1.2f, f32 gamma=1.0f)
+        -> cubehelix_t
 {
     return cubehelix_t { start, rotations, hue, gamma };
 }

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "types.hpp"
-#include "math.hpp"
 #include "kernels.hpp"
-
+#include "math.hpp"
+#include "types.hpp"
 #include "algorithm/border.hpp"
+#include "container/image.hpp"
 
 #include "math/num.hpp"
 #include "math/mat2.hpp"
@@ -15,14 +15,15 @@
 namespace impl {
 
 template<typename Bx, typename By, typename T, index_t Nx, index_t Ny>
-void structure_tensor_generic(image<math::mat2s_t<T>>& out, image<T> const& in,
+void structure_tensor_generic(container::image<math::mat2s_t<T>>& out,
+                              container::image<T> const& in,
                               kernel<T, Nx, Ny> const& kx, kernel<T, Nx, Ny> const& ky)
 {
     index_t const dx = (Nx - 1) / 2;
     index_t const dy = (Ny - 1) / 2;
 
-    for (index_t cy = 0; cy < in.shape().y; ++cy) {
-        for (index_t cx = 0; cx < in.shape().x; ++cx) {
+    for (index_t cy = 0; cy < in.size().y; ++cy) {
+        for (index_t cx = 0; cx < in.size().x; ++cx) {
             T gx = math::num<T>::zero;
             T gy = math::num<T>::zero;
 
@@ -44,11 +45,11 @@ void structure_tensor_generic(image<math::mat2s_t<T>>& out, image<T> const& in,
 
 
 template<typename Bx=border::zero, typename By=border::zero, typename T, index_t Nx=3, index_t Ny=3>
-void structure_tensor(image<math::mat2s_t<T>>& out, image<T> const& in,
+void structure_tensor(container::image<math::mat2s_t<T>>& out, container::image<T> const& in,
                       kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
                       kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)
 {
-    assert(in.shape() == out.shape());
+    assert(in.size() == out.size());
 
     // workaround for partial function template specialization
     if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<Bx, border::zero> && std::is_same_v<By, border::zero>) {

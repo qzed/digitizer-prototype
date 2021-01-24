@@ -2,6 +2,10 @@
 
 #include "math.hpp"
 
+#include "container/image.hpp"
+
+#include "math/num.hpp"
+
 #include "math/vec2.hpp"
 #include "math/mat2.hpp"
 
@@ -9,22 +13,13 @@
 #include "math/mat6.hpp"
 #include "math/sle6.hpp"
 
-#include "math/num.hpp"
-
 #include <array>
 
 
 namespace gfit {
 
-using math::vec2_t;
-using math::mat2s_t;
-
-using math::vec6_t;
-using math::mat6_t;
-
-
 template<class T>
-inline constexpr auto const range = vec2_t<T> { static_cast<T>(1), static_cast<T>(1) };
+inline constexpr auto const range = math::vec2_t<T> { static_cast<T>(1), static_cast<T>(1) };
 
 
 struct bbox {
@@ -34,12 +29,12 @@ struct bbox {
 
 template<class T>
 struct parameters {
-    bool        valid;      // flag to invalidate parameters
-    T           scale;      // alpha
-    vec2_t<T>   mean;       // mu
-    mat2s_t<T>  prec;       // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
-    bbox        bounds;     // local bounds for sampling
-    image<T>    weights;    // local weights for sampling
+    bool                valid;      // flag to invalidate parameters
+    T                   scale;      // alpha
+    math::vec2_t<T>     mean;       // mu
+    math::mat2s_t<T>    prec;       // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
+    bbox                bounds;     // local bounds for sampling
+    container::image<T> weights;    // local weights for sampling
 };
 
 
@@ -52,20 +47,21 @@ namespace impl {
  * @prec: Precision matrix, i.e. the invariance of the covariance matrix.
  */
 template<class T>
-auto gaussian_like(vec2_t<T> x, vec2_t<T> mean, mat2s_t<T> prec) -> T
+auto gaussian_like(math::vec2_t<T> x, math::vec2_t<T> mean, math::mat2s_t<T> prec) -> T
 {
     return std::exp(-prec.vtmv(x - mean) / static_cast<T>(2));
 }
 
 
 template<class T, class S>
-inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T> const& data, image<S> const& w)
+inline void assemble_system(math::mat6_t<S>& m, math::vec6_t<S>& rhs, bbox const& b,
+                           container::image<T> const& data, container::image<S> const& w)
 {
     auto const eps = std::numeric_limits<S>::epsilon();
 
-    auto const scale = vec2_t<S> {
-        static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),
-        static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
+    auto const scale = math::vec2_t<S> {
+        static_cast<S>(2) * range<S>.x / static_cast<S>(data.size().x),
+        static_cast<S>(2) * range<S>.y / static_cast<S>(data.size().y),
     };
 
     std::fill(m.data.begin(), m.data.end(), math::num<T>::zero);
@@ -139,9 +135,10 @@ inline void assemble_system(mat6_t<S>& m, vec6_t<S>& rhs, bbox const& b, image<T
 }
 
 template<class T>
-bool extract_params(vec6_t<T> const& chi, T& scale, vec2_t<T>& mean, mat2s_t<T>& prec, T eps=math::num<T>::eps)
+bool extract_params(math::vec6_t<T> const& chi, T& scale, math::vec2_t<T>& mean,
+                    math::mat2s_t<T>& prec, T eps=math::num<T>::eps)
 {
-    prec = -static_cast<T>(2) * mat2s_t<T> { chi[0], chi[1], chi[2] };
+    prec = -static_cast<T>(2) * math::mat2s_t<T> { chi[0], chi[1], chi[2] };
 
     // mu = sigma * b = prec^-1 * B
     auto const d = prec.det();
@@ -159,11 +156,11 @@ bool extract_params(vec6_t<T> const& chi, T& scale, vec2_t<T>& mean, mat2s_t<T>&
 
 
 template<class T>
-inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& total)
+inline void update_weight_maps(std::vector<parameters<T>>& params, container::image<T>& total)
 {
-    auto const scale = vec2_t<T> {
-        static_cast<T>(2) * range<T>.x / static_cast<T>(total.shape().x),
-        static_cast<T>(2) * range<T>.y / static_cast<T>(total.shape().y),
+    auto const scale = math::vec2_t<T> {
+        static_cast<T>(2) * range<T>.x / static_cast<T>(total.size().x),
+        static_cast<T>(2) * range<T>.y / static_cast<T>(total.size().y),
     };
 
     std::fill(total.begin(), total.end(), math::num<T>::zero);
@@ -221,7 +218,7 @@ inline void update_weight_maps(std::vector<parameters<T>>& params, image<T>& tot
 // TODO: vector as parameter container is not good... drops image memory when resized
 
 template<class T>
-void reserve(std::vector<parameters<T>>& params, std::size_t n, index2_t shape)
+void reserve(std::vector<parameters<T>>& params, std::size_t n, index2_t size)
 {
     if (n > params.size()) {
         params.resize(n, parameters<T> {
@@ -230,7 +227,7 @@ void reserve(std::vector<parameters<T>>& params, std::size_t n, index2_t shape)
             { static_cast<T>(0), static_cast<T>(0) },
             { static_cast<T>(1), static_cast<T>(0), static_cast<T>(1) },
             { 0, -1, 0, -1 },
-            image<T> { shape },
+            container::image<T> { size },
         });
     }
 
@@ -240,12 +237,12 @@ void reserve(std::vector<parameters<T>>& params, std::size_t n, index2_t shape)
 }
 
 template<class T, class S>
-void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp,
-         unsigned int n_iter, S eps=math::num<S>::eps)
+void fit(std::vector<parameters<S>>& params, container::image<T> const& data,
+         container::image<S>& tmp, unsigned int n_iter, S eps=math::num<S>::eps)
 {
-    auto const scale = vec2_t<S> {
-        static_cast<S>(2) * range<S>.x / static_cast<S>(data.shape().x),
-        static_cast<S>(2) * range<S>.y / static_cast<S>(data.shape().y),
+    auto const scale = math::vec2_t<S> {
+        static_cast<S>(2) * range<S>.x / static_cast<S>(data.size().x),
+        static_cast<S>(2) * range<S>.y / static_cast<S>(data.size().y),
     };
 
     // down-scaling
@@ -271,9 +268,9 @@ void fit(std::vector<parameters<S>>& params, image<T> const& data, image<S>& tmp
 
         // fit individual parameters
         for (auto& p : params) {
-            auto sys = mat6_t<S>{};
-            auto rhs = vec6_t<S>{};
-            auto chi = vec6_t<S>{};
+            auto sys = math::mat6_t<S>{};
+            auto rhs = math::vec6_t<S>{};
+            auto chi = math::vec6_t<S>{};
 
             if (!p.valid) {
                 continue;

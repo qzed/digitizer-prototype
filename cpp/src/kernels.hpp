@@ -66,7 +66,10 @@ auto gaussian(T sigma) -> kernel<T, Nx, Ny>
         }
     }
 
-    transform_inplace(k, [&](auto const& x) { return x / sum; });
+    std::transform(k.begin(), k.end(), k.begin(), [&](auto const& x) {
+        return x / sum;
+    });
+
     return k;
 }
 

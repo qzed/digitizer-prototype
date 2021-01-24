@@ -8,10 +8,11 @@
 namespace impl {
 
 template<typename T, typename S>
-void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const& kern)
+void conv_3x3_extend(container::image<T>& out, container::image<T> const& data,
+                     kernel<S, 3, 3> const& kern)
 {
     // strides
-    auto const stride_d = stride(data.shape());
+    auto const stride_d = stride(data.size());
     auto const stride_k = stride({ 3, 3 });
 
     // access helpers
@@ -48,7 +49,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
         }
 
         // 0 < x < n
-        auto const limit = i + data.shape().x - 2;
+        auto const limit = i + data.size().x - 2;
         while (i < limit) {
             T v = math::num<T>::zero;
 
@@ -88,7 +89,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
     }
 
     // 0 < y < n
-    while (i < data.shape().x * (data.shape().y - 1)) {
+    while (i < data.size().x * (data.size().y - 1)) {
         // x = 0
         {
             T v = math::num<T>::zero;
@@ -109,7 +110,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
         }
 
         // 0 < x < n
-        auto const limit = i + data.shape().x - 2;
+        auto const limit = i + data.size().x - 2;
         while (i < limit) {
             T v = math::num<T>::zero;
 
@@ -170,7 +171,7 @@ void conv_3x3_extend(image<T>& out, image<T> const& data, kernel<S, 3, 3> const&
         }
 
         // 1 < x < n - 2
-        auto const limit = i + data.shape().x - 2;
+        auto const limit = i + data.size().x - 2;
         while (i < limit) {
             T v = math::num<T>::zero;
 

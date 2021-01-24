@@ -11,6 +11,8 @@
 #include "algorithm/local_maxima.hpp"
 #include "algorithm/structure_tensor.hpp"
 
+#include "container/image.hpp"
+
 #include "eval/perf.hpp"
 
 #include "gfx/cairo.hpp"
@@ -48,20 +50,20 @@ auto read_file(char const* path) -> std::vector<u8>
 
 class parser : public parser_base {
 private:
-    std::vector<image<f32>> m_data;
+    std::vector<container::image<f32>> m_data;
     ipts_heatmap_dim m_dim;
 
 public:
-    auto parse(char const* file) -> std::vector<image<f32>>;
+    auto parse(char const* file) -> std::vector<container::image<f32>>;
 
 protected:
     virtual void on_heatmap_dim(ipts_heatmap_dim const& dim);
     virtual void on_heatmap(slice<u8> const& data);
 };
 
-auto parser::parse(char const* file) -> std::vector<image<f32>>
+auto parser::parse(char const* file) -> std::vector<container::image<f32>>
 {
-    m_data = std::vector<image<f32>>{};
+    m_data = std::vector<container::image<f32>>{};
 
     auto const data = read_file(file);
     this->do_parse({data.data(), data.data() + data.size()});
@@ -76,7 +78,7 @@ void parser::on_heatmap_dim(ipts_heatmap_dim const& dim)
 
 void parser::on_heatmap(slice<u8> const& data)
 {
-    auto img = image<f32> {{ m_dim.width, m_dim.height }};
+    auto img = container::image<f32> {{ m_dim.width, m_dim.height }};
 
     std::transform(data.begin, data.end, img.begin(), [&](auto v) {
         return 1.0f - static_cast<f32>(v - m_dim.z_min) / static_cast<f32>(m_dim.z_max - m_dim.z_min);
@@ -129,6 +131,9 @@ auto main(int argc, char** argv) -> int
         print_usage_and_exit(argv[0]);
     }
 
+    auto _test = container::image<f32> {{ 72, 48 }};
+    std::fill(_test.begin(), _test.end(), 1.0f);
+
     auto perf_reg = eval::perf::registry {};
     auto perf_t_total = perf_reg.create_entry("total");
     auto perf_t_prep  = perf_reg.create_entry("preprocessing");
@@ -145,19 +150,19 @@ auto main(int argc, char** argv) -> int
     auto perf_t_lmaxf = perf_reg.create_entry("filter.maximas");
     auto perf_t_gfit  = perf_reg.create_entry("gaussian-fitting");
 
-    auto img_pp  = image<f32> {{ 72, 48 }};
-    auto img_m2_1 = image<math::mat2s_t<f32>> { img_pp.shape() };
-    auto img_m2_2 = image<math::mat2s_t<f32>> { img_pp.shape() };
-    auto img_stev = image<math::vec2_t<f32>>  { img_pp.shape() };
-    auto img_rdg = image<f32> { img_pp.shape() };
-    auto img_obj = image<f32> { img_pp.shape() };
-    auto img_lbl = image<u16> { img_pp.shape() };
-    auto img_dm1 = image<f32> { img_pp.shape() };
-    auto img_dm2 = image<f32> { img_pp.shape() };
-    auto img_flt = image<f32> { img_pp.shape() };
-    auto img_gftmp = image<f32> { img_pp.shape() };
+    auto img_pp    = container::image<f32> {{ 72, 48 }};
+    auto img_m2_1  = container::image<math::mat2s_t<f32>> { img_pp.size() };
+    auto img_m2_2  = container::image<math::mat2s_t<f32>> { img_pp.size() };
+    auto img_stev  = container::image<math::vec2_t<f32>> { img_pp.size() };
+    auto img_rdg   = container::image<f32> { img_pp.size() };
+    auto img_obj   = container::image<f32> { img_pp.size() };
+    auto img_lbl   = container::image<u16> { img_pp.size() };
+    auto img_dm1   = container::image<f32> { img_pp.size() };
+    auto img_dm2   = container::image<f32> { img_pp.size() };
+    auto img_flt   = container::image<f32> { img_pp.size() };
+    auto img_gftmp = container::image<f32> { img_pp.size() };
 
-    auto img_out_color = image<gfx::srgba> { img_pp.shape() };
+    auto img_out_color = container::image<gfx::srgba> { img_pp.size() };
 
     auto kern_pp = kernels::gaussian<f32, 5, 5>(1.0);
     auto kern_st = kernels::gaussian<f32, 5, 5>(1.0);
@@ -178,7 +183,7 @@ auto main(int argc, char** argv) -> int
 
     auto const heatmaps = parser().parse(argv[2]);
 
-    auto out = std::vector<image<f32>>{};
+    auto out = std::vector<container::image<f32>>{};
     out.reserve(heatmaps.size());
 
     auto out_tp = std::vector<std::vector<std::tuple<f32, f32, math::vec2_t<f32>, math::mat2s_t<f32>>>>{};
@@ -199,7 +204,13 @@ auto main(int argc, char** argv) -> int
                 auto _r = perf_reg.record(perf_t_prep);
 
                 conv(img_pp, hm, kern_pp);
-                sub0(img_pp, average(img_pp));
+
+                auto const sum = std::accumulate(img_pp.begin(), img_pp.end(), 0.0f);
+                auto const avg = sum / img_pp.size().product();
+
+                std::transform(img_pp.begin(), img_pp.end(), img_pp.begin(), [&](auto const x) {
+                    return std::max(x - avg, 0.0f);
+                });
             }
 
             // structure tensor
@@ -245,7 +256,7 @@ auto main(int argc, char** argv) -> int
                 f32 const wr = 0.9;
                 f32 const wh = 1.1;
 
-                for (index_t i = 0; i < img_pp.shape().product(); ++i) {
+                for (index_t i = 0; i < img_pp.size().product(); ++i) {
                     img_obj[i] = wh * img_pp[i] - wr * img_rdg[i];
                 }
             }
@@ -273,7 +284,7 @@ auto main(int argc, char** argv) -> int
                 cstats.clear();
                 cstats.assign(num_labels, component_stats { 0, 0, 0, 0 });
 
-                for (index_t i = 0; i < img_pp.shape().product(); ++i) {
+                for (index_t i = 0; i < img_pp.size().product(); ++i) {
                     auto const label = img_lbl[i];
 
                     if (label == 0)
@@ -349,7 +360,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_flt);
 
-                for (index_t i = 0; i < img_pp.shape().product(); ++i) {
+                for (index_t i = 0; i < img_pp.size().product(); ++i) {
                     auto const sigma = 1.0f;
 
                     // img_out[i] = std::numeric_limits<f32>::max() == img_dm1[i] ? 0.0f : img_dm1[i];
@@ -382,14 +393,14 @@ auto main(int argc, char** argv) -> int
                 gfit::reserve(gfparams, maximas.size(), gfwindow);
 
                 for (std::size_t i = 0; i < maximas.size(); ++i) {
-                    auto const [x, y] = unravel(img_pp.shape(), maximas[i]);
+                    auto const [x, y] = unravel(img_pp.size(), maximas[i]);
 
                     // TODO: move window inwards instead of clamping?
                     auto const bounds = gfit::bbox {
                         std::max(x - (gfwindow.x - 1) / 2, 0),
-                        std::min(x + (gfwindow.x - 1) / 2, img_pp.shape().x - 1),
+                        std::min(x + (gfwindow.x - 1) / 2, img_pp.size().x - 1),
                         std::max(y - (gfwindow.y - 1) / 2, 0),
-                        std::min(y + (gfwindow.y - 1) / 2, img_pp.shape().y - 1),
+                        std::min(y + (gfwindow.y - 1) / 2, img_pp.size().y - 1),
                     };
 
                     gfparams[i].valid  = true;
@@ -464,8 +475,8 @@ auto main(int argc, char** argv) -> int
     for (std::size_t i = 0; i < out.size(); ++i) {
         auto const& img_out = out[i];
 
-        auto const img_w = static_cast<f64>(img_out.shape().x);
-        auto const img_h = static_cast<f64>(img_out.shape().y);
+        auto const img_w = static_cast<f64>(img_out.size().x);
+        auto const img_h = static_cast<f64>(img_out.size().y);
 
         auto const win_w = static_cast<f64>(width);
         auto const win_h = static_cast<f64>(height);

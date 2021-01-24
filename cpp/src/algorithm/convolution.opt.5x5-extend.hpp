@@ -8,10 +8,11 @@
 namespace impl {
 
 template<typename T, typename S>
-void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const& kern)
+void conv_5x5_extend(container::image<T>& out, container::image<T> const& data,
+                     kernel<S, 5, 5> const& kern)
 {
     // strides
-    auto const stride_d = stride(data.shape());
+    auto const stride_d = stride(data.size());
     auto const stride_k = stride({ 5, 5 });
 
     // access helpers
@@ -103,7 +104,7 @@ void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const&
         }
 
         // 1 < x < n - 2
-        auto const limit = i + data.shape().x - 4;
+        auto const limit = i + data.size().x - 4;
         while (i < limit) {
             T v = math::num<T>::zero;
 
@@ -292,7 +293,7 @@ void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const&
         }
 
         // 1 < x < n - 2
-        auto const limit = i + data.shape().x - 4;
+        auto const limit = i + data.size().x - 4;
         while (i < limit) {
             T v = math::num<T>::zero;
 
@@ -405,7 +406,7 @@ void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const&
     }
 
     // 1 < y < n - 2
-    while (i < data.shape().x * (data.shape().y - 2)) {
+    while (i < data.size().x * (data.size().y - 2)) {
         // x = 0
         {
             T v = math::num<T>::zero;
@@ -481,7 +482,7 @@ void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const&
         }
 
         // 1 < x < n - 2
-        auto const limit = i + data.shape().x - 4;
+        auto const limit = i + data.size().x - 4;
         while (i < limit) {
             T v = math::num<T>::zero;
 
@@ -670,7 +671,7 @@ void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const&
         }
 
         // 1 < x < n - 2
-        auto const limit = i + data.shape().x - 4;
+        auto const limit = i + data.size().x - 4;
         while (i < limit) {
             T v = math::num<T>::zero;
 
@@ -859,7 +860,7 @@ void conv_5x5_extend(image<T>& out, image<T> const& data, kernel<S, 5, 5> const&
         }
 
         // 1 < x < n - 2
-        auto const limit = i + data.shape().x - 4;
+        auto const limit = i + data.size().x - 4;
         while (i < limit) {
             T v = math::num<T>::zero;
 

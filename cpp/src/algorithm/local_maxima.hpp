@@ -5,7 +5,7 @@
 
 
 template<int C=8, typename T, typename O>
-void find_local_maximas(image<T> const& data, T threshold, O output_iter)
+void find_local_maximas(container::image<T> const& data, T threshold, O output_iter)
 {
     static_assert(C == 4 || C == 8);
 
@@ -26,10 +26,10 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
     // strides
     index_t const s_left       = -1;
     index_t const s_right      =  1;
-    index_t const s_top_center = -stride(data.shape());
+    index_t const s_top_center = -stride(data.size());
     index_t const s_top_left   = s_top_center + s_left;
     index_t const s_top_right  = s_top_center + s_right;
-    index_t const s_bot_center = stride(data.shape());
+    index_t const s_bot_center = stride(data.size());
     index_t const s_bot_left   = s_bot_center + s_left;
     index_t const s_bot_right  = s_bot_center + s_right;
 
@@ -51,7 +51,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
     ++i;
 
     // 0 < x < n - 1, y = 0
-    for (; i < data.shape().x - 1; ++i) {
+    for (; i < data.size().x - 1; ++i) {
         if (data[i] <= threshold)
             continue;
 
@@ -94,7 +94,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
     ++i;
 
     // 0 < y < n - 1
-    while (i < data.shape().x * (data.shape().y - 1)) {
+    while (i < data.size().x * (data.size().y - 1)) {
         // x = 0
         if (data[i] > threshold) {
             bool max = true;
@@ -119,7 +119,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
         ++i;
 
         // 0 < x < n - 1
-        auto const limit = i + data.shape().x - 2;
+        auto const limit = i + data.size().x - 2;
         for (; i < limit; ++i) {
             if (data[i] <= threshold)
                 continue;
@@ -195,7 +195,7 @@ void find_local_maximas(image<T> const& data, T threshold, O output_iter)
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < data.shape().product() - 1; ++i) {
+    for (; i < data.size().product() - 1; ++i) {
         if (data[i] <= threshold)
             continue;
 

@@ -15,27 +15,18 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     auto const& kyy = conv::kernels::sobel3_yy<T>;
     auto const& kxy = conv::kernels::sobel3_xy<T>;
 
-    // strides for data access
-    index_t const s_left      = -1;
-    index_t const s_center    =  0;
-    index_t const s_right     =  1;
-    index_t const s_top       = -in.stride();
-    index_t const s_top_left  = s_top + s_left;
-    index_t const s_top_right = s_top + s_right;
-    index_t const s_bot       = -s_top;
-    index_t const s_bot_left  = s_bot + s_left;
-    index_t const s_bot_right = s_bot + s_right;
+    // strides
+    auto const stride_d = in.stride();
+    auto const stride_k = 3;
 
-    // strides for kernel access
-    index_t const k_top_left  = 0;
-    index_t const k_top       = 1;
-    index_t const k_top_right = 2;
-    index_t const k_left      = 3;
-    index_t const k_center    = 4;
-    index_t const k_right     = 5;
-    index_t const k_bot_left  = 6;
-    index_t const k_bot       = 7;
-    index_t const k_bot_right = 8;
+    // access helpers
+    auto const k = [&](auto const& kern, index_t dx, index_t dy) constexpr -> T {
+        return kern[4 + dy * stride_k + dx];
+    };
+
+    auto const d = [&](index_t i, index_t dx, index_t dy) constexpr -> T {
+        return in[i + dy * stride_d + dx];
+    };
 
     // processing...
     index_t i = 0;
@@ -44,21 +35,21 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     {
         auto h = math::num<math::mat2s_t<T>>::zero;
 
-        h.xx += in[i + s_center] * kxx[k_center];
-        h.xy += in[i + s_center] * kxy[k_center];
-        h.yy += in[i + s_center] * kyy[k_center];
+        h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+        h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+        h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-        h.xx += in[i + s_right] * kxx[k_right];
-        h.xy += in[i + s_right] * kxy[k_right];
-        h.yy += in[i + s_right] * kyy[k_right];
+        h.xx += d(i,  1,  0) * k(kxx,  1,  0);
+        h.xy += d(i,  1,  0) * k(kxy,  1,  0);
+        h.yy += d(i,  1,  0) * k(kyy,  1,  0);
 
-        h.xx += in[i + s_bot] * kxx[k_bot];
-        h.xy += in[i + s_bot] * kxy[k_bot];
-        h.yy += in[i + s_bot] * kyy[k_bot];
+        h.xx += d(i,  0,  1) * k(kxx,  0,  1);
+        h.xy += d(i,  0,  1) * k(kxy,  0,  1);
+        h.yy += d(i,  0,  1) * k(kyy,  0,  1);
 
-        h.xx += in[i + s_bot_right] * kxx[k_bot_right];
-        h.xy += in[i + s_bot_right] * kxy[k_bot_right];
-        h.yy += in[i + s_bot_right] * kyy[k_bot_right];
+        h.xx += d(i,  1,  1) * k(kxx,  1,  1);
+        h.xy += d(i,  1,  1) * k(kxy,  1,  1);
+        h.yy += d(i,  1,  1) * k(kyy,  1,  1);
 
         out[i] = h;
     }
@@ -68,29 +59,29 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     for (; i < in.size().x - 1; ++i) {
         auto h = math::num<math::mat2s_t<T>>::zero;
 
-        h.xx += in[i + s_left] * kxx[k_left];
-        h.xy += in[i + s_left] * kxy[k_left];
-        h.yy += in[i + s_left] * kyy[k_left];
+        h.xx += d(i, -1,  0) * k(kxx, -1,  0);
+        h.xy += d(i, -1,  0) * k(kxy, -1,  0);
+        h.yy += d(i, -1,  0) * k(kyy, -1,  0);
 
-        h.xx += in[i + s_center] * kxx[k_center];
-        h.xy += in[i + s_center] * kxy[k_center];
-        h.yy += in[i + s_center] * kyy[k_center];
+        h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+        h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+        h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-        h.xx += in[i + s_right] * kxx[k_right];
-        h.xy += in[i + s_right] * kxy[k_right];
-        h.yy += in[i + s_right] * kyy[k_right];
+        h.xx += d(i,  1,  0) * k(kxx,  1,  0);
+        h.xy += d(i,  1,  0) * k(kxy,  1,  0);
+        h.yy += d(i,  1,  0) * k(kyy,  1,  0);
 
-        h.xx += in[i + s_bot_left] * kxx[k_bot_left];
-        h.xy += in[i + s_bot_left] * kxy[k_bot_left];
-        h.yy += in[i + s_bot_left] * kyy[k_bot_left];
+        h.xx += d(i, -1,  1) * k(kxx, -1,  1);
+        h.xy += d(i, -1,  1) * k(kxy, -1,  1);
+        h.yy += d(i, -1,  1) * k(kyy, -1,  1);
 
-        h.xx += in[i + s_bot] * kxx[k_bot];
-        h.xy += in[i + s_bot] * kxy[k_bot];
-        h.yy += in[i + s_bot] * kyy[k_bot];
+        h.xx += d(i,  0,  1) * k(kxx,  0,  1);
+        h.xy += d(i,  0,  1) * k(kxy,  0,  1);
+        h.yy += d(i,  0,  1) * k(kyy,  0,  1);
 
-        h.xx += in[i + s_bot_right] * kxx[k_bot_right];
-        h.xy += in[i + s_bot_right] * kxy[k_bot_right];
-        h.yy += in[i + s_bot_right] * kyy[k_bot_right];
+        h.xx += d(i,  1,  1) * k(kxx,  1,  1);
+        h.xy += d(i,  1,  1) * k(kxy,  1,  1);
+        h.yy += d(i,  1,  1) * k(kyy,  1,  1);
 
         out[i] = h;
     }
@@ -99,21 +90,21 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     {
         auto h = math::num<math::mat2s_t<T>>::zero;
 
-        h.xx += in[i + s_left] * kxx[k_left];
-        h.xy += in[i + s_left] * kxy[k_left];
-        h.yy += in[i + s_left] * kyy[k_left];
+        h.xx += d(i, -1,  0) * k(kxx, -1,  0);
+        h.xy += d(i, -1,  0) * k(kxy, -1,  0);
+        h.yy += d(i, -1,  0) * k(kyy, -1,  0);
 
-        h.xx += in[i + s_center] * kxx[k_center];
-        h.xy += in[i + s_center] * kxy[k_center];
-        h.yy += in[i + s_center] * kyy[k_center];
+        h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+        h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+        h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-        h.xx += in[i + s_bot_left] * kxx[k_bot_left];
-        h.xy += in[i + s_bot_left] * kxy[k_bot_left];
-        h.yy += in[i + s_bot_left] * kyy[k_bot_left];
+        h.xx += d(i, -1,  1) * k(kxx, -1,  1);
+        h.xy += d(i, -1,  1) * k(kxy, -1,  1);
+        h.yy += d(i, -1,  1) * k(kyy, -1,  1);
 
-        h.xx += in[i + s_bot] * kxx[k_bot];
-        h.xy += in[i + s_bot] * kxy[k_bot];
-        h.yy += in[i + s_bot] * kyy[k_bot];
+        h.xx += d(i,  0,  1) * k(kxx,  0,  1);
+        h.xy += d(i,  0,  1) * k(kxy,  0,  1);
+        h.yy += d(i,  0,  1) * k(kyy,  0,  1);
 
         out[i] = h;
     }
@@ -125,29 +116,29 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
         {
             auto h = math::num<math::mat2s_t<T>>::zero;
 
-            h.xx += in[i + s_top] * kxx[k_top];
-            h.xy += in[i + s_top] * kxy[k_top];
-            h.yy += in[i + s_top] * kyy[k_top];
+            h.xx += d(i,  0, -1) * k(kxx,  0, -1);
+            h.xy += d(i,  0, -1) * k(kxy,  0, -1);
+            h.yy += d(i,  0, -1) * k(kyy,  0, -1);
 
-            h.xx += in[i + s_top_right] * kxx[k_top_right];
-            h.xy += in[i + s_top_right] * kxy[k_top_right];
-            h.yy += in[i + s_top_right] * kyy[k_top_right];
+            h.xx += d(i,  1, -1) * k(kxx,  1, -1);
+            h.xy += d(i,  1, -1) * k(kxy,  1, -1);
+            h.yy += d(i,  1, -1) * k(kyy,  1, -1);
 
-            h.xx += in[i + s_center] * kxx[k_center];
-            h.xy += in[i + s_center] * kxy[k_center];
-            h.yy += in[i + s_center] * kyy[k_center];
+            h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+            h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+            h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-            h.xx += in[i + s_right] * kxx[k_right];
-            h.xy += in[i + s_right] * kxy[k_right];
-            h.yy += in[i + s_right] * kyy[k_right];
+            h.xx += d(i,  1,  0) * k(kxx,  1,  0);
+            h.xy += d(i,  1,  0) * k(kxy,  1,  0);
+            h.yy += d(i,  1,  0) * k(kyy,  1,  0);
 
-            h.xx += in[i + s_bot] * kxx[k_bot];
-            h.xy += in[i + s_bot] * kxy[k_bot];
-            h.yy += in[i + s_bot] * kyy[k_bot];
+            h.xx += d(i,  0,  1) * k(kxx,  0,  1);
+            h.xy += d(i,  0,  1) * k(kxy,  0,  1);
+            h.yy += d(i,  0,  1) * k(kyy,  0,  1);
 
-            h.xx += in[i + s_bot_right] * kxx[k_bot_right];
-            h.xy += in[i + s_bot_right] * kxy[k_bot_right];
-            h.yy += in[i + s_bot_right] * kyy[k_bot_right];
+            h.xx += d(i,  1,  1) * k(kxx,  1,  1);
+            h.xy += d(i,  1,  1) * k(kxy,  1,  1);
+            h.yy += d(i,  1,  1) * k(kyy,  1,  1);
 
             out[i] = h;
         }
@@ -158,41 +149,41 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
         for (; i < limit; ++i) {
             auto h = math::num<math::mat2s_t<T>>::zero;
 
-            h.xx += in[i + s_top_left] * kxx[k_top_left];
-            h.xy += in[i + s_top_left] * kxy[k_top_left];
-            h.yy += in[i + s_top_left] * kyy[k_top_left];
+            h.xx += d(i, -1, -1) * k(kxx, -1, -1);
+            h.xy += d(i, -1, -1) * k(kxy, -1, -1);
+            h.yy += d(i, -1, -1) * k(kyy, -1, -1);
 
-            h.xx += in[i + s_top] * kxx[k_top];
-            h.xy += in[i + s_top] * kxy[k_top];
-            h.yy += in[i + s_top] * kyy[k_top];
+            h.xx += d(i,  0, -1) * k(kxx,  0, -1);
+            h.xy += d(i,  0, -1) * k(kxy,  0, -1);
+            h.yy += d(i,  0, -1) * k(kyy,  0, -1);
 
-            h.xx += in[i + s_top_right] * kxx[k_top_right];
-            h.xy += in[i + s_top_right] * kxy[k_top_right];
-            h.yy += in[i + s_top_right] * kyy[k_top_right];
+            h.xx += d(i,  1, -1) * k(kxx,  1, -1);
+            h.xy += d(i,  1, -1) * k(kxy,  1, -1);
+            h.yy += d(i,  1, -1) * k(kyy,  1, -1);
 
-            h.xx += in[i + s_left] * kxx[k_left];
-            h.xy += in[i + s_left] * kxy[k_left];
-            h.yy += in[i + s_left] * kyy[k_left];
+            h.xx += d(i, -1,  0) * k(kxx, -1,  0);
+            h.xy += d(i, -1,  0) * k(kxy, -1,  0);
+            h.yy += d(i, -1,  0) * k(kyy, -1,  0);
 
-            h.xx += in[i + s_center] * kxx[k_center];
-            h.xy += in[i + s_center] * kxy[k_center];
-            h.yy += in[i + s_center] * kyy[k_center];
+            h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+            h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+            h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-            h.xx += in[i + s_right] * kxx[k_right];
-            h.xy += in[i + s_right] * kxy[k_right];
-            h.yy += in[i + s_right] * kyy[k_right];
+            h.xx += d(i,  1,  0) * k(kxx,  1,  0);
+            h.xy += d(i,  1,  0) * k(kxy,  1,  0);
+            h.yy += d(i,  1,  0) * k(kyy,  1,  0);
 
-            h.xx += in[i + s_bot_left] * kxx[k_bot_left];
-            h.xy += in[i + s_bot_left] * kxy[k_bot_left];
-            h.yy += in[i + s_bot_left] * kyy[k_bot_left];
+            h.xx += d(i, -1,  1) * k(kxx, -1,  1);
+            h.xy += d(i, -1,  1) * k(kxy, -1,  1);
+            h.yy += d(i, -1,  1) * k(kyy, -1,  1);
 
-            h.xx += in[i + s_bot] * kxx[k_bot];
-            h.xy += in[i + s_bot] * kxy[k_bot];
-            h.yy += in[i + s_bot] * kyy[k_bot];
+            h.xx += d(i,  0,  1) * k(kxx,  0,  1);
+            h.xy += d(i,  0,  1) * k(kxy,  0,  1);
+            h.yy += d(i,  0,  1) * k(kyy,  0,  1);
 
-            h.xx += in[i + s_bot_right] * kxx[k_bot_right];
-            h.xy += in[i + s_bot_right] * kxy[k_bot_right];
-            h.yy += in[i + s_bot_right] * kyy[k_bot_right];
+            h.xx += d(i,  1,  1) * k(kxx,  1,  1);
+            h.xy += d(i,  1,  1) * k(kxy,  1,  1);
+            h.yy += d(i,  1,  1) * k(kyy,  1,  1);
 
             out[i] = h;
         }
@@ -201,29 +192,29 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
         {
             auto h = math::num<math::mat2s_t<T>>::zero;
 
-            h.xx += in[i + s_top_left] * kxx[k_top_left];
-            h.xy += in[i + s_top_left] * kxy[k_top_left];
-            h.yy += in[i + s_top_left] * kyy[k_top_left];
+            h.xx += d(i, -1, -1) * k(kxx, -1, -1);
+            h.xy += d(i, -1, -1) * k(kxy, -1, -1);
+            h.yy += d(i, -1, -1) * k(kyy, -1, -1);
 
-            h.xx += in[i + s_top] * kxx[k_top];
-            h.xy += in[i + s_top] * kxy[k_top];
-            h.yy += in[i + s_top] * kyy[k_top];
+            h.xx += d(i,  0, -1) * k(kxx,  0, -1);
+            h.xy += d(i,  0, -1) * k(kxy,  0, -1);
+            h.yy += d(i,  0, -1) * k(kyy,  0, -1);
 
-            h.xx += in[i + s_left] * kxx[k_left];
-            h.xy += in[i + s_left] * kxy[k_left];
-            h.yy += in[i + s_left] * kyy[k_left];
+            h.xx += d(i, -1,  0) * k(kxx, -1,  0);
+            h.xy += d(i, -1,  0) * k(kxy, -1,  0);
+            h.yy += d(i, -1,  0) * k(kyy, -1,  0);
 
-            h.xx += in[i + s_center] * kxx[k_center];
-            h.xy += in[i + s_center] * kxy[k_center];
-            h.yy += in[i + s_center] * kyy[k_center];
+            h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+            h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+            h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-            h.xx += in[i + s_bot_left] * kxx[k_bot_left];
-            h.xy += in[i + s_bot_left] * kxy[k_bot_left];
-            h.yy += in[i + s_bot_left] * kyy[k_bot_left];
+            h.xx += d(i, -1,  1) * k(kxx, -1,  1);
+            h.xy += d(i, -1,  1) * k(kxy, -1,  1);
+            h.yy += d(i, -1,  1) * k(kyy, -1,  1);
 
-            h.xx += in[i + s_bot] * kxx[k_bot];
-            h.xy += in[i + s_bot] * kxy[k_bot];
-            h.yy += in[i + s_bot] * kyy[k_bot];
+            h.xx += d(i,  0,  1) * k(kxx,  0,  1);
+            h.xy += d(i,  0,  1) * k(kxy,  0,  1);
+            h.yy += d(i,  0,  1) * k(kyy,  0,  1);
 
             out[i] = h;
         }
@@ -234,21 +225,21 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     {
         auto h = math::num<math::mat2s_t<T>>::zero;
 
-        h.xx += in[i + s_top] * kxx[k_top];
-        h.xy += in[i + s_top] * kxy[k_top];
-        h.yy += in[i + s_top] * kyy[k_top];
+        h.xx += d(i,  0, -1) * k(kxx,  0, -1);
+        h.xy += d(i,  0, -1) * k(kxy,  0, -1);
+        h.yy += d(i,  0, -1) * k(kyy,  0, -1);
 
-        h.xx += in[i + s_top_right] * kxx[k_top_right];
-        h.xy += in[i + s_top_right] * kxy[k_top_right];
-        h.yy += in[i + s_top_right] * kyy[k_top_right];
+        h.xx += d(i,  1, -1) * k(kxx,  1, -1);
+        h.xy += d(i,  1, -1) * k(kxy,  1, -1);
+        h.yy += d(i,  1, -1) * k(kyy,  1, -1);
 
-        h.xx += in[i + s_center] * kxx[k_center];
-        h.xy += in[i + s_center] * kxy[k_center];
-        h.yy += in[i + s_center] * kyy[k_center];
+        h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+        h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+        h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-        h.xx += in[i + s_right] * kxx[k_right];
-        h.xy += in[i + s_right] * kxy[k_right];
-        h.yy += in[i + s_right] * kyy[k_right];
+        h.xx += d(i,  1,  0) * k(kxx,  1,  0);
+        h.xy += d(i,  1,  0) * k(kxy,  1,  0);
+        h.yy += d(i,  1,  0) * k(kyy,  1,  0);
 
         out[i] = h;
     }
@@ -258,29 +249,29 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     for (; i < in.size().product() - 1; ++i) {
         auto h = math::num<math::mat2s_t<T>>::zero;
 
-        h.xx += in[i + s_top_left] * kxx[k_top_left];
-        h.xy += in[i + s_top_left] * kxy[k_top_left];
-        h.yy += in[i + s_top_left] * kyy[k_top_left];
+        h.xx += d(i, -1, -1) * k(kxx, -1, -1);
+        h.xy += d(i, -1, -1) * k(kxy, -1, -1);
+        h.yy += d(i, -1, -1) * k(kyy, -1, -1);
 
-        h.xx += in[i + s_top] * kxx[k_top];
-        h.xy += in[i + s_top] * kxy[k_top];
-        h.yy += in[i + s_top] * kyy[k_top];
+        h.xx += d(i,  0, -1) * k(kxx,  0, -1);
+        h.xy += d(i,  0, -1) * k(kxy,  0, -1);
+        h.yy += d(i,  0, -1) * k(kyy,  0, -1);
 
-        h.xx += in[i + s_top_right] * kxx[k_top_right];
-        h.xy += in[i + s_top_right] * kxy[k_top_right];
-        h.yy += in[i + s_top_right] * kyy[k_top_right];
+        h.xx += d(i,  1, -1) * k(kxx,  1, -1);
+        h.xy += d(i,  1, -1) * k(kxy,  1, -1);
+        h.yy += d(i,  1, -1) * k(kyy,  1, -1);
 
-        h.xx += in[i + s_left] * kxx[k_left];
-        h.xy += in[i + s_left] * kxy[k_left];
-        h.yy += in[i + s_left] * kyy[k_left];
+        h.xx += d(i, -1,  0) * k(kxx, -1,  0);
+        h.xy += d(i, -1,  0) * k(kxy, -1,  0);
+        h.yy += d(i, -1,  0) * k(kyy, -1,  0);
 
-        h.xx += in[i + s_center] * kxx[k_center];
-        h.xy += in[i + s_center] * kxy[k_center];
-        h.yy += in[i + s_center] * kyy[k_center];
+        h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+        h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+        h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
-        h.xx += in[i + s_right] * kxx[k_right];
-        h.xy += in[i + s_right] * kxy[k_right];
-        h.yy += in[i + s_right] * kyy[k_right];
+        h.xx += d(i,  1,  0) * k(kxx,  1,  0);
+        h.xy += d(i,  1,  0) * k(kxy,  1,  0);
+        h.yy += d(i,  1,  0) * k(kyy,  1,  0);
 
         out[i] = h;
     }
@@ -289,21 +280,21 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     {
         auto h = math::num<math::mat2s_t<T>>::zero;
 
-        h.xx += in[i + s_top_left] * kxx[k_top_left];
-        h.xy += in[i + s_top_left] * kxy[k_top_left];
-        h.yy += in[i + s_top_left] * kyy[k_top_left];
+        h.xx += d(i, -1, -1) * k(kxx, -1, -1);
+        h.xy += d(i, -1, -1) * k(kxy, -1, -1);
+        h.yy += d(i, -1, -1) * k(kyy, -1, -1);
 
-        h.xx += in[i + s_top] * kxx[k_top];
-        h.xy += in[i + s_top] * kxy[k_top];
-        h.yy += in[i + s_top] * kyy[k_top];
+        h.xx += d(i,  0, -1) * k(kxx,  0, -1);
+        h.xy += d(i,  0, -1) * k(kxy,  0, -1);
+        h.yy += d(i,  0, -1) * k(kyy,  0, -1);
 
-        h.xx += in[i + s_left] * kxx[k_left];
-        h.xy += in[i + s_left] * kxy[k_left];
-        h.yy += in[i + s_left] * kyy[k_left];
+        h.xx += d(i, -1,  0) * k(kxx, -1,  0);
+        h.xy += d(i, -1,  0) * k(kxy, -1,  0);
+        h.yy += d(i, -1,  0) * k(kyy, -1,  0);
 
-        h.xx += in[i + s_center] * kxx[k_center];
-        h.xy += in[i + s_center] * kxy[k_center];
-        h.yy += in[i + s_center] * kyy[k_center];
+        h.xx += d(i,  0,  0) * k(kxx,  0,  0);
+        h.xy += d(i,  0,  0) * k(kxy,  0,  0);
+        h.yy += d(i,  0,  0) * k(kyy,  0,  0);
 
         out[i] = h;
     }

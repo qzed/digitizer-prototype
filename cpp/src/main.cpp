@@ -154,7 +154,7 @@ auto main(int argc, char** argv) -> int
     auto img_pp    = container::image<f32> {{ 72, 48 }};
     auto img_m2_1  = container::image<math::mat2s_t<f32>> { img_pp.size() };
     auto img_m2_2  = container::image<math::mat2s_t<f32>> { img_pp.size() };
-    auto img_stev  = container::image<math::vec2_t<f32>> { img_pp.size() };
+    auto img_stev  = container::image<std::array<f32, 2>> { img_pp.size() };
     auto img_rdg   = container::image<f32> { img_pp.size() };
     auto img_obj   = container::image<f32> { img_pp.size() };
     auto img_lbl   = container::image<u16> { img_pp.size() };
@@ -226,9 +226,8 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_stev);
 
-                container::ops::transform(img_m2_2, img_stev, [](auto s) {
-                    auto const [ew1, ew2] = s.eigenvalues();
-                    return math::vec2_t<f32> { ew1, ew2 };
+                container::ops::transform(img_m2_2, img_stev, [](auto const s) {
+                    return s.eigenvalues();
                 });
             }
 

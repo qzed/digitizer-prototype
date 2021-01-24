@@ -1,6 +1,5 @@
 #include "parser.hpp"
 #include "types.hpp"
-#include "kernels.hpp"
 
 #include "algorithm/convolution.hpp"
 #include "algorithm/distance_transform.hpp"
@@ -165,9 +164,9 @@ auto main(int argc, char** argv) -> int
 
     auto img_out_color = container::image<gfx::srgba> { img_pp.size() };
 
-    auto kern_pp = kernels::gaussian<f32, 5, 5>(1.0);
-    auto kern_st = kernels::gaussian<f32, 5, 5>(1.0);
-    auto kern_hs = kernels::gaussian<f32, 5, 5>(1.0);
+    auto kern_pp = alg::conv::kernels::gaussian<f32, 5, 5>(1.0);
+    auto kern_st = alg::conv::kernels::gaussian<f32, 5, 5>(1.0);
+    auto kern_hs = alg::conv::kernels::gaussian<f32, 5, 5>(1.0);
 
     auto maximas = std::vector<index_t>{};
     auto cstats = std::vector<component_stats>{};

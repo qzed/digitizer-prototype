@@ -1,9 +1,9 @@
 #pragma once
 
-#include "kernels.hpp"
 #include "types.hpp"
 
 #include "algorithm/border.hpp"
+#include "algorithm/convolution.hpp"
 
 #include "container/image.hpp"
 #include "container/kernel.hpp"
@@ -52,8 +52,8 @@ void structure_tensor_generic(container::image<math::mat2s_t<T>>& out,
 template<typename Bx=border::zero, typename By=border::zero, typename T, index_t Nx=3, index_t Ny=3>
 void structure_tensor(container::image<math::mat2s_t<T>>& out,
                       container::image<T> const& in,
-                      container::kernel<T, Nx, Ny> const& kx=kernels::sobel3_x<T>,
-                      container::kernel<T, Nx, Ny> const& ky=kernels::sobel3_y<T>)
+                      container::kernel<T, Nx, Ny> const& kx=alg::conv::kernels::sobel3_x<T>,
+                      container::kernel<T, Nx, Ny> const& ky=alg::conv::kernels::sobel3_y<T>)
 {
     assert(in.size() == out.size());
 

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "types.hpp"
-#include "kernels.hpp"
 
 #include "container/image.hpp"
 #include "container/kernel.hpp"
 
 #include "algorithm/border.hpp"
+#include "algorithm/convolution.hpp"
 
 #include "math/num.hpp"
 #include "math/mat2.hpp"
@@ -21,9 +21,9 @@ namespace impl {
 template<typename B=border::zero, typename T>
 void hessian_generic(container::image<math::mat2s_t<T>>& out, container::image<T> const& in)
 {
-    auto const& kxx = kernels::sobel3_xx<T>;
-    auto const& kyy = kernels::sobel3_yy<T>;
-    auto const& kxy = kernels::sobel3_xy<T>;
+    auto const& kxx = alg::conv::kernels::sobel3_xx<T>;
+    auto const& kyy = alg::conv::kernels::sobel3_yy<T>;
+    auto const& kxy = alg::conv::kernels::sobel3_xy<T>;
 
     index_t const nx = kxx.size().x;
     index_t const ny = kxx.size().y;

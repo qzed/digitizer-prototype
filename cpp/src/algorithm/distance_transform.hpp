@@ -7,7 +7,8 @@
 #include <numeric>
 
 
-namespace impl {
+namespace alg {
+namespace wdt {
 
 template<typename T>
 struct q_item {
@@ -52,6 +53,8 @@ auto operator> (struct q_item<T> const& a, struct q_item<T> const& b) noexcept -
 }
 
 
+namespace impl {
+
 template<typename T>
 auto is_masked(T& mask, index_t i) -> bool
 {
@@ -91,12 +94,18 @@ inline void evaluate(container::image<T>& out, Q& queue, B& bin, M& mask, C& cos
 }
 
 } /* namespace impl */
+} /* namespace wdt */
 
 
 template<int N=8, typename T, typename F, typename M, typename C, typename Q>
 void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& cost, Q& q,
                                  T limit=std::numeric_limits<T>::max())
 {
+    using wdt::impl::evaluate;
+    using wdt::impl::get_cost;
+    using wdt::impl::is_foreground;
+    using wdt::impl::is_masked;
+
     static_assert(N == 4 || N == 8);
 
     // strides
@@ -113,22 +122,22 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     index_t i = 0;
 
     // x = 0, y = 0
-    if (!impl::is_foreground(bin, i)) {
+    if (!is_foreground(bin, i)) {
         out[i] = std::numeric_limits<T>::max();
 
-        if (!impl::is_masked(mask, i)) {
+        if (!is_masked(mask, i)) {
             auto c = std::numeric_limits<T>::max();
 
-            if (impl::is_foreground(bin, i + s_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_right, { -1, 0 }));
+            if (is_foreground(bin, i + s_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_right, { -1, 0 }));
             }
 
-            if (impl::is_foreground(bin, i + s_bot)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot, { 0, -1 }));
+            if (is_foreground(bin, i + s_bot)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot, { 0, -1 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_bot_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
+            if (N == 8 && is_foreground(bin, i + s_bot_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
             }
 
             if (c < limit) {
@@ -142,36 +151,36 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
 
     // 0 < x < n - 1, y = 0
     for (; i < out.size().x - 1; ++i) {
-        if (impl::is_foreground(bin, i)) {
+        if (is_foreground(bin, i)) {
             out[i] = static_cast<T>(0);
             continue;
         }
 
         out[i] = std::numeric_limits<T>::max();
 
-        if (impl::is_masked(mask, i))
+        if (is_masked(mask, i))
             continue;
 
         auto c = std::numeric_limits<T>::max();
 
-        if (impl::is_foreground(bin, i + s_left)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_left, { 1, 0 }));
+        if (is_foreground(bin, i + s_left)) {
+            c = std::min(c, get_cost<T>(cost, i + s_left, { 1, 0 }));
         }
 
-        if (impl::is_foreground(bin, i + s_right)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_right, { -1, 0 }));
+        if (is_foreground(bin, i + s_right)) {
+            c = std::min(c, get_cost<T>(cost, i + s_right, { -1, 0 }));
         }
 
-        if (N == 8 && impl::is_foreground(bin, i + s_bot_left)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
+        if (N == 8 && is_foreground(bin, i + s_bot_left)) {
+            c = std::min(c, get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
         }
 
-        if (impl::is_foreground(bin, i + s_bot)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_bot, { 0, -1 }));
+        if (is_foreground(bin, i + s_bot)) {
+            c = std::min(c, get_cost<T>(cost, i + s_bot, { 0, -1 }));
         }
 
-        if (N == 8 && impl::is_foreground(bin, i + s_bot_right)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
+        if (N == 8 && is_foreground(bin, i + s_bot_right)) {
+            c = std::min(c, get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
         }
 
         if (c < limit) {
@@ -180,22 +189,22 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     }
 
     // x = n - 1, y = 0
-    if (!impl::is_foreground(bin, i)) {
+    if (!is_foreground(bin, i)) {
         out[i] = std::numeric_limits<T>::max();
 
-        if (!impl::is_masked(mask, i)) {
+        if (!is_masked(mask, i)) {
             auto c = std::numeric_limits<T>::max();
 
-            if (impl::is_foreground(bin, i + s_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_left, { 1, 0 }));
+            if (is_foreground(bin, i + s_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_left, { 1, 0 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_bot_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
+            if (N == 8 && is_foreground(bin, i + s_bot_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
             }
 
-            if (impl::is_foreground(bin, i + s_bot)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot, { 0, -1 }));
+            if (is_foreground(bin, i + s_bot)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot, { 0, -1 }));
             }
 
             if (c < limit) {
@@ -210,30 +219,30 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     // 0 < y < n - 1
     while (i < out.size().x * (out.size().y - 1)) {
         // x = 0
-        if (!impl::is_foreground(bin, i)) {
+        if (!is_foreground(bin, i)) {
             out[i] = std::numeric_limits<T>::max();
 
-            if (!impl::is_masked(mask, i)) {
+            if (!is_masked(mask, i)) {
                 auto c = std::numeric_limits<T>::max();
 
-                if (impl::is_foreground(bin, i + s_right)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_right, { -1, 0 }));
+                if (is_foreground(bin, i + s_right)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_right, { -1, 0 }));
                 }
 
-                if (impl::is_foreground(bin, i + s_top)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_top, { 0, 1 }));
+                if (is_foreground(bin, i + s_top)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_top, { 0, 1 }));
                 }
 
-                if (N == 8 && impl::is_foreground(bin, i + s_top_right)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_top_right, { -1, 1 }));
+                if (N == 8 && is_foreground(bin, i + s_top_right)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_top_right, { -1, 1 }));
                 }
 
-                if (impl::is_foreground(bin, i + s_bot)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_bot, { 0, -1 }));
+                if (is_foreground(bin, i + s_bot)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_bot, { 0, -1 }));
                 }
 
-                if (N == 8 && impl::is_foreground(bin, i + s_bot_right)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
+                if (N == 8 && is_foreground(bin, i + s_bot_right)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
                 }
 
                 if (c < limit) {
@@ -249,7 +258,7 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
         auto const limit = i + out.size().x - 2;
         for (; i < limit; ++i) {
             // if this is a foreground pixel, set it to zero and skip the rest
-            if (impl::is_foreground(bin, i)) {
+            if (is_foreground(bin, i)) {
                 out[i] = static_cast<T>(0);
                 continue;
             }
@@ -258,42 +267,42 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
             out[i] = std::numeric_limits<T>::max();
 
             // don't evaluate pixels that are excluded by mask
-            if (impl::is_masked(mask, i))
+            if (is_masked(mask, i))
                 continue;
 
             // compute minimum cost to any neighboring foreground pixel, if available
             auto c = std::numeric_limits<T>::max();
 
-            if (impl::is_foreground(bin, i + s_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_left, { 1, 0 }));
+            if (is_foreground(bin, i + s_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_left, { 1, 0 }));
             }
 
-            if (impl::is_foreground(bin, i + s_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_right, { -1, 0 }));
+            if (is_foreground(bin, i + s_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_right, { -1, 0 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_top_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top_left, { 1, 1 }));
+            if (N == 8 && is_foreground(bin, i + s_top_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top_left, { 1, 1 }));
             }
 
-            if (impl::is_foreground(bin, i + s_top)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top, { 0, 1 }));
+            if (is_foreground(bin, i + s_top)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top, { 0, 1 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_top_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top_right, { -1, 1 }));
+            if (N == 8 && is_foreground(bin, i + s_top_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top_right, { -1, 1 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_bot_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
+            if (N == 8 && is_foreground(bin, i + s_bot_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
             }
 
-            if (impl::is_foreground(bin, i + s_bot)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot, { 0, -1 }));
+            if (is_foreground(bin, i + s_bot)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot, { 0, -1 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_bot_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
+            if (N == 8 && is_foreground(bin, i + s_bot_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_bot_right, { -1, -1 }));
             }
 
             // if we have a finite projected cost, add this pixel
@@ -303,30 +312,30 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
         }
 
         // x = n - 1
-        if (!impl::is_foreground(bin, i)) {
+        if (!is_foreground(bin, i)) {
             out[i] = std::numeric_limits<T>::max();
 
-            if (!impl::is_masked(mask, i)) {
+            if (!is_masked(mask, i)) {
                 auto c = std::numeric_limits<T>::max();
 
-                if (impl::is_foreground(bin, i + s_left)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_left, { 1, 0 }));
+                if (is_foreground(bin, i + s_left)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_left, { 1, 0 }));
                 }
 
-                if (N == 8 && impl::is_foreground(bin, i + s_top_left)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_top_left, { 1, 1 }));
+                if (N == 8 && is_foreground(bin, i + s_top_left)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_top_left, { 1, 1 }));
                 }
 
-                if (impl::is_foreground(bin, i + s_top)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_top, { 0, 1 }));
+                if (is_foreground(bin, i + s_top)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_top, { 0, 1 }));
                 }
 
-                if (N == 8 && impl::is_foreground(bin, i + s_bot_left)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
+                if (N == 8 && is_foreground(bin, i + s_bot_left)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_bot_left, { 1, -1 }));
                 }
 
-                if (impl::is_foreground(bin, i + s_bot)) {
-                    c = std::min(c, impl::get_cost<T>(cost, i + s_bot, { 0, -1 }));
+                if (is_foreground(bin, i + s_bot)) {
+                    c = std::min(c, get_cost<T>(cost, i + s_bot, { 0, -1 }));
                 }
 
                 if (c < limit) {
@@ -340,22 +349,22 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     }
 
     // x = 0, y = n - 1
-    if (!impl::is_foreground(bin, i)) {
+    if (!is_foreground(bin, i)) {
         out[i] = std::numeric_limits<T>::max();
 
-        if (!impl::is_masked(mask, i)) {
+        if (!is_masked(mask, i)) {
             auto c = std::numeric_limits<T>::max();
 
-            if (impl::is_foreground(bin, i + s_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_right, { -1, 0 }));
+            if (is_foreground(bin, i + s_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_right, { -1, 0 }));
             }
 
-            if (impl::is_foreground(bin, i + s_top)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top, { 0, 1 }));
+            if (is_foreground(bin, i + s_top)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top, { 0, 1 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_top_right)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top_right, { -1, 1 }));
+            if (N == 8 && is_foreground(bin, i + s_top_right)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top_right, { -1, 1 }));
             }
 
             if (c < limit) {
@@ -369,36 +378,36 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
 
     // 0 < x < n - 1, y = n - 1
     for (; i < out.size().product() - 1; ++i) {
-        if (impl::is_foreground(bin, i)) {
+        if (is_foreground(bin, i)) {
             out[i] = static_cast<T>(0);
             continue;
         }
 
         out[i] = std::numeric_limits<T>::max();
 
-        if (impl::is_masked(mask, i))
+        if (is_masked(mask, i))
             continue;
 
         auto c = std::numeric_limits<T>::max();
 
-        if (impl::is_foreground(bin, i + s_left)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_left, { 1, 0 }));
+        if (is_foreground(bin, i + s_left)) {
+            c = std::min(c, get_cost<T>(cost, i + s_left, { 1, 0 }));
         }
 
-        if (impl::is_foreground(bin, i + s_right)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_right, { -1, 0 }));
+        if (is_foreground(bin, i + s_right)) {
+            c = std::min(c, get_cost<T>(cost, i + s_right, { -1, 0 }));
         }
 
-        if (N == 8 && impl::is_foreground(bin, i + s_top_left)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_top_left, { 1, 1 }));
+        if (N == 8 && is_foreground(bin, i + s_top_left)) {
+            c = std::min(c, get_cost<T>(cost, i + s_top_left, { 1, 1 }));
         }
 
-        if (impl::is_foreground(bin, i + s_top)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_top, { 0, 1 }));
+        if (is_foreground(bin, i + s_top)) {
+            c = std::min(c, get_cost<T>(cost, i + s_top, { 0, 1 }));
         }
 
-        if (N == 8 && impl::is_foreground(bin, i + s_top_right)) {
-            c = std::min(c, impl::get_cost<T>(cost, i + s_top_right, { -1, 1 }));
+        if (N == 8 && is_foreground(bin, i + s_top_right)) {
+            c = std::min(c, get_cost<T>(cost, i + s_top_right, { -1, 1 }));
         }
 
         if (c < limit) {
@@ -407,22 +416,22 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     }
 
     // x = n - 1, y = n - 1
-    if (!impl::is_foreground(bin, i)) {
+    if (!is_foreground(bin, i)) {
         out[i] = std::numeric_limits<T>::max();
 
-        if (!impl::is_masked(mask, i)) {
+        if (!is_masked(mask, i)) {
             auto c = std::numeric_limits<T>::max();
 
-            if (impl::is_foreground(bin, i + s_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_left, { 1, 0 }));
+            if (is_foreground(bin, i + s_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_left, { 1, 0 }));
             }
 
-            if (N == 8 && impl::is_foreground(bin, i + s_top_left)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top_left, { 1, 1 }));
+            if (N == 8 && is_foreground(bin, i + s_top_left)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top_left, { 1, 1 }));
             }
 
-            if (impl::is_foreground(bin, i + s_top)) {
-                c = std::min(c, impl::get_cost<T>(cost, i + s_top, { 0, 1 }));
+            if (is_foreground(bin, i + s_top)) {
+                c = std::min(c, get_cost<T>(cost, i + s_top, { 0, 1 }));
             }
 
             if (c < limit) {
@@ -436,7 +445,7 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     // step 2: while queue is not empty, get next pixel, write down cost, and add neighbors
     while (!q.empty()) {
         // get next pixel and remove it from queue
-        impl::q_item<T> pixel = q.top();
+        wdt::q_item<T> pixel = q.top();
         q.pop();
 
         // check if someone has been here before; if so, skip this one
@@ -450,35 +459,37 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
         auto const [x, y] = container::image<T>::unravel(out.size(), pixel.idx);
 
         if (x > 0) {
-            impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_left, { -1, 0 }, limit);
+            evaluate(out, q, bin, mask, cost, pixel.idx, s_left, { -1, 0 }, limit);
         }
 
         if (x < out.size().x - 1) {
-            impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_right, { 1, 0 }, limit);
+            evaluate(out, q, bin, mask, cost, pixel.idx, s_right, { 1, 0 }, limit);
         }
 
         if (y > 0) {
             if (N == 8 && x > 0) {
-                impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_top_left, { -1, -1 }, limit);
+                evaluate(out, q, bin, mask, cost, pixel.idx, s_top_left, { -1, -1 }, limit);
             }
 
-            impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_top, { 0, -1 }, limit);
+            evaluate(out, q, bin, mask, cost, pixel.idx, s_top, { 0, -1 }, limit);
 
             if (N == 8 && x < out.size().x - 1) {
-                impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_top_right, { 1, -1 }, limit);
+                evaluate(out, q, bin, mask, cost, pixel.idx, s_top_right, { 1, -1 }, limit);
             }
         }
 
         if (y < out.size().y - 1) {
             if (N == 8 && x > 0) {
-                impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_bot_left, { -1, 1 }, limit);
+                evaluate(out, q, bin, mask, cost, pixel.idx, s_bot_left, { -1, 1 }, limit);
             }
 
-            impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_bot, { 0, 1 }, limit);
+            evaluate(out, q, bin, mask, cost, pixel.idx, s_bot, { 0, 1 }, limit);
 
             if (N == 8 && x < out.size().x - 1) {
-                impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_bot_right, { 1, 1 }, limit);
+                evaluate(out, q, bin, mask, cost, pixel.idx, s_bot_right, { 1, 1 }, limit);
             }
         }
     }
 }
+
+} /* namespace alg */

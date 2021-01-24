@@ -5,15 +5,15 @@
 #include "algorithm/hessian.hpp"
 
 
-namespace impl {
+namespace alg::hess::impl {
 
 template<typename T>
 void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> const& in)
 {
     // kernels
-    auto const& kxx = alg::conv::kernels::sobel3_xx<T>;
-    auto const& kyy = alg::conv::kernels::sobel3_yy<T>;
-    auto const& kxy = alg::conv::kernels::sobel3_xy<T>;
+    auto const& kxx = conv::kernels::sobel3_xx<T>;
+    auto const& kyy = conv::kernels::sobel3_yy<T>;
+    auto const& kxy = conv::kernels::sobel3_xy<T>;
 
     // strides for data access
     index_t const s_left      = -1;
@@ -309,4 +309,4 @@ void hessian_zero(container::image<math::mat2s_t<T>>& out, container::image<T> c
     }
 }
 
-} /* namespace impl */
+} /* namespace alg::hess::impl */

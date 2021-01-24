@@ -7,7 +7,7 @@
 #include <algorithm>
 
 
-namespace border {
+namespace alg::border {
 
 struct mirror {
     template<class T>
@@ -79,4 +79,4 @@ constexpr auto zero::value(container::image<T> const& img, index2_t const& i) ->
         img[{i.x, i.y}] : math::num<T>::zero;
 }
 
-} /* namespace border */
+} /* namespace alg::border */

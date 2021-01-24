@@ -176,10 +176,10 @@ auto main(int argc, char** argv) -> int
     auto gfwindow = index2_t { 11, 11 };
     gfit::reserve(gfparams, 32, gfwindow);
 
-    auto wdt_qbuf = std::vector<impl::q_item<f32>> {};
+    auto wdt_qbuf = std::vector<alg::wdt::q_item<f32>> {};
     wdt_qbuf.reserve(1024);
 
-    auto wdt_queue = std::priority_queue<impl::q_item<f32>> { std::less<impl::q_item<f32>>(), wdt_qbuf };
+    auto wdt_queue = std::priority_queue<alg::wdt::q_item<f32>> { std::less<alg::wdt::q_item<f32>>(), wdt_qbuf };
 
     auto const heatmaps = parser().parse(argv[2]);
 
@@ -203,7 +203,7 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_prep);
 
-                conv(img_pp, hm, kern_pp);
+                alg::convolve(img_pp, hm, kern_pp);
 
                 auto const sum = container::ops::sum(img_pp);
                 auto const avg = sum / img_pp.size().product();
@@ -217,8 +217,8 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_st);
 
-                structure_tensor(img_m2_1, img_pp);
-                conv(img_m2_2, img_m2_1, kern_st);
+                alg::structure_tensor(img_m2_1, img_pp);
+                alg::convolve(img_m2_2, img_m2_1, kern_st);
             }
 
             // eigenvalues of structure tensor
@@ -234,8 +234,8 @@ auto main(int argc, char** argv) -> int
             {
                 auto _r = perf_reg.record(perf_t_hess);
 
-                hessian(img_m2_1, img_pp);
-                conv(img_m2_2, img_m2_1, kern_hs);
+                alg::hessian(img_m2_1, img_pp);
+                alg::convolve(img_m2_2, img_m2_1, kern_hs);
             }
 
             // ridge measure
@@ -351,8 +351,8 @@ auto main(int argc, char** argv) -> int
                     return img_lbl[i] > 0 && cscore.at(img_lbl[i] - 1) <= th_inc;
                 };
 
-                weighted_distance_transform<4>(img_dm1, wdt_inc_bin, wdt_mask, wdt_cost, wdt_queue, 6.0f);
-                weighted_distance_transform<4>(img_dm2, wdt_exc_bin, wdt_mask, wdt_cost, wdt_queue, 6.0f);
+                alg::weighted_distance_transform<4>(img_dm1, wdt_inc_bin, wdt_mask, wdt_cost, wdt_queue, 6.0f);
+                alg::weighted_distance_transform<4>(img_dm2, wdt_exc_bin, wdt_mask, wdt_cost, wdt_queue, 6.0f);
             }
 
             // filter

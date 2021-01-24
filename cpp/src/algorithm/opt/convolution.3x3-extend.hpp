@@ -5,7 +5,7 @@
 #include "algorithm/convolution.hpp"
 
 
-namespace impl {
+namespace alg::conv::impl {
 
 template<typename T, typename S>
 void conv_3x3_extend(container::image<T>& out, container::image<T> const& data,
@@ -211,4 +211,4 @@ void conv_3x3_extend(container::image<T>& out, container::image<T> const& data,
     }
 }
 
-} /* namespace impl */
+} /* namespace alg::conv::impl */

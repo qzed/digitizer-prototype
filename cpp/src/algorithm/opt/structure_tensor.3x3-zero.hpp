@@ -5,7 +5,7 @@
 #include "algorithm/structure_tensor.hpp"
 
 
-namespace impl {
+namespace alg::stensor::impl {
 
 template<typename T>
 void structure_tensor_3x3_zero(container::image<math::mat2s_t<T>>& out,
@@ -269,4 +269,4 @@ void structure_tensor_3x3_zero(container::image<math::mat2s_t<T>>& out,
     }
 }
 
-} /* namespace impl */
+} /* namespace alg::stensor::impl */

@@ -15,7 +15,9 @@
 #include "algorithm/opt/convolution.5x5-extend.hpp"
 
 
-namespace alg::conv::kernels {
+namespace alg {
+namespace conv {
+namespace kernels {
 
 template<class T>
 inline constexpr container::kernel<T, 3, 3> sobel3_x {
@@ -84,8 +86,8 @@ auto gaussian(T sigma) -> container::kernel<T, Nx, Ny>
     return k;
 }
 
+} /* namespace kernels */
 
-} /* namespace alg::conv::kernel */
 
 namespace impl {
 
@@ -110,18 +112,21 @@ void conv_generic(container::image<T>& out, container::image<T> const& in,
 }
 
 } /* namespace impl */
+} /* namespace conv */
 
 
 template<typename B=border::extend, typename T, typename S, index_t Nx, index_t Ny>
-void conv(container::image<T>& out, container::image<T> const& in,
-          container::kernel<S, Nx, Ny> const& k)
+void convolve(container::image<T>& out, container::image<T> const& in,
+              container::kernel<S, Nx, Ny> const& k)
 {
     // workaround for partial function template specialization
     if constexpr (Nx == 5 && Ny == 5 && std::is_same_v<B, border::extend>) {
-        impl::conv_5x5_extend<T, S>(out, in, k);
+        conv::impl::conv_5x5_extend<T, S>(out, in, k);
     } else if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<B, border::extend>) {
-        impl::conv_3x3_extend<T, S>(out, in, k);
+        conv::impl::conv_3x3_extend<T, S>(out, in, k);
     } else {
-        impl::conv_generic<B, T, S, Nx, Ny>(out, in, k);
+        conv::impl::conv_generic<B, T, S, Nx, Ny>(out, in, k);
     }
 }
+
+} /* namespace alg */

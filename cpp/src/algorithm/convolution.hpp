@@ -32,9 +32,6 @@ void conv_generic(container::image<T>& out, container::image<T> const& in, kerne
     }
 }
 
-template<typename T, typename S>
-void conv_5x5_extend(container::image<T>& out, container::image<T> const& in, kernel<S, 5, 5> const& k);
-
 } /* namespace impl */
 
 

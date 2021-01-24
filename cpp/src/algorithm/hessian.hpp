@@ -1,7 +1,6 @@
 #pragma once
 
 #include "types.hpp"
-#include "math.hpp"
 #include "kernels.hpp"
 
 #include "algorithm/border.hpp"
@@ -9,7 +8,7 @@
 #include "math/num.hpp"
 #include "math/mat2.hpp"
 
-#include "algorithm/hessian.opt.zero.hpp"
+#include "algorithm/opt/hessian.zero.hpp"
 
 
 namespace impl {

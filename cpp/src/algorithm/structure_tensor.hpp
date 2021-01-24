@@ -9,7 +9,7 @@
 #include "math/num.hpp"
 #include "math/mat2.hpp"
 
-#include "algorithm/structure_tensor.opt.3x3-zero.hpp"
+#include "algorithm/opt/structure_tensor.3x3-zero.hpp"
 
 
 namespace impl {

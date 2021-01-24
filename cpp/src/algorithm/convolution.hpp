@@ -6,8 +6,8 @@
 #include "algorithm/border.hpp"
 #include "container/image.hpp"
 
-#include "algorithm/convolution.opt.3x3-extend.hpp"
-#include "algorithm/convolution.opt.5x5-extend.hpp"
+#include "algorithm/opt/convolution.3x3-extend.hpp"
+#include "algorithm/opt/convolution.5x5-extend.hpp"
 
 
 namespace impl {

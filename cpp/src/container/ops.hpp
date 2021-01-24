@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math/num.hpp"
+
 #include <algorithm>
 #include <utility>
 
@@ -38,6 +40,15 @@ template<class C, class F>
 inline void transform(C& container, F fn)
 {
     std::transform(container.begin(), container.end(), container.begin(), fn);
+}
+
+
+template<class C>
+inline auto sum(C const& container) -> typename C::value_type
+{
+    using T = typename C::value_type;
+
+    return std::accumulate(container.begin(), container.end(), math::num<T>::zero);
 }
 
 } /* namespace container::ops */

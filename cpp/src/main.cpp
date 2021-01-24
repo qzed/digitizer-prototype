@@ -206,7 +206,7 @@ auto main(int argc, char** argv) -> int
 
                 conv(img_pp, hm, kern_pp);
 
-                auto const sum = std::accumulate(img_pp.begin(), img_pp.end(), 0.0f);
+                auto const sum = container::ops::sum(img_pp);
                 auto const avg = sum / img_pp.size().product();
 
                 container::ops::transform(img_pp, [&](auto const x) {

@@ -2,6 +2,7 @@
 
 #include "types.hpp"
 #include "container/image.hpp"
+#include "container/ops.hpp"
 #include "gfx/color.hpp"
 #include "math/num.hpp"
 
@@ -67,16 +68,9 @@ template<class T, class P>
 void cmap::map_into(container::image<P>& dest, container::image<T> const& img,
                     std::optional<std::pair<T, T>> range) const
 {
-    auto r = [&]() -> std::pair<T, T> {
-        if (range.has_value()) {
-            return *range;
-        };
-
-        auto [min, max] = std::minmax_element(img.begin(), img.end());
-        return { *min, *max };
-    }();
-
     assert(dest.size() == img.size());
+
+    auto r = range.has_value() ? *range : container::ops::minmax(img);
 
     if (r.second - r.first <= 0) {
         r = {r.first, r.second + 1};

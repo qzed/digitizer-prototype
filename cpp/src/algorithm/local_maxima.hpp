@@ -1,7 +1,9 @@
 #pragma once
 
-#include "types.hpp"
 #include "math.hpp"
+
+#include "types.hpp"
+#include "container/image.hpp"
 
 
 template<int C=8, typename T, typename O>

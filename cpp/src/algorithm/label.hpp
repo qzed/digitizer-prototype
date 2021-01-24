@@ -15,8 +15,10 @@
  *    http://repositories.cdlib.org/lbnl/LBNL-56864
  */
 
-#include "types.hpp"
 #include "math.hpp"
+
+#include "types.hpp"
+#include "container/image.hpp"
 
 #include <numeric>
 

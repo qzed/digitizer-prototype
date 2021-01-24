@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "algorithm/border.hpp"
 #include "container/image.hpp"
+#include "math/num.hpp"
 
 #include "algorithm/opt/convolution.3x3-extend.hpp"
 #include "algorithm/opt/convolution.5x5-extend.hpp"

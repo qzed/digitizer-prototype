@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.hpp"
-#include "math.hpp"
+#include "container/image.hpp"
 
 #include <queue>
 #include <numeric>

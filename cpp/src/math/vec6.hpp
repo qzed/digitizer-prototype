@@ -1,6 +1,7 @@
 #pragma once
 
-#include "math.hpp"
+#include "types.hpp"
+#include "math/num.hpp"
 #include "utils/access.hpp"
 
 

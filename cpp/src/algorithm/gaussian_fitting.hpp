@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types.hpp"
 #include "container/image.hpp"
 
 #include "math/num.hpp"

@@ -3,6 +3,8 @@
 #include "types.hpp"
 #include "kernels.hpp"
 
+#include "container/image.hpp"
+
 #include "algorithm/border.hpp"
 
 #include "math/num.hpp"

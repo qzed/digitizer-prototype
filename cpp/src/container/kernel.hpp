@@ -1,7 +1,6 @@
 #pragma once
 
 #include "types.hpp"
-#include "math.hpp"
 #include "utils/access.hpp"
 
 #include <array>
@@ -28,6 +27,7 @@ public:
 
 public:
     auto size() const -> index2_t;
+    auto stride() const -> index_t;
 
     auto data() -> pointer;
     auto data() const -> const_pointer;
@@ -46,6 +46,9 @@ public:
 
     auto cbegin() const -> const_iterator;
     auto cend() const -> const_iterator;
+
+    static constexpr auto ravel(index2_t size, index2_t i) -> index_t;
+    static constexpr auto unravel(index2_t size, index_t i) -> index2_t;
 };
 
 
@@ -53,6 +56,12 @@ template<class T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::size() const -> index2_t
 {
     return { Nx, Ny };
+}
+
+template<class T, index_t Nx, index_t Ny>
+auto kernel<T, Nx, Ny>::stride() const -> index_t
+{
+    return Nx;
 }
 
 template<class T, index_t Nx, index_t Ny>
@@ -141,6 +150,19 @@ auto operator<< (std::ostream& os, kernel<T, Nx, Ny> const& k) -> std::ostream&
     }
 
     return os << "]]";
+}
+
+
+template<class T, index_t Nx, index_t Ny>
+inline constexpr auto kernel<T, Nx, Ny>::ravel(index2_t size, index2_t i) -> index_t
+{
+    return i.y * size.x + i.x;
+}
+
+template<class T, index_t Nx, index_t Ny>
+inline constexpr auto kernel<T, Nx, Ny>::unravel(index2_t size, index_t i) -> index2_t
+{
+    return { i % size.x, i / size.x };
 }
 
 } /* namespace container */

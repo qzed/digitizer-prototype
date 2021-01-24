@@ -12,8 +12,8 @@ void conv_3x3_extend(container::image<T>& out, container::image<T> const& data,
                      container::kernel<S, 3, 3> const& kern)
 {
     // strides
-    auto const stride_d = stride(data.size());
-    auto const stride_k = stride({ 3, 3 });
+    auto const stride_d = data.stride();
+    auto const stride_k = kern.stride();
 
     // access helpers
     auto const k = [&](index_t dx, index_t dy) constexpr -> S {

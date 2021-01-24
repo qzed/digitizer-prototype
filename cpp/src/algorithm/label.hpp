@@ -105,7 +105,7 @@ auto label(container::image<u16>& out, container::image<T> const& data, T thresh
 
     // strides
     index_t const s_left = 1;
-    index_t const s_up = stride(data.size());
+    index_t const s_up = data.stride();
     index_t const s_up_left = s_up + 1;
     index_t const s_up_right = s_up - 1;
 

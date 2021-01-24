@@ -19,7 +19,7 @@ void structure_tensor_3x3_zero(container::image<math::mat2s_t<T>>& out,
     index_t const s_left      = -1;
     index_t const s_center    =  0;
     index_t const s_right     =  1;
-    index_t const s_top       = -stride(in.size());
+    index_t const s_top       = -in.stride();
     index_t const s_top_left  = s_top + s_left;
     index_t const s_top_right = s_top + s_right;
     index_t const s_bot       = -s_top;

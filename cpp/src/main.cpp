@@ -393,7 +393,7 @@ auto main(int argc, char** argv) -> int
                 gfit::reserve(gfparams, maximas.size(), gfwindow);
 
                 for (std::size_t i = 0; i < maximas.size(); ++i) {
-                    auto const [x, y] = unravel(img_pp.size(), maximas[i]);
+                    auto const [x, y] = container::image<f32>::unravel(img_pp.size(), maximas[i]);
 
                     // TODO: move window inwards instead of clamping?
                     auto const bounds = gfit::bbox {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "math.hpp"
-
 #include "types.hpp"
 #include "utils/access.hpp"
 
@@ -35,6 +33,7 @@ public:
     auto operator= (image<T>&& rhs) noexcept -> image<T>&;
 
     auto size() const -> index2_t;
+    auto stride() const -> index_t;
 
     auto data() -> pointer;
     auto data() const -> const_pointer;
@@ -53,6 +52,9 @@ public:
 
     auto cbegin() const -> const_iterator;
     auto cend() const -> const_iterator;
+
+    static constexpr auto ravel(index2_t size, index2_t i) -> index_t;
+    static constexpr auto unravel(index2_t size, index_t i) -> index2_t;
 
 private:
     index2_t m_size;
@@ -134,6 +136,12 @@ inline auto image<T>::size() const -> index2_t
 }
 
 template<class T>
+inline auto image<T>::stride() const -> index_t
+{
+    return m_size.x;
+}
+
+template<class T>
 inline auto image<T>::data() -> pointer
 {
     return m_data;
@@ -203,6 +211,19 @@ template<class T>
 inline auto image<T>::cend() const -> const_iterator
 {
     return &m_data[m_size.product()];
+}
+
+
+template<class T>
+inline constexpr auto image<T>::ravel(index2_t size, index2_t i) -> index_t
+{
+    return i.y * size.x + i.x;
+}
+
+template<class T>
+inline constexpr auto image<T>::unravel(index2_t size, index_t i) -> index2_t
+{
+    return { i % size.x, i / size.x };
 }
 
 } /* namespace container */

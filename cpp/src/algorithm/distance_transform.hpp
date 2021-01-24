@@ -102,10 +102,10 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
     // strides
     index_t const s_left      = -1;
     index_t const s_right     =  1;
-    index_t const s_top       = -stride(out.size());
+    index_t const s_top       = -out.stride();
     index_t const s_top_left  = s_top + s_left;
     index_t const s_top_right = s_top + s_right;
-    index_t const s_bot       = stride(out.size());
+    index_t const s_bot       = -s_top;
     index_t const s_bot_left  = s_bot + s_left;
     index_t const s_bot_right = s_bot + s_right;
 
@@ -447,7 +447,7 @@ void weighted_distance_transform(container::image<T>& out, F& bin, M& mask, C& c
         out[pixel.idx] = pixel.cost;
 
         // evaluate neighbors
-        auto const [x, y] = unravel(out.size(), pixel.idx);
+        auto const [x, y] = container::image<T>::unravel(out.size(), pixel.idx);
 
         if (x > 0) {
             impl::evaluate(out, q, bin, mask, cost, pixel.idx, s_left, { -1, 0 }, limit);

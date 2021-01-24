@@ -26,10 +26,10 @@ void find_local_maximas(container::image<T> const& data, T threshold, O output_i
     // strides
     index_t const s_left       = -1;
     index_t const s_right      =  1;
-    index_t const s_top_center = -stride(data.size());
+    index_t const s_top_center = -data.stride();
     index_t const s_top_left   = s_top_center + s_left;
     index_t const s_top_right  = s_top_center + s_right;
-    index_t const s_bot_center = stride(data.size());
+    index_t const s_bot_center = -s_top_center;
     index_t const s_bot_left   = s_bot_center + s_left;
     index_t const s_bot_right  = s_bot_center + s_right;
 

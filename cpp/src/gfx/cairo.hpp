@@ -237,7 +237,7 @@ inline auto cairo::create(surface& target) -> cairo
     return cr;
 }
 
-inline auto wrap_raw(cairo_t* raw) -> cairo
+inline auto cairo::wrap_raw(cairo_t* raw) -> cairo
 {
     return { cairo_reference(raw) };
 }

@@ -77,6 +77,7 @@ public:
     ~cairo();
 
     static auto create(surface& surface) -> cairo;
+    static auto wrap_raw(cairo_t* raw) -> cairo;
 
     void operator=(cairo const& rhs);
     void operator=(cairo&& rhs);
@@ -234,6 +235,11 @@ inline auto cairo::create(surface& target) -> cairo
     }
 
     return cr;
+}
+
+inline auto wrap_raw(cairo_t* raw) -> cairo
+{
+    return { cairo_reference(raw) };
 }
 
 inline void cairo::operator=(cairo const& rhs)

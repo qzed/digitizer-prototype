@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "types.hpp"
+#include "visualization.hpp"
 
 #include "algorithm/convolution.hpp"
 #include "algorithm/distance_transform.hpp"
@@ -186,7 +187,7 @@ auto main(int argc, char** argv) -> int
     auto out = std::vector<container::image<f32>>{};
     out.reserve(heatmaps.size());
 
-    auto out_tp = std::vector<std::vector<std::tuple<f32, f32, math::vec2_t<f32>, math::mat2s_t<f32>>>>{};
+    auto out_tp = std::vector<std::vector<touch_point>>{};
     out_tp.reserve(heatmaps.size());
 
     std::cout << "Processing..." << std::endl;
@@ -422,14 +423,23 @@ auto main(int argc, char** argv) -> int
             if (mode == mode_type::plot) {
                 out_tp.push_back({});
                 out_tp.back().reserve(16);
-                for (auto const& p : gfparams) {
-                    if (p.valid) {
-                        auto const x = static_cast<index_t>(p.mean.x);
-                        auto const y = static_cast<index_t>(p.mean.y);
-                        auto const cs = cscore.at(img_lbl[{ x, y }] - 1);
 
-                        out_tp.back().push_back({ cs, p.scale, p.mean, p.prec });
+                for (auto const& p : gfparams) {
+                    if (!p.valid) {
+                        continue;
                     }
+
+                    auto const x = static_cast<index_t>(p.mean.x);
+                    auto const y = static_cast<index_t>(p.mean.y);
+                    auto const cs = cscore.at(img_lbl[{ x, y }] - 1);
+
+                    auto const cov = p.prec.inverse();
+                    if (!cov.has_value()) {
+                        std::cout << "warning: failed to invert matrix\n";
+                        continue;
+                    }
+
+                    out_tp.back().push_back({ cs, p.scale, p.mean, *cov });
                 }
             }
         }
@@ -464,115 +474,13 @@ auto main(int argc, char** argv) -> int
     auto const dir_out = std::filesystem::path { argv[3] };
     std::filesystem::create_directories(dir_out);
 
-    auto src = gfx::cairo::image_surface_create(img_out_color);
     auto surface = gfx::cairo::image_surface_create(gfx::cairo::format::argb32, { width, height });
     auto cr = gfx::cairo::cairo::create(surface);
 
-    cr.select_font_face("monospace", gfx::cairo::font_slant::normal, gfx::cairo::font_weight::normal);
-    cr.set_font_size(12.0);
+    auto vis = visualization {{ 72, 48 }};
 
     for (std::size_t i = 0; i < out.size(); ++i) {
-        auto const& img_out = out[i];
-
-        auto const img_w = static_cast<f64>(img_out.size().x);
-        auto const img_h = static_cast<f64>(img_out.size().y);
-
-        auto const win_w = static_cast<f64>(width);
-        auto const win_h = static_cast<f64>(height);
-
-        auto const t = [&](math::vec2_t<f64> p) -> math::vec2_t<f64> {
-            return { p.x * (win_w / img_w), win_h - p.y * (win_h / img_h) };
-        };
-
-        // plot
-        gfx::cmap::cubehelix(0.1, -0.6, 1.0, 2.0)
-                .map_into(img_out_color, img_out, {{ 0.1f, 0.7f }});
-
-        // plot heatmap
-        auto m = gfx::cairo::matrix::identity();
-        m.translate({ 0.0, img_h });
-        m.scale({ img_w / win_w, -img_h / win_h });
-
-        auto p = gfx::cairo::pattern::create_for_surface(src);
-        p.set_matrix(m);
-        p.set_filter(gfx::cairo::filter::nearest);
-
-        cr.set_source(p);
-        cr.rectangle({ 0, 0 }, { win_w, win_h });
-        cr.fill();
-
-        auto txtbuf = std::array<char, 32>{};
-
-        // plot touch-points
-        for (auto const [confidence, scale, mean, prec] : out_tp[i]) {
-            auto const sigma = prec.inverse();
-
-            if (!sigma.has_value()) {
-                std::cout << "warning: failed to invert sigma\n";
-                continue;
-            }
-
-            auto const eigen = sigma.value().eigen();
-
-            // get standard deviation
-            auto const nstd = 1.0;
-            auto const s1 = nstd * std::sqrt(eigen.w[0]);
-            auto const s2 = nstd * std::sqrt(eigen.w[1]);
-
-            // eigenvectors scaled with standard deviation
-            auto const v1 = eigen.v[0].cast<f64>() * s1;
-            auto const v2 = eigen.v[1].cast<f64>() * s2;
-
-            // standard deviation
-            cr.set_source(gfx::srgba { 0.0, 0.0, 0.0, 0.33 });
-
-            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
-            cr.line_to(t({ mean.x + 0.5 + v1.x, mean.y + 0.5 + v1.y }));
-
-            cr.move_to(t({ mean.x + 0.5, mean.y + 0.5 }));
-            cr.line_to(t({ mean.x + 0.5 + v2.x, mean.y + 0.5 + v2.y }));
-
-            cr.stroke();
-
-            // mean
-            cr.set_source(gfx::srgb { 1.0, 0.0, 0.0 });
-
-            cr.move_to(t({ mean.x + 0.1, mean.y + 0.5 }));
-            cr.line_to(t({ mean.x + 0.9, mean.y + 0.5 }));
-
-            cr.move_to(t({ mean.x + 0.5, mean.y + 0.1 }));
-            cr.line_to(t({ mean.x + 0.5, mean.y + 0.9 }));
-
-            cr.stroke();
-
-            // standard deviation ellipse
-            cr.set_source(gfx::srgb { 1.0, 0.0, 0.0 });
-
-            cr.save();
-
-            cr.translate(t({ mean.x + 0.5, mean.y + 0.5 }));
-            cr.rotate(std::atan2(v1.x, v1.y));
-            cr.scale({s2 * win_w / img_w, s1 * win_h / img_h});
-            cr.arc({ 0.0, 0.0 }, 1.0, 0.0, 2.0 * math::num<f64>::pi);
-
-            cr.restore();
-            cr.stroke();
-
-            // stats
-            cr.set_source(gfx::srgb { 1.0, 1.0, 1.0 });
-
-            std::snprintf(txtbuf.data(), txtbuf.size(), "c:%.02f", confidence);
-            cr.move_to(t({ mean.x - 3.5, mean.y + 3.0 }));
-            cr.show_text(txtbuf.data());
-
-            std::snprintf(txtbuf.data(), txtbuf.size(), "a:%.02f", std::max(s1, s2) / std::min(s1, s2));
-            cr.move_to(t({ mean.x - 3.5, mean.y + 2.0 }));
-            cr.show_text(txtbuf.data());
-
-            std::snprintf(txtbuf.data(), txtbuf.size(), "s:%.02f", scale);
-            cr.move_to(t({ mean.x - 3.5, mean.y + 1.0 }));
-            cr.show_text(txtbuf.data());
-        }
+        vis.draw(cr, out[i], out_tp[i], width, height);
 
         // write file
         auto fname = std::array<char, 32>{};

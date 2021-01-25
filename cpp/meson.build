@@ -55,7 +55,8 @@ cairo_dep = dependency('cairo')
 
 # binaries
 src_main = [
-    'src/main.cpp'
+    'src/main.cpp',
+    'src/visualization.cpp',
 ]
 
 inc_main = include_directories('src')

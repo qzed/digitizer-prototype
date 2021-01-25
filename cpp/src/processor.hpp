@@ -19,8 +19,8 @@
 
 
 struct touch_point {
-    f32 scale;
     f32 confidence;
+    f32 scale;
     math::vec2_t<f32>  mean;
     math::mat2s_t<f32> cov;
 };

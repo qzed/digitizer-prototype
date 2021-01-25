@@ -15,7 +15,13 @@ class token {
 private:
     friend class registry;
 
-    token(std::size_t index_t);
+public:
+    inline constexpr token(token const& other) = default;
+
+    inline constexpr auto operator= (token const& rhs) -> token& = default;
+
+private:
+    inline constexpr token(std::size_t index_t);
 
 private:
     std::size_t m_index;
@@ -87,7 +93,7 @@ private:
 };
 
 
-inline token::token(std::size_t i)
+inline constexpr token::token(std::size_t i)
     : m_index{i}
 {}
 

@@ -56,6 +56,7 @@ cairo_dep = dependency('cairo')
 # binaries
 src_main = [
     'src/main.cpp',
+    'src/processor.cpp',
     'src/visualization.cpp',
 ]
 

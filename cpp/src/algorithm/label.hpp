@@ -21,6 +21,7 @@
 #include <numeric>
 
 
+namespace alg {
 namespace impl {
 
 inline auto is_root(container::image<u16> const& forest, u16 idx) -> bool
@@ -203,3 +204,5 @@ auto label(container::image<u16>& out, container::image<T> const& data, T thresh
     // pass 2: assign labels
     return impl::resolve(out, background);
 }
+
+} /* namespace alg */

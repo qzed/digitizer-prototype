@@ -15,7 +15,7 @@
 #include <array>
 
 
-namespace gfit {
+namespace alg::gfit {
 
 template<class T>
 inline constexpr auto const range = math::vec2_t<T> { static_cast<T>(1), static_cast<T>(1) };
@@ -310,4 +310,4 @@ void fit(std::vector<parameters<S>>& params, container::image<T> const& data,
     }
 }
 
-} /* namespace gfit */
+} /* namespace alg::gfit */

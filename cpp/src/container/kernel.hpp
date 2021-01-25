@@ -26,6 +26,13 @@ public:
     using const_reverse_iterator = T const*;
 
 public:
+    template<class... Args>
+    constexpr kernel(Args... args);
+
+    constexpr kernel(kernel<T, Nx, Ny> const& other);
+
+    constexpr auto operator= (kernel<T, Nx, Ny> const& rhs) -> kernel<T, Nx, Ny>&;
+
     auto size() const -> index2_t;
     auto stride() const -> index_t;
 
@@ -51,6 +58,24 @@ public:
     static constexpr auto unravel(index2_t size, index_t i) -> index2_t;
 };
 
+template<class T, index_t Nx, index_t Ny>
+template<class... Args>
+inline constexpr kernel<T, Nx, Ny>::kernel(Args... args)
+    : buf{std::forward<Args>(args)...}
+{}
+
+
+template<class T, index_t Nx, index_t Ny>
+inline constexpr kernel<T, Nx, Ny>::kernel(kernel<T, Nx, Ny> const& other)
+    : buf{other.buf}
+{}
+
+template<class T, index_t Nx, index_t Ny>
+inline constexpr auto kernel<T, Nx, Ny>::operator= (kernel<T, Nx, Ny> const& rhs) -> kernel<T, Nx, Ny>&
+{
+    this->buf = rhs.buf;
+    return *this;
+}
 
 template<class T, index_t Nx, index_t Ny>
 auto kernel<T, Nx, Ny>::size() const -> index2_t

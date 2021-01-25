@@ -21,37 +21,37 @@ namespace kernels {
 
 template<class T>
 inline constexpr container::kernel<T, 3, 3> sobel3_x {
-     1,  0, -1,
-     2,  0, -2,
-     1,  0, -1,
+    static_cast<T>( 1), static_cast<T>( 0), static_cast<T>(-1),
+    static_cast<T>( 2), static_cast<T>( 0), static_cast<T>(-2),
+    static_cast<T>( 1), static_cast<T>( 0), static_cast<T>(-1),
 };
 
 template<class T>
 inline constexpr container::kernel<T, 3, 3> sobel3_y {
-     1,  2,  1,
-     0,  0,  0,
-    -1, -2, -1,
+    static_cast<T>( 1), static_cast<T>( 2), static_cast<T>( 1),
+    static_cast<T>( 0), static_cast<T>( 0), static_cast<T>( 0),
+    static_cast<T>(-1), static_cast<T>(-2), static_cast<T>(-1),
 };
 
 template<class T>
 inline constexpr container::kernel<T, 3, 3> sobel3_xx {
-     1, -2,  1,
-     2, -4,  2,
-     1, -2,  1,
+    static_cast<T>( 1), static_cast<T>(-2), static_cast<T>( 1),
+    static_cast<T>( 2), static_cast<T>(-4), static_cast<T>( 2),
+    static_cast<T>( 1), static_cast<T>(-2), static_cast<T>( 1),
 };
 
 template<class T>
 inline constexpr container::kernel<T, 3, 3> sobel3_yy {
-     1,  2,  1,
-    -2, -4, -2,
-     1,  2,  1,
+    static_cast<T>( 1), static_cast<T>( 2), static_cast<T>( 1),
+    static_cast<T>(-2), static_cast<T>(-4), static_cast<T>(-2),
+    static_cast<T>( 1), static_cast<T>( 2), static_cast<T>( 1),
 };
 
 template<class T>
 inline constexpr container::kernel<T, 3, 3> sobel3_xy {
-     1,  0, -1,
-     0,  0,  0,
-    -1,  0,  1,
+    static_cast<T>( 1), static_cast<T>( 0), static_cast<T>(-1),
+    static_cast<T>( 0), static_cast<T>( 0), static_cast<T>( 0),
+    static_cast<T>(-1), static_cast<T>( 0), static_cast<T>( 1),
 };
 
 

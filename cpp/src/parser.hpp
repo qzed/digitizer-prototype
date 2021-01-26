@@ -133,7 +133,7 @@ public:
     virtual ~parser_base() = default;
 
 protected:
-    void do_parse(slice<u8> data);
+    void do_parse(slice<u8> data, bool oneshot=false);
 
     auto parse_data(slice<u8> data) -> slice<u8>;
     void parse_data_payload(ipts_data const& header, slice<u8> data);
@@ -148,11 +148,15 @@ protected:
 };
 
 
-void parser_base::do_parse(slice<u8> data)
+void parser_base::do_parse(slice<u8> data, bool oneshot)
 {
-    while (data.size()) {
-        data = parse_data(data);
+    if (!data.size()) {
+        return;
     }
+
+    do {
+        data = parse_data(data);
+    } while (data.size() && !oneshot);
 }
 
 auto parser_base::parse_data(slice<u8> data) -> slice<u8>

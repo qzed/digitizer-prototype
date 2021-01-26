@@ -70,10 +70,10 @@ private:
     container::image<f32> m_img_dm1;
     container::image<f32> m_img_dm2;
     container::image<f32> m_img_flt;
-    container::image<f32> m_img_gftmp;
+    container::image<f64> m_img_gftmp;
 
     std::priority_queue<alg::wdt::q_item<f32>> m_wdt_queue;
-    std::vector<alg::gfit::parameters<f32>> m_gf_params;
+    std::vector<alg::gfit::parameters<f64>> m_gf_params;
 
     std::vector<index_t> m_maximas;
     std::vector<component_stats> m_cstats;

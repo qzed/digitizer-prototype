@@ -310,7 +310,7 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
             continue;
         }
 
-        m_touchpoints.push_back({ cs, p.scale, p.mean, *cov });
+        m_touchpoints.push_back(touch_point { cs, static_cast<f32>(p.scale), p.mean.cast<f32>(), cov->cast<f32>() });
     }
 
     return m_touchpoints;

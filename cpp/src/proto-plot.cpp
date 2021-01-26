@@ -107,9 +107,14 @@ auto main(int argc, char** argv) -> int
         print_usage_and_exit(argv[0]);
     }
 
-    auto proc = touch_processor {{ 72, 48 }};
-
     auto const heatmaps = parser().parse(argv[2]);
+
+    if (heatmaps.empty()) {
+        std::cout << "No touch data found!" << std::endl;
+        return 0;
+    }
+
+    auto proc = touch_processor { heatmaps[0].size() };
 
     auto out = std::vector<container::image<f32>>{};
     out.reserve(heatmaps.size());
@@ -161,7 +166,7 @@ auto main(int argc, char** argv) -> int
     auto surface = gfx::cairo::image_surface_create(gfx::cairo::format::argb32, { width, height });
     auto cr = gfx::cairo::cairo::create(surface);
 
-    auto vis = visualization {{ 72, 48 }};
+    auto vis = visualization { heatmaps[0].size() };
 
     for (std::size_t i = 0; i < out.size(); ++i) {
         vis.draw(cr, out[i], out_tp[i], width, height);

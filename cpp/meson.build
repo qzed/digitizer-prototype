@@ -1,6 +1,6 @@
 project(
     'test',
-    'cpp',
+    'cpp', 'c',
     default_options: [
         'cpp_std=c++17',
         'buildtype=debugoptimized',
@@ -51,15 +51,26 @@ add_project_arguments('-Wno-unused-parameter', language: 'cpp')
 
 # dependencies
 cairo_dep = dependency('cairo')
+gtk_dep = dependency('gtk+-3.0')
+threads_dep = dependency('threads')
 
 
 # binaries
-src_main = [
-    'src/main.cpp',
+src_plot = [
+    'src/proto-plot.cpp',
     'src/processor.cpp',
     'src/visualization.cpp',
 ]
 
 inc_main = include_directories('src')
 
-executable('main', src_main, dependencies: [cairo_dep], include_directories: inc_main)
+src_rt = [
+    'src/proto-rt.cpp',
+    'src/processor.cpp',
+    'src/visualization.cpp',
+    'src/control.c',
+    'src/utils.c',
+]
+
+executable('proto-plot', src_plot, dependencies: [cairo_dep],                       include_directories: inc_main)
+executable('proto-rt',   src_rt,   dependencies: [cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)

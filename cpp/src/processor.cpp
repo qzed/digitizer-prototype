@@ -300,9 +300,9 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
             continue;
         }
 
-        auto const x = static_cast<index_t>(p.mean.x);
-        auto const y = static_cast<index_t>(p.mean.y);
-        auto const cs = m_cscore.at(m_img_lbl[{ x, y }] - 1);
+        auto const x = std::clamp(static_cast<index_t>(p.mean.x), 0, m_img_lbl.size().x - 1);
+        auto const y = std::clamp(static_cast<index_t>(p.mean.y), 0, m_img_lbl.size().y - 1);
+        auto const cs = m_img_lbl[{ x, y }] > 0 ? m_cscore.at(m_img_lbl[{ x, y }] - 1) : 0.0f;
 
         auto const cov = p.prec.inverse();
         if (!cov.has_value()) {

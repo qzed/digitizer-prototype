@@ -198,6 +198,8 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
     }
 
     // TODO: limit inclusion to N (e.g. N=16) local maximas by highest inclusion score
+    // TODO: if everything is excluded here, we can skip the rest
+    //       (useful to improve performance for touch sensor issues)
 
     // distance transform
     {

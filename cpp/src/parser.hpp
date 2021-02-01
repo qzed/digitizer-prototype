@@ -31,6 +31,12 @@ struct ipts_report {
     u16 size;
 } __attribute__ ((packed));
 
+struct ipts_timestamp_report {
+    u16 unknown;
+    u16 counter;
+    u32 timestamp;
+};
+
 struct ipts_stylus_report_s {
     u8 elements;
     u8 reserved[3];
@@ -140,9 +146,11 @@ protected:
     auto parse_payload_frame(ipts_payload const& header, slice<u8> data) -> slice<u8>;
     void parse_payload_frame_reports(ipts_payload_frame const& header, slice<u8> data);
     auto parse_report(ipts_payload_frame const& header, slice<u8> data) -> slice<u8>;
+    void parse_report_timestamp(ipts_report const& header, slice<u8> data);
     void parse_report_heatmap_dim(ipts_report const& header, slice<u8> data);
     void parse_report_heatmap(ipts_report const& header, slice<u8> data);
 
+    virtual void on_timestamp(ipts_timestamp_report const& ts);
     virtual void on_heatmap_dim(ipts_heatmap_dim const& dim);
     virtual void on_heatmap(slice<u8> const& data);
 };
@@ -238,6 +246,10 @@ auto parser_base::parse_report(ipts_payload_frame const& header, slice<u8> data)
 
     switch (hdr.type)
     {
+    case 0x400:
+        parse_report_timestamp(hdr, pld);
+        break;
+
     case 0x403:
         parse_report_heatmap_dim(hdr, pld);
         break;
@@ -251,6 +263,15 @@ auto parser_base::parse_report(ipts_payload_frame const& header, slice<u8> data)
     }
 
     return { pld.end, data.end };
+}
+
+void parser_base::parse_report_timestamp(ipts_report const& header, slice<u8> data)
+{
+    ipts_timestamp_report ts;
+
+    std::copy(data.begin, data.begin + sizeof(ts), reinterpret_cast<u8*>(&ts));
+
+    on_timestamp(ts);
 }
 
 void parser_base::parse_report_heatmap_dim(ipts_report const& header, slice<u8> data)
@@ -267,6 +288,9 @@ void parser_base::parse_report_heatmap(ipts_report const& header, slice<u8> data
     on_heatmap(data);
 }
 
+
+void parser_base::on_timestamp(ipts_timestamp_report const& ts)
+{}
 
 void parser_base::on_heatmap_dim(ipts_heatmap_dim const& dim)
 {}

@@ -302,15 +302,29 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
             continue;
         }
 
-        auto const x = std::clamp(static_cast<index_t>(p.mean.x), 0, m_img_lbl.size().x - 1);
-        auto const y = std::clamp(static_cast<index_t>(p.mean.y), 0, m_img_lbl.size().y - 1);
-        auto const cs = m_img_lbl[{ x, y }] > 0 ? m_cscore.at(m_img_lbl[{ x, y }] - 1) : 0.0f;
-
         auto const cov = p.prec.inverse();
         if (!cov.has_value()) {
             std::cout << "warning: failed to invert matrix\n";
             continue;
         }
+
+        auto const [ev1, ev2] = cov->eigenvalues();
+        auto const sd1 = std::sqrt(std::abs(ev1));
+        auto const sd2 = std::sqrt(std::abs(ev2));
+
+        if (sd1 <= math::num<f32>::eps || sd2 <= math::num<f32>::eps) {
+            std::cout << "warning: standard deviation too small\n";
+            continue;
+        }
+
+        auto const aspect = std::max(sd1, sd2) / std::min(sd1, sd2);
+        if (aspect > 2.0f) {
+            continue;
+        }
+
+        auto const x = std::clamp(static_cast<index_t>(p.mean.x), 0, m_img_lbl.size().x - 1);
+        auto const y = std::clamp(static_cast<index_t>(p.mean.y), 0, m_img_lbl.size().y - 1);
+        auto const cs = m_img_lbl[{ x, y }] > 0 ? m_cscore.at(m_img_lbl[{ x, y }] - 1) : 0.0f;
 
         m_touchpoints.push_back(touch_point { cs, static_cast<f32>(p.scale), p.mean.cast<f32>(), cov->cast<f32>() });
     }

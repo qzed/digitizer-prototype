@@ -143,6 +143,8 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
     {
         auto _r = m_perf_reg.record(m_perf_t_lmax);
 
+        // TODO: We may want to compute local maximas with a different smoothing factor
+
         m_maximas.clear();
         alg::find_local_maximas(m_img_pp, 0.05f, std::back_inserter(m_maximas));
     }
@@ -275,6 +277,8 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
     // filtered maximas
     {
         auto _r = m_perf_reg.record(m_perf_t_lmaxf);
+
+        // TODO: We may want to compute local maximas with a different smoothing factor
 
         m_maximas.clear();
         alg::find_local_maximas(m_img_flt, 0.05f, std::back_inserter(m_maximas));

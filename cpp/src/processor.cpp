@@ -57,7 +57,7 @@ touch_processor::touch_processor(index2_t size)
     , m_maximas{32}
     , m_cstats{32}
     , m_cscore{32}
-    , m_kern_pp{alg::conv::kernels::gaussian<f32, 5, 5>(1.0f)}
+    , m_kern_pp{alg::conv::kernels::gaussian<f32, 5, 5>(0.9f)}
     , m_kern_st{alg::conv::kernels::gaussian<f32, 5, 5>(1.0f)}
     , m_kern_hs{alg::conv::kernels::gaussian<f32, 5, 5>(1.0f)}
     , m_gf_window{11, 11}
@@ -131,8 +131,8 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
     {
         auto _r = m_perf_reg.record(m_perf_t_obj);
 
-        f32 const wr = 0.9;
-        f32 const wh = 1.1;
+        f32 const wr = 1.5;
+        f32 const wh = 1.0;
 
         for (index_t i = 0; i < m_img_pp.size().product(); ++i) {
             m_img_obj[i] = wh * m_img_pp[i] - wr * m_img_rdg[i];

@@ -186,14 +186,30 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
 
         m_cscore.assign(num_labels, 0.0f);
         for (index_t i = 0; i < num_labels; ++i) {
-            auto const c = 100.f;
-
             auto const& stats = m_cstats.at(i);
 
-            f32 v = c * (stats.incoherence / (stats.size * stats.size))
-                * (stats.maximas > 0 ? 1.0f / stats.maximas : 0.0f);
+            // size score
+            auto const cen_vol = 40.0f;
+            auto const spr_vol = 15.0f;
+            auto const cov_vol =  0.9f;
 
-            m_cscore.at(i) = v / (1.0f + v);
+            auto const alph_vol = std::log(-(cov_vol + 1.0f) / (cov_vol - 1.0f)) / spr_vol;
+            auto const beta_vol = alph_vol * cen_vol;
+
+            auto const s_vol = 1.0f - 1.0f / (1.0f + std::exp(-alph_vol * stats.size + beta_vol));
+
+            // rotation score per size
+            auto const cen_rot = 0.4f;
+            auto const spr_rot = 0.3f;
+            auto const cov_rot = 0.9f;
+
+            auto const alph_rot = std::log(-(cov_rot + 1.0f) / (cov_rot - 1.0f)) / spr_rot;
+            auto const beta_rot = alph_rot * cen_rot;
+
+            auto const s_rot = 1.0f / (1.0f + std::exp(-alph_rot * (stats.incoherence / stats.size) + beta_rot));
+
+            // combined score
+            m_cscore.at(i) = stats.maximas > 0 ? s_vol * s_rot : 0.0f;
         }
     }
 

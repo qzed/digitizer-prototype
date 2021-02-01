@@ -219,10 +219,10 @@ auto main(int argc, char** argv) -> int
                 ctx.submit(hm, prc.process(hm));
 
                 ret = iptsd_control_send_feedback(&ctrl);
-		        if (ret < 0) {
+                if (ret < 0) {
                     std::cout << "failed to send IPTS feedback: " << ret << std::endl;
-			        return;
-		        }
+                    return;
+                }
             }
 
             std::this_thread::sleep_for(10ms);

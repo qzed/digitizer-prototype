@@ -76,7 +76,7 @@ TouchProcessor::TouchProcessor(index2_t size)
     m_touchpoints.reserve(32);
 }
 
-auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<TouchPoint> const&
+auto TouchProcessor::process(Image<f32> const& hm) -> std::vector<TouchPoint> const&
 {
     auto _tr = m_perf_reg.record(m_perf_t_total);
 
@@ -293,7 +293,7 @@ auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<Tou
         alg::gfit::reserve(m_gf_params, m_maximas.size(), m_gf_window);
 
         for (std::size_t i = 0; i < m_maximas.size(); ++i) {
-            auto const [x, y] = container::Image<f32>::unravel(m_img_pp.size(), m_maximas[i]);
+            auto const [x, y] = Image<f32>::unravel(m_img_pp.size(), m_maximas[i]);
 
             // TODO: move window inwards instead of clamping?
             auto const bounds = alg::gfit::BBox {

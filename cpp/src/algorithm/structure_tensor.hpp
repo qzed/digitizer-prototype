@@ -20,10 +20,8 @@ namespace iptsd::alg {
 namespace stensor::impl {
 
 template<typename Bx, typename By, typename T, index_t Nx, index_t Ny>
-void structure_tensor_generic(container::Image<math::Mat2s<T>>& out,
-                              container::Image<T> const& in,
-                              container::Kernel<T, Nx, Ny> const& kx,
-                              container::Kernel<T, Nx, Ny> const& ky)
+void structure_tensor_generic(Image<Mat2s<T>>& out, Image<T> const& in,
+                              Kernel<T, Nx, Ny> const& kx, Kernel<T, Nx, Ny> const& ky)
 {
     index_t const dx = (Nx - 1) / 2;
     index_t const dy = (Ny - 1) / 2;
@@ -51,10 +49,9 @@ void structure_tensor_generic(container::Image<math::Mat2s<T>>& out,
 
 
 template<typename Bx=border::Zero, typename By=border::Zero, typename T, index_t Nx=3, index_t Ny=3>
-void structure_tensor(container::Image<math::Mat2s<T>>& out,
-                      container::Image<T> const& in,
-                      container::Kernel<T, Nx, Ny> const& kx=conv::kernels::sobel3_x<T>,
-                      container::Kernel<T, Nx, Ny> const& ky=conv::kernels::sobel3_y<T>)
+void structure_tensor(Image<Mat2s<T>>& out, Image<T> const& in,
+                      Kernel<T, Nx, Ny> const& kx=conv::kernels::sobel3_x<T>,
+                      Kernel<T, Nx, Ny> const& ky=conv::kernels::sobel3_y<T>)
 {
     assert(in.size() == out.size());
 

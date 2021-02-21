@@ -80,7 +80,7 @@ auto get_cost(T& cost, index_t i, index2_t d) -> V
 }
 
 template<typename T, typename Q, typename B, typename M, typename C>
-inline void evaluate(container::Image<T>& out, Q& queue, B& bin, M& mask, C& cost, index_t i,
+inline void evaluate(Image<T>& out, Q& queue, B& bin, M& mask, C& cost, index_t i,
                      index_t stride, index2_t dir, T limit)
 {
     if (!is_compute(bin, mask, i + stride))
@@ -98,7 +98,7 @@ inline void evaluate(container::Image<T>& out, Q& queue, B& bin, M& mask, C& cos
 
 
 template<int N=8, typename T, typename F, typename M, typename C, typename Q>
-void weighted_distance_transform(container::Image<T>& out, F& bin, M& mask, C& cost, Q& q,
+void weighted_distance_transform(Image<T>& out, F& bin, M& mask, C& cost, Q& q,
                                  T limit=std::numeric_limits<T>::max())
 {
     using wdt::impl::evaluate;
@@ -456,7 +456,7 @@ void weighted_distance_transform(container::Image<T>& out, F& bin, M& mask, C& c
         out[pixel.idx] = pixel.cost;
 
         // evaluate neighbors
-        auto const [x, y] = container::Image<T>::unravel(out.size(), pixel.idx);
+        auto const [x, y] = Image<T>::unravel(out.size(), pixel.idx);
 
         if (x > 0) {
             evaluate(out, q, bin, mask, cost, pixel.idx, s_left, { -1, 0 }, limit);

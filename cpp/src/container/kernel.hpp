@@ -191,3 +191,11 @@ inline constexpr auto Kernel<T, Nx, Ny>::unravel(index2_t size, index_t i) -> in
 }
 
 } /* namespace iptsd::container */
+
+
+/* imports */
+namespace iptsd {
+
+using container::Kernel;
+
+} /* namespace iptsd */

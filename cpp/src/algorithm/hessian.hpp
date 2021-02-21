@@ -20,7 +20,7 @@ namespace iptsd::alg {
 namespace hess::impl {
 
 template<typename B=border::Zero, typename T>
-void hessian_generic(container::Image<math::Mat2s<T>>& out, container::Image<T> const& in)
+void hessian_generic(Image<Mat2s<T>>& out, Image<T> const& in)
 {
     auto const& kxx = conv::kernels::sobel3_xx<T>;
     auto const& kyy = conv::kernels::sobel3_yy<T>;
@@ -57,7 +57,7 @@ void hessian_generic(container::Image<math::Mat2s<T>>& out, container::Image<T> 
 
 
 template<typename B=border::Zero, typename T>
-void hessian(container::Image<math::Mat2s<T>>& out, container::Image<T> const& in)
+void hessian(Image<Mat2s<T>>& out, Image<T> const& in)
 {
     assert(in.size() == out.size());
 

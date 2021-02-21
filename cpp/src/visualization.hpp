@@ -18,11 +18,11 @@ class Visualization {
 public:
     Visualization(index2_t heatmap_size);
 
-    void draw(gfx::cairo::Cairo& cr, container::Image<f32> const& img,
+    void draw(gfx::cairo::Cairo& cr, Image<f32> const& img,
               std::vector<TouchPoint> const& tps, int width, int height);
 
 private:
-    container::Image<gfx::Srgb> m_data;
+    Image<gfx::Srgb> m_data;
 };
 
 } /* namespace iptsd */

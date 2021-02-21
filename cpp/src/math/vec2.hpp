@@ -192,3 +192,11 @@ struct num<Vec2<T>> {
 };
 
 } /* namespace iptsd::math */
+
+
+/* imports */
+namespace iptsd {
+
+using math::Vec2;
+
+} /* namespace iptsd */

@@ -18,7 +18,7 @@
 namespace iptsd::alg::gfit {
 
 template<class T>
-inline constexpr auto const range = math::Vec2<T> { static_cast<T>(1), static_cast<T>(1) };
+inline constexpr auto const range = Vec2<T> { static_cast<T>(1), static_cast<T>(1) };
 
 
 struct BBox {
@@ -28,12 +28,12 @@ struct BBox {
 
 template<class T>
 struct Parameters {
-    bool                valid;      // flag to invalidate parameters
-    T                   scale;      // alpha
-    math::Vec2<T>       mean;       // mu
-    math::Mat2s<T>      prec;       // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
-    BBox                bounds;     // local bounds for sampling
-    container::Image<T> weights;    // local weights for sampling
+    bool     valid;     // flag to invalidate parameters
+    T        scale;     // alpha
+    Vec2<T>  mean;      // mu
+    Mat2s<T> prec;      // precision matrix, aka. inverse covariance matrix, aka. sigma^-1
+    BBox     bounds;    // local bounds for sampling
+    Image<T> weights;   // local weights for sampling
 };
 
 
@@ -46,19 +46,19 @@ namespace impl {
  * @prec: Precision matrix, i.e. the invariance of the covariance matrix.
  */
 template<class T>
-auto gaussian_like(math::Vec2<T> x, math::Vec2<T> mean, math::Mat2s<T> prec) -> T
+auto gaussian_like(Vec2<T> x, Vec2<T> mean, Mat2s<T> prec) -> T
 {
     return std::exp(-prec.vtmv(x - mean) / static_cast<T>(2));
 }
 
 
 template<class T, class S>
-inline void assemble_system(math::Mat6<S>& m, math::Vec6<S>& rhs, BBox const& b,
-                           container::Image<T> const& data, container::Image<S> const& w)
+inline void assemble_system(Mat6<S>& m, Vec6<S>& rhs, BBox const& b, Image<T> const& data,
+                            Image<S> const& w)
 {
     auto const eps = std::numeric_limits<S>::epsilon();
 
-    auto const scale = math::Vec2<S> {
+    auto const scale = Vec2<S> {
         static_cast<S>(2) * range<S>.x / static_cast<S>(data.size().x),
         static_cast<S>(2) * range<S>.y / static_cast<S>(data.size().y),
     };
@@ -134,10 +134,10 @@ inline void assemble_system(math::Mat6<S>& m, math::Vec6<S>& rhs, BBox const& b,
 }
 
 template<class T>
-bool extract_params(math::Vec6<T> const& chi, T& scale, math::Vec2<T>& mean,
-                    math::Mat2s<T>& prec, T eps=math::num<T>::eps)
+bool extract_params(Vec6<T> const& chi, T& scale, Vec2<T>& mean, Mat2s<T>& prec,
+                    T eps=math::num<T>::eps)
 {
-    prec = -static_cast<T>(2) * math::Mat2s<T> { chi[0], chi[1], chi[2] };
+    prec = -static_cast<T>(2) * Mat2s<T> { chi[0], chi[1], chi[2] };
 
     // mu = sigma * b = prec^-1 * B
     auto const d = prec.det();
@@ -155,9 +155,9 @@ bool extract_params(math::Vec6<T> const& chi, T& scale, math::Vec2<T>& mean,
 
 
 template<class T>
-inline void update_weight_maps(std::vector<Parameters<T>>& params, container::Image<T>& total)
+inline void update_weight_maps(std::vector<Parameters<T>>& params, Image<T>& total)
 {
-    auto const scale = math::Vec2<T> {
+    auto const scale = Vec2<T> {
         static_cast<T>(2) * range<T>.x / static_cast<T>(total.size().x),
         static_cast<T>(2) * range<T>.y / static_cast<T>(total.size().y),
     };
@@ -226,7 +226,7 @@ void reserve(std::vector<Parameters<T>>& params, std::size_t n, index2_t size)
             { static_cast<T>(0), static_cast<T>(0) },
             { static_cast<T>(1), static_cast<T>(0), static_cast<T>(1) },
             { 0, -1, 0, -1 },
-            container::Image<T> { size },
+            Image<T> { size },
         });
     }
 
@@ -236,10 +236,10 @@ void reserve(std::vector<Parameters<T>>& params, std::size_t n, index2_t size)
 }
 
 template<class T, class S>
-void fit(std::vector<Parameters<S>>& params, container::Image<T> const& data,
-         container::Image<S>& tmp, unsigned int n_iter, S eps=math::num<S>::eps)
+void fit(std::vector<Parameters<S>>& params, Image<T> const& data,
+         Image<S>& tmp, unsigned int n_iter, S eps=math::num<S>::eps)
 {
-    auto const scale = math::Vec2<S> {
+    auto const scale = Vec2<S> {
         static_cast<S>(2) * range<S>.x / static_cast<S>(data.size().x),
         static_cast<S>(2) * range<S>.y / static_cast<S>(data.size().y),
     };
@@ -267,9 +267,9 @@ void fit(std::vector<Parameters<S>>& params, container::Image<T> const& data,
 
         // fit individual parameters
         for (auto& p : params) {
-            auto sys = math::Mat6<S>{};
-            auto rhs = math::Vec6<S>{};
-            auto chi = math::Vec6<S>{};
+            auto sys = Mat6<S>{};
+            auto rhs = Vec6<S>{};
+            auto chi = Vec6<S>{};
 
             if (!p.valid) {
                 continue;

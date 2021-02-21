@@ -579,7 +579,7 @@ inline auto format_stride_for_width(Format fmt, int width) -> int
 }
 
 template<class T>
-inline auto image_surface_create(container::Image<T>& image) -> Surface
+inline auto image_surface_create(Image<T>& image) -> Surface
 {
     auto const format = pixel_format<T>();
     auto const size = image.size();

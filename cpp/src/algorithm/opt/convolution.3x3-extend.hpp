@@ -8,8 +8,7 @@
 namespace iptsd::alg::conv::impl {
 
 template<typename T, typename S>
-void conv_3x3_extend(container::Image<T>& out, container::Image<T> const& data,
-                     container::Kernel<S, 3, 3> const& kern)
+void conv_3x3_extend(Image<T>& out, Image<T> const& data, Kernel<S, 3, 3> const& kern)
 {
     // strides
     auto const stride_d = data.stride();

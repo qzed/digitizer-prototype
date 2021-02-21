@@ -38,12 +38,10 @@ public:
     auto map(T const& value, std::pair<T, T> range) const -> P;
 
     template<class T, class P>
-    auto map(container::Image<T> const& img, std::optional<std::pair<T, T>> range=std::nullopt) const
-            -> container::Image<P>;
+    auto map(Image<T> const& img, std::optional<std::pair<T, T>> range=std::nullopt) const -> Image<P>;
 
     template<class T, class P>
-    void map_into(container::Image<P>& dest, container::Image<T> const& img,
-                  std::optional<std::pair<T, T>> range=std::nullopt) const;
+    void map_into(Image<P>& dest, Image<T> const& img, std::optional<std::pair<T, T>> range=std::nullopt) const;
 };
 
 template<class T, class P>
@@ -55,18 +53,16 @@ auto Cmap::map(T const& value, std::pair<T, T> range) const -> P
 }
 
 template<class T, class P>
-auto Cmap::map(container::Image<T> const& img, std::optional<std::pair<T, T>> range) const
-        -> container::Image<P>
+auto Cmap::map(Image<T> const& img, std::optional<std::pair<T, T>> range) const -> Image<P>
 {
-    auto out = container::Image<P>{img.size()};
+    auto out = Image<P>{img.size()};
 
     this->map_into(out, img, range);
     return out;
 }
 
 template<class T, class P>
-void Cmap::map_into(container::Image<P>& dest, container::Image<T> const& img,
-                    std::optional<std::pair<T, T>> range) const
+void Cmap::map_into(Image<P>& dest, Image<T> const& img, std::optional<std::pair<T, T>> range) const
 {
     assert(dest.size() == img.size());
 

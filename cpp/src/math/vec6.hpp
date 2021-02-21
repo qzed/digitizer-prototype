@@ -42,3 +42,11 @@ struct num<Vec6<T>> {
 };
 
 } /* namespace iptsd::math */
+
+
+/* imports */
+namespace iptsd {
+
+using math::Vec6;
+
+} /* namespace iptsd */

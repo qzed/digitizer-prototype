@@ -37,20 +37,20 @@ auto read_file(char const* path) -> std::vector<u8>
 
 class Parser : public ParserBase {
 private:
-    std::vector<container::Image<f32>> m_data;
+    std::vector<Image<f32>> m_data;
     IptsHeatmapDim m_dim;
 
 public:
-    auto parse(char const* file) -> std::vector<container::Image<f32>>;
+    auto parse(char const* file) -> std::vector<Image<f32>>;
 
 protected:
     virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
     virtual void on_heatmap(Slice<u8> const& data);
 };
 
-auto Parser::parse(char const* file) -> std::vector<container::Image<f32>>
+auto Parser::parse(char const* file) -> std::vector<Image<f32>>
 {
-    m_data = std::vector<container::Image<f32>>{};
+    m_data = std::vector<Image<f32>>{};
 
     auto const data = read_file(file);
     this->do_parse({data.data(), data.data() + data.size()});
@@ -65,7 +65,7 @@ void Parser::on_heatmap_dim(IptsHeatmapDim const& dim)
 
 void Parser::on_heatmap(Slice<u8> const& data)
 {
-    auto img = container::Image<f32> {{ m_dim.width, m_dim.height }};
+    auto img = Image<f32> {{ m_dim.width, m_dim.height }};
 
     std::transform(data.begin, data.end, img.begin(), [&](auto v) {
         return 1.0f - static_cast<f32>(v - m_dim.z_min) / static_cast<f32>(m_dim.z_max - m_dim.z_min);
@@ -118,7 +118,7 @@ auto main(int argc, char** argv) -> int
 
     auto proc = TouchProcessor { heatmaps[0].size() };
 
-    auto out = std::vector<container::Image<f32>>{};
+    auto out = std::vector<Image<f32>>{};
     out.reserve(heatmaps.size());
 
     auto out_tp = std::vector<std::vector<TouchPoint>>{};

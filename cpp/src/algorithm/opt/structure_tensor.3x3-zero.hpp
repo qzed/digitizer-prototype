@@ -8,10 +8,8 @@
 namespace iptsd::alg::stensor::impl {
 
 template<typename T>
-void structure_tensor_3x3_zero(container::Image<math::Mat2s<T>>& out,
-                               container::Image<T> const& in,
-                               container::Kernel<T, 3, 3> const& kx,
-                               container::Kernel<T, 3, 3> const& ky)
+void structure_tensor_3x3_zero(Image<Mat2s<T>>& out, Image<T> const& in,
+                               Kernel<T, 3, 3> const& kx, Kernel<T, 3, 3> const& ky)
 {
     assert(in.size() == out.size());
     assert(kx.stride() == ky.stride());

@@ -7,7 +7,7 @@
 namespace iptsd::alg {
 
 template<int C=8, typename T, typename O>
-void find_local_maximas(container::Image<T> const& data, T threshold, O output_iter)
+void find_local_maximas(Image<T> const& data, T threshold, O output_iter)
 {
     static_assert(C == 4 || C == 8);
 

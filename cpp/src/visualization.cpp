@@ -12,7 +12,7 @@ Visualization::Visualization(index2_t heatmap_size)
     : m_data{heatmap_size}
 {}
 
-void Visualization::draw(gfx::cairo::Cairo& cr, container::Image<f32> const& img,
+void Visualization::draw(gfx::cairo::Cairo& cr, Image<f32> const& img,
                          std::vector<TouchPoint> const& tps, int width, int height)
 {
     auto const img_w = static_cast<f64>(img.size().x);
@@ -21,7 +21,7 @@ void Visualization::draw(gfx::cairo::Cairo& cr, container::Image<f32> const& img
     auto const win_w = static_cast<f64>(width);
     auto const win_h = static_cast<f64>(height);
 
-    auto const t = [&](math::Vec2<f64> p) -> math::Vec2<f64> {
+    auto const t = [&](Vec2<f64> p) -> Vec2<f64> {
         return { p.x * (win_w / img_w), win_h - p.y * (win_h / img_h) };
     };
 

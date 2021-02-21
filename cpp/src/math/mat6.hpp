@@ -59,3 +59,11 @@ inline constexpr auto Mat6<T>::operator[] (index2_t i) const -> T const&
 }
 
 } /* namespace iptsd::math */
+
+
+/* imports */
+namespace iptsd {
+
+using math::Mat6;
+
+} /* namespace iptsd */

@@ -264,3 +264,11 @@ struct num<Mat2s<T>> {
 };
 
 } /* namespace iptsd::math */
+
+
+/* imports */
+namespace iptsd {
+
+using math::Mat2s;
+
+} /* namespace iptsd */

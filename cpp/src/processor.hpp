@@ -21,10 +21,10 @@
 namespace iptsd {
 
 struct TouchPoint {
-    f32 confidence;
-    f32 scale;
-    math::Vec2<f32>  mean;
-    math::Mat2s<f32> cov;
+    f32        confidence;
+    f32        scale;
+    Vec2<f32>  mean;
+    Mat2s<f32> cov;
 };
 
 
@@ -40,7 +40,7 @@ class TouchProcessor {
 public:
     TouchProcessor(index2_t size);
 
-    auto process(container::Image<f32> const& hm) -> std::vector<TouchPoint> const&;
+    auto process(Image<f32> const& hm) -> std::vector<TouchPoint> const&;
     auto perf() const -> eval::perf::Registry const&;
 
 private:
@@ -62,17 +62,17 @@ private:
     eval::perf::Token m_perf_t_gfit;
 
     // temporary storage
-    container::Image<f32> m_img_pp;
-    container::Image<math::Mat2s<f32>> m_img_m2_1;
-    container::Image<math::Mat2s<f32>> m_img_m2_2;
-    container::Image<std::array<f32, 2>> m_img_stev;
-    container::Image<f32> m_img_rdg;
-    container::Image<f32> m_img_obj;
-    container::Image<u16> m_img_lbl;
-    container::Image<f32> m_img_dm1;
-    container::Image<f32> m_img_dm2;
-    container::Image<f32> m_img_flt;
-    container::Image<f64> m_img_gftmp;
+    Image<f32> m_img_pp;
+    Image<Mat2s<f32>> m_img_m2_1;
+    Image<Mat2s<f32>> m_img_m2_2;
+    Image<std::array<f32, 2>> m_img_stev;
+    Image<f32> m_img_rdg;
+    Image<f32> m_img_obj;
+    Image<u16> m_img_lbl;
+    Image<f32> m_img_dm1;
+    Image<f32> m_img_dm2;
+    Image<f32> m_img_flt;
+    Image<f64> m_img_gftmp;
 
     std::priority_queue<alg::wdt::QItem<f32>> m_wdt_queue;
     std::vector<alg::gfit::Parameters<f64>> m_gf_params;
@@ -82,9 +82,9 @@ private:
     std::vector<f32> m_cscore;
 
     // gauss kernels
-    container::Kernel<f32, 5, 5> m_kern_pp;
-    container::Kernel<f32, 5, 5> m_kern_st;
-    container::Kernel<f32, 5, 5> m_kern_hs;
+    Kernel<f32, 5, 5> m_kern_pp;
+    Kernel<f32, 5, 5> m_kern_st;
+    Kernel<f32, 5, 5> m_kern_hs;
 
     // parameters
     index2_t m_gf_window;

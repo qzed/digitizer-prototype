@@ -227,3 +227,11 @@ inline constexpr auto Image<T>::unravel(index2_t size, index_t i) -> index2_t
 }
 
 } /* namespace iptsd::container */
+
+
+/* imports */
+namespace iptsd {
+
+using container::Image;
+
+} /* namespace iptsd */

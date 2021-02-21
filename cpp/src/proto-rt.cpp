@@ -30,15 +30,15 @@ class Parser : public ParserBase {
 public:
     Parser(index2_t size);
 
-    auto parse(Slice<u8> data) -> container::Image<f32> const&;
+    auto parse(Slice<u8> data) -> Image<f32> const&;
 
 protected:
     virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
     virtual void on_heatmap(Slice<u8> const& data);
 
 private:
-    IptsHeatmapDim        m_dim;
-    container::Image<f32> m_img;
+    IptsHeatmapDim m_dim;
+    Image<f32>     m_img;
 };
 
 Parser::Parser(index2_t size)
@@ -46,7 +46,7 @@ Parser::Parser(index2_t size)
     , m_img { size }
 {}
 
-auto Parser::parse(Slice<u8> data) -> container::Image<f32> const&
+auto Parser::parse(Slice<u8> data) -> Image<f32> const&
 {
     this->do_parse(data, true);
     return m_img;
@@ -74,7 +74,7 @@ class MainContext {
 public:
     MainContext(GtkWidget* widget, index2_t img_size);
 
-    void submit(container::Image<f32> const& img, std::vector<TouchPoint> const& tps);
+    void submit(Image<f32> const& img, std::vector<TouchPoint> const& tps);
 
     auto draw_event(gfx::cairo::Cairo& cr) -> bool;
 
@@ -86,15 +86,15 @@ private:
 
     Visualization m_vis;
 
-    container::Image<f32> m_img1;
-    container::Image<f32> m_img2;
+    Image<f32> m_img1;
+    Image<f32> m_img2;
     std::vector<TouchPoint> m_tps1;
     std::vector<TouchPoint> m_tps2;
 
     std::mutex m_lock;
 
-    container::Image<f32>* m_img_frnt;
-    container::Image<f32>* m_img_back;
+    Image<f32>* m_img_frnt;
+    Image<f32>* m_img_back;
     std::vector<TouchPoint>* m_tps_frnt;
     std::vector<TouchPoint>* m_tps_back;
     bool m_swap;
@@ -113,7 +113,7 @@ MainContext::MainContext(GtkWidget* widget, index2_t img_size)
     , m_tps_back{&m_tps2}
 {}
 
-void MainContext::submit(container::Image<f32> const& img, std::vector<TouchPoint> const& tps)
+void MainContext::submit(Image<f32> const& img, std::vector<TouchPoint> const& tps)
 {
     {   // set swap to false to prevent read-access in draw
         auto guard = std::lock_guard(m_lock);

@@ -16,6 +16,8 @@
 #include <cairo/cairo.h>
 #include <gtk/gtk.h>
 
+#include <spdlog/spdlog.h>
+
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -60,7 +62,7 @@ void Parser::on_heatmap_dim(IptsHeatmapDim const& dim)
 void Parser::on_heatmap(Slice<u8> const& data)
 {
     if (m_dim.width != m_img.size().x || m_dim.height != m_img.size().y) {
-        std::cout << "error: invalid heatmap size" << std::endl;
+        spdlog::error("invalid heatmap size");
         abort();
     }
 
@@ -163,6 +165,8 @@ auto MainContext::on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_da
 
 auto main(int argc, char** argv) -> int
 {
+    spdlog::set_pattern("[%X.%e] [%l] %v");
+
     GtkWidget* window;
     GtkWidget* darea;
 
@@ -204,7 +208,7 @@ auto main(int argc, char** argv) -> int
         while(run.load()) {
             int64_t doorbell = iptsd_control_doorbell(&ctrl);
             if (doorbell < 0) {
-                std::cout << "failed to read IPTS doorbell: " << doorbell << std::endl;
+                spdlog::error("failed to read IPTS doorbell: {}", doorbell);
                 return;
             }
 
@@ -213,7 +217,7 @@ auto main(int argc, char** argv) -> int
             while (doorbell > ctrl.current_doorbell && run.load()) {
                 int ret = iptsd_control_read(&ctrl, buf.data(), size);
                 if (ret < 0) {
-                    std::cout << "failed to read IPTS data: " << ret << std::endl;
+                    spdlog::error("failed to read IPTS data: {}", ret);
                     return;
                 }
 
@@ -222,7 +226,7 @@ auto main(int argc, char** argv) -> int
 
                 ret = iptsd_control_send_feedback(&ctrl);
                 if (ret < 0) {
-                    std::cout << "failed to send IPTS feedback: " << ret << std::endl;
+                    spdlog::error("failed to send IPTS feedback: {}", ret);
                     return;
                 }
             }

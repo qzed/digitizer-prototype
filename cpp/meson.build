@@ -5,6 +5,7 @@ project(
         'cpp_std=c++17',
         'buildtype=debugoptimized',
         'warning_level=3',
+        'default_library=static',
     ]
 )
 
@@ -54,6 +55,12 @@ cairo_dep = dependency('cairo')
 gtk_dep = dependency('gtk+-3.0')
 threads_dep = dependency('threads')
 
+fmt_proj = subproject('fmt')
+fmt_dep = fmt_proj.get_variable('fmt_dep')
+
+spdlog_proj = subproject('spdlog')
+spdlog_dep = spdlog_proj.get_variable('spdlog_dep')
+
 
 # binaries
 src_plot = [
@@ -72,5 +79,5 @@ src_rt = [
     'src/utils.c',
 ]
 
-executable('proto-plot', src_plot, dependencies: [cairo_dep],                       include_directories: inc_main)
-executable('proto-rt',   src_rt,   dependencies: [cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)
+executable('proto-plot', src_plot, dependencies: [fmt_dep, spdlog_dep, cairo_dep],                       include_directories: inc_main)
+executable('proto-rt',   src_rt,   dependencies: [fmt_dep, spdlog_dep, cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)

@@ -9,6 +9,9 @@
 
 #include "gfx/cairo.hpp"
 
+#include <fmt/core.h>
+#include <spdlog/spdlog.h>
+
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -93,6 +96,8 @@ auto main(int argc, char** argv) -> int
     using namespace std::string_literals;
     mode_type mode;
 
+    spdlog::set_pattern("[%X.%e] [%^%l%$] %v");
+
     if (argc < 2) {
         print_usage_and_exit(argv[0]);
     }
@@ -112,7 +117,7 @@ auto main(int argc, char** argv) -> int
     auto const heatmaps = Parser().parse(argv[2]);
 
     if (heatmaps.empty()) {
-        std::cout << "No touch data found!" << std::endl;
+        spdlog::warn("No touch data found!");
         return 0;
     }
 
@@ -124,7 +129,7 @@ auto main(int argc, char** argv) -> int
     auto out_tp = std::vector<std::vector<TouchPoint>>{};
     out_tp.reserve(heatmaps.size());
 
-    std::cout << "Processing..." << std::endl;
+    spdlog::info("Processing...");
 
     int __i = 0;
     do {
@@ -137,19 +142,19 @@ auto main(int argc, char** argv) -> int
     } while (++__i < 50 && mode == mode_type::perf);
 
     // statistics
-    std::cout << "Performance Statistics:" << std::endl;
+    spdlog::info("Performance Statistics:");
 
     for (auto const e : proc.perf().entries()) {
         using ms = std::chrono::microseconds;
 
-        std::cout << "  " << e.name << "\n";
-        std::cout << "    N:      " << std::setw(8) << e.n_measurements       << "\n";
-        std::cout << "    full:   " << std::setw(8) << e.total<ms>().count()  << "\n";
-        std::cout << "    mean:   " << std::setw(8) << e.mean<ms>().count()   << "\n";
-        std::cout << "    stddev: " << std::setw(8) << e.stddev<ms>().count() << "\n";
-        std::cout << "    min:    " << std::setw(8) << e.min<ms>().count()    << "\n";
-        std::cout << "    max:    " << std::setw(8) << e.max<ms>().count()    << "\n";
-        std::cout << std::endl;
+        spdlog::info("  {}", e.name);
+        spdlog::info("    N:      {:8d}", e.n_measurements);
+        spdlog::info("    full:   {:8d}", e.total<ms>().count());
+        spdlog::info("    mean:   {:8d}", e.mean<ms>().count());
+        spdlog::info("    stddev: {:8d}", e.stddev<ms>().count());
+        spdlog::info("    min:    {:8d}", e.min<ms>().count());
+        spdlog::info("    max:    {:8d}", e.max<ms>().count());
+        spdlog::info("");
     }
 
     if (mode == mode_type::perf) {
@@ -157,7 +162,7 @@ auto main(int argc, char** argv) -> int
     }
 
     // plot
-    std::cout << "Plotting..." << std::endl;
+    spdlog::info("Plotting...");
 
     auto const width  = 900;
     auto const height = 600;
@@ -175,7 +180,7 @@ auto main(int argc, char** argv) -> int
 
         // write file
         auto fname = std::array<char, 32>{};
-        std::snprintf(fname.data(), fname.size(), "out-%04ld.png", i);
+        fmt::format_to_n(fname.begin(), fname.size(), "out-{:04d}.png", i);
 
         surface.write_to_png(dir_out / fname.data());
     }

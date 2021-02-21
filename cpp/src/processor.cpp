@@ -20,6 +20,8 @@
 #include "math/vec2.hpp"
 #include "math/mat2.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <array>
 #include <vector>
 #include <queue>
@@ -326,7 +328,7 @@ auto TouchProcessor::process(Image<f32> const& hm) -> std::vector<TouchPoint> co
 
         auto const cov = p.prec.inverse();
         if (!cov.has_value()) {
-            std::cout << "warning: failed to invert matrix\n";
+            spdlog::warn("failed to invert matrix");
             continue;
         }
 
@@ -335,7 +337,7 @@ auto TouchProcessor::process(Image<f32> const& hm) -> std::vector<TouchPoint> co
         auto const sd2 = std::sqrt(std::abs(ev2));
 
         if (sd1 <= math::num<f32>::eps || sd2 <= math::num<f32>::eps) {
-            std::cout << "warning: standard deviation too small\n";
+            spdlog::warn("standard deviation too small");
             continue;
         }
 

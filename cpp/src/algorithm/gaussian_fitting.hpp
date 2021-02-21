@@ -12,6 +12,8 @@
 #include "math/mat6.hpp"
 #include "math/sle6.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <array>
 
 
@@ -281,14 +283,14 @@ void fit(std::vector<Parameters<S>>& params, Image<T> const& data,
             // solve systems
             p.valid = math::ge_solve(sys, rhs, chi, eps);
             if (!p.valid) {
-                std::cout << "warning: invalid equation system\n";
+                spdlog::warn("invalid equation system");
                 continue;
             }
 
             // get parameters
             p.valid = impl::extract_params(chi, p.scale, p.mean, p.prec, eps);
             if (!p.valid) {
-                std::cout << "warning: parameter extraction failed\n";
+                spdlog::warn("parameter extraction failed");
             }
         }
     }

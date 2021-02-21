@@ -3,6 +3,8 @@
 #include "types.hpp"
 #include "utils/access.hpp"
 
+#include <gsl/pointers>
+
 #include <algorithm>
 #include <utility>
 
@@ -57,8 +59,8 @@ public:
     static constexpr auto unravel(index2_t size, index_t i) -> index2_t;
 
 private:
-    index2_t m_size;
-    T*       m_data;
+    index2_t       m_size;
+    gsl::owner<T*> m_data;
 };
 
 

@@ -5,6 +5,8 @@
 #include "gfx/color.hpp"
 #include "math/vec2.hpp"
 
+#include <gsl/pointers>
+
 #include <exception>
 #include <filesystem>
 #include <utility>
@@ -71,7 +73,7 @@ private:
 class Cairo {
 public:
     Cairo();
-    Cairo(cairo_t* raw);
+    Cairo(gsl::owner<cairo_t*> raw);
     Cairo(Cairo const& other);
     Cairo(Cairo&& other);
     ~Cairo();
@@ -116,14 +118,14 @@ public:
     void show_text(char const* utf8);
 
 private:
-    cairo_t* m_raw;
+    gsl::owner<cairo_t*> m_raw;
 };
 
 
 class Surface {
 public:
     Surface();
-    Surface(cairo_surface_t* raw);
+    Surface(gsl::owner<cairo_surface_t*> raw);
     Surface(Surface const& other);
     Surface(Surface&& other);
     ~Surface();
@@ -140,14 +142,14 @@ public:
     void write_to_png(std::filesystem::path const& p);
 
 private:
-    cairo_surface_t* m_raw;
+    gsl::owner<cairo_surface_t*> m_raw;
 };
 
 
 class Pattern {
 public:
     Pattern();
-    Pattern(cairo_pattern_t* raw);
+    Pattern(gsl::owner<cairo_pattern_t*> raw);
     Pattern(Pattern const& other);
     Pattern(Pattern&& other);
     ~Pattern();
@@ -166,7 +168,7 @@ public:
     void set_filter(Filter f);
 
 private:
-    cairo_pattern_t* m_raw;
+    gsl::owner<cairo_pattern_t*> m_raw;
 };
 
 
@@ -207,7 +209,7 @@ inline Cairo::Cairo()
     : m_raw{nullptr}
 {}
 
-inline Cairo::Cairo(cairo_t* raw)
+inline Cairo::Cairo(gsl::owner<cairo_t*> raw)
     : m_raw{raw}
 {}
 
@@ -380,7 +382,7 @@ inline Surface::Surface()
     : m_raw{nullptr}
 {}
 
-inline Surface::Surface(cairo_surface_t* raw)
+inline Surface::Surface(gsl::owner<cairo_surface_t*> raw)
     : m_raw{raw}
 {}
 
@@ -444,7 +446,7 @@ inline Pattern::Pattern()
     : m_raw{}
 {}
 
-inline Pattern::Pattern(cairo_pattern_t* raw)
+inline Pattern::Pattern(gsl::owner<cairo_pattern_t*> raw)
     : m_raw{raw}
 {}
 

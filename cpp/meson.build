@@ -55,6 +55,9 @@ cairo_dep = dependency('cairo')
 gtk_dep = dependency('gtk+-3.0')
 threads_dep = dependency('threads')
 
+gsl_proj = subproject('microsoft-gsl')
+gsl_dep = gsl_proj.get_variable('microsoft_gsl_dep')
+
 fmt_proj = subproject('fmt')
 fmt_dep = fmt_proj.get_variable('fmt_dep')
 
@@ -79,5 +82,5 @@ src_rt = [
     'src/utils.c',
 ]
 
-executable('proto-plot', src_plot, dependencies: [fmt_dep, spdlog_dep, cairo_dep],                       include_directories: inc_main)
-executable('proto-rt',   src_rt,   dependencies: [fmt_dep, spdlog_dep, cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)
+executable('proto-plot', src_plot, dependencies: [gsl_dep, fmt_dep, spdlog_dep, cairo_dep],                       include_directories: inc_main)
+executable('proto-rt',   src_rt,   dependencies: [gsl_dep, fmt_dep, spdlog_dep, cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)

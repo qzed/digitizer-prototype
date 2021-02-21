@@ -2,6 +2,8 @@
 
 #include "types.hpp"
 
+#include <gsl/span>
+
 #include <vector>
 #include <string>
 

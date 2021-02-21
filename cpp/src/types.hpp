@@ -30,7 +30,7 @@ public:
     constexpr auto operator+= (index2_t const& v) -> index2_t&;
     constexpr auto operator-= (index2_t const& v) -> index2_t&;
 
-    constexpr auto product() const -> index_t;
+    constexpr auto span() const -> index_t;
 };
 
 
@@ -49,7 +49,7 @@ inline constexpr auto index2_t::operator-= (index2_t const& v) -> index2_t&
 }
 
 
-inline constexpr auto index2_t::product() const -> index_t
+inline constexpr auto index2_t::span() const -> index_t
 {
     return this->x * this->y;
 }

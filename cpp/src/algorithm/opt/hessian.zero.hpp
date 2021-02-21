@@ -246,7 +246,7 @@ void hessian_zero(container::Image<math::Mat2s<T>>& out, container::Image<T> con
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < in.size().product() - 1; ++i) {
+    for (; i < in.size().span() - 1; ++i) {
         auto h = math::num<math::Mat2s<T>>::zero;
 
         h.xx += d(i, -1, -1) * k(kxx, -1, -1);

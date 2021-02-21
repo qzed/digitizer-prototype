@@ -87,7 +87,7 @@ auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<Tou
         alg::convolve(m_img_pp, hm, m_kern_pp);
 
         auto const sum = container::ops::sum(m_img_pp);
-        auto const avg = sum / m_img_pp.size().product();
+        auto const avg = sum / m_img_pp.size().span();
 
         container::ops::transform(m_img_pp, [&](auto const x) {
             return std::max(x - avg, 0.0f);
@@ -136,7 +136,7 @@ auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<Tou
         f32 const wr = 1.5;
         f32 const wh = 1.0;
 
-        for (index_t i = 0; i < m_img_pp.size().product(); ++i) {
+        for (index_t i = 0; i < m_img_pp.size().span(); ++i) {
             m_img_obj[i] = wh * m_img_pp[i] - wr * m_img_rdg[i];
         }
     }
@@ -166,7 +166,7 @@ auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<Tou
         m_cstats.clear();
         m_cstats.assign(num_labels, ComponentStats { 0, 0, 0, 0 });
 
-        for (index_t i = 0; i < m_img_pp.size().product(); ++i) {
+        for (index_t i = 0; i < m_img_pp.size().span(); ++i) {
             auto const label = m_img_lbl[i];
 
             if (label == 0)
@@ -260,7 +260,7 @@ auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<Tou
     {
         auto _r = m_perf_reg.record(m_perf_t_flt);
 
-        for (index_t i = 0; i < m_img_pp.size().product(); ++i) {
+        for (index_t i = 0; i < m_img_pp.size().span(); ++i) {
             auto const sigma = 1.0f;
 
             auto w_inc = m_img_dm1[i] / sigma;

@@ -377,7 +377,7 @@ void weighted_distance_transform(container::Image<T>& out, F& bin, M& mask, C& c
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < out.size().product() - 1; ++i) {
+    for (; i < out.size().span() - 1; ++i) {
         if (is_foreground(bin, i)) {
             out[i] = static_cast<T>(0);
             continue;

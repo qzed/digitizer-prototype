@@ -73,7 +73,7 @@ Image<T>::Image(index2_t size)
     : m_size{0, 0}
     , m_data{nullptr}
 {
-    m_data = new T[size.product()];
+    m_data = new T[size.span()];
     m_size = size;
 }
 
@@ -108,7 +108,7 @@ auto Image<T>::operator= (Image<T> const& rhs) -> Image<T>&
     if (m_size != rhs.m_size) {
         delete[] std::exchange(m_data, nullptr);
 
-        m_data = new T[rhs.m_size.product()];
+        m_data = new T[rhs.m_size.span()];
         m_size = rhs.m_size;
     }
 
@@ -168,13 +168,13 @@ inline auto Image<T>::operator[] (index2_t const& i) -> reference
 template<class T>
 inline auto Image<T>::operator[] (index_t const& i) const -> const_reference
 {
-    return utils::access::access<T>(m_data, m_size.product(), i);
+    return utils::access::access<T>(m_data, m_size.span(), i);
 }
 
 template<class T>
 inline auto Image<T>::operator[] (index_t const& i) -> reference
 {
-    return utils::access::access<T>(m_data, m_size.product(), i);
+    return utils::access::access<T>(m_data, m_size.span(), i);
 }
 
 template<class T>
@@ -186,7 +186,7 @@ inline auto Image<T>::begin() -> iterator
 template<class T>
 inline auto Image<T>::end() -> iterator
 {
-    return &m_data[m_size.product()];
+    return &m_data[m_size.span()];
 }
 
 template<class T>
@@ -198,7 +198,7 @@ inline auto Image<T>::begin() const -> const_iterator
 template<class T>
 inline auto Image<T>::end() const -> const_iterator
 {
-    return &m_data[m_size.product()];
+    return &m_data[m_size.span()];
 }
 
 template<class T>
@@ -210,7 +210,7 @@ inline auto Image<T>::cbegin() const -> const_iterator
 template<class T>
 inline auto Image<T>::cend() const -> const_iterator
 {
-    return &m_data[m_size.product()];
+    return &m_data[m_size.span()];
 }
 
 

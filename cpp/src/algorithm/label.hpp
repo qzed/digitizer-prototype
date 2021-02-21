@@ -70,7 +70,7 @@ inline auto merge(container::Image<u16>& forest, u16 t1_index, u16 t1_root, u16 
 inline auto resolve(container::Image<u16>& forest, u16 background) -> u16
 {
     u16 n_labels = 0;
-    for (index_t i = 0; i < forest.size().product(); ++i) {
+    for (index_t i = 0; i < forest.size().span(); ++i) {
         if (i != background) {
             if (!is_root(forest, i)) {
                 forest[i] = forest[forest[i]];
@@ -88,7 +88,7 @@ inline auto resolve(container::Image<u16>& forest, u16 background) -> u16
 template<typename T>
 inline auto find_background(container::Image<T> const& data, T threshold) -> u16
 {
-    for (index_t i = 0; i < data.size().product(); ++i) {
+    for (index_t i = 0; i < data.size().span(); ++i) {
         if (data[i] <= threshold) {
             return i;
         }
@@ -134,7 +134,7 @@ auto label(container::Image<u16>& out, container::Image<T> const& data, T thresh
     }
 
     // 0 < y < n
-    while (i < data.size().product()) {
+    while (i < data.size().span()) {
 
         // x = 0
         if (data[i] <= threshold) {

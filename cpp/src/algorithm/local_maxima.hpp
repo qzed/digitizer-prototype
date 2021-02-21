@@ -194,7 +194,7 @@ void find_local_maximas(container::Image<T> const& data, T threshold, O output_i
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < data.size().product() - 1; ++i) {
+    for (; i < data.size().span() - 1; ++i) {
         if (data[i] <= threshold)
             continue;
 

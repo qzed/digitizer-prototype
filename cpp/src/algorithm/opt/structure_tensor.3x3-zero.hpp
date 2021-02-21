@@ -215,7 +215,7 @@ void structure_tensor_3x3_zero(container::Image<math::Mat2s<T>>& out,
     ++i;
 
     // 0 < x < n - 1, y = n - 1
-    for (; i < in.size().product() - 1; ++i) {
+    for (; i < in.size().span() - 1; ++i) {
         T gx = math::num<T>::zero;
         T gy = math::num<T>::zero;
 

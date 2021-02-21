@@ -3,9 +3,8 @@
 #include "types.hpp"
 #include "utils/access.hpp"
 
-#include <gsl/pointers>
-
 #include <algorithm>
+#include <memory>
 #include <utility>
 
 
@@ -29,7 +28,6 @@ public:
     Image(index2_t size);
     Image(Image const& other);
     Image(Image&& other) noexcept;
-    ~Image();
 
     auto operator= (Image<T> const& rhs) -> Image<T>&;
     auto operator= (Image<T>&& rhs) noexcept -> Image<T>&;
@@ -59,8 +57,8 @@ public:
     static constexpr auto unravel(index2_t size, index_t i) -> index2_t;
 
 private:
-    index2_t       m_size;
-    gsl::owner<T*> m_data;
+    index2_t             m_size;
+    std::unique_ptr<T[]> m_data;
 };
 
 
@@ -75,7 +73,7 @@ Image<T>::Image(index2_t size)
     : m_size{0, 0}
     , m_data{nullptr}
 {
-    m_data = new T[size.span()];
+    m_data = std::unique_ptr<T[]> { new T[size.span()] };
     m_size = size;
 }
 
@@ -99,18 +97,11 @@ Image<T>::Image(Image&& other) noexcept
 {}
 
 template<class T>
-Image<T>::~Image()
-{
-    delete[] std::exchange(m_data, nullptr);
-}
-
-template<class T>
 auto Image<T>::operator= (Image<T> const& rhs) -> Image<T>&
 {
     if (m_size != rhs.m_size) {
-        delete[] std::exchange(m_data, nullptr);
-
-        m_data = new T[rhs.m_size.span()];
+        m_data = nullptr;   // free old data first and set to nullptr
+        m_data = std::unique_ptr<T[]> { new T[rhs.m_size.span()] };
         m_size = rhs.m_size;
     }
 
@@ -122,8 +113,6 @@ auto Image<T>::operator= (Image<T> const& rhs) -> Image<T>&
 template<class T>
 auto Image<T>::operator= (Image<T>&& rhs) noexcept -> Image<T>&
 {
-    delete[] m_data;
-
     m_data = std::exchange(rhs.m_data, nullptr);
     m_size = std::exchange(rhs.m_size, {0, 0});
 
@@ -146,13 +135,13 @@ inline auto Image<T>::stride() const -> index_t
 template<class T>
 inline auto Image<T>::data() -> pointer
 {
-    return m_data;
+    return m_data.get();
 }
 
 template<class T>
 inline auto Image<T>::data() const -> const_pointer
 {
-    return m_data;
+    return m_data.get();
 }
 
 template<class T>

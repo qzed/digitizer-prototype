@@ -19,8 +19,8 @@
 namespace alg {
 namespace hess::impl {
 
-template<typename B=border::zero, typename T>
-void hessian_generic(container::image<math::mat2s_t<T>>& out, container::image<T> const& in)
+template<typename B=border::Zero, typename T>
+void hessian_generic(container::Image<math::Mat2s<T>>& out, container::Image<T> const& in)
 {
     auto const& kxx = conv::kernels::sobel3_xx<T>;
     auto const& kyy = conv::kernels::sobel3_yy<T>;
@@ -56,12 +56,12 @@ void hessian_generic(container::image<math::mat2s_t<T>>& out, container::image<T
 } /* namespace hess::impl */
 
 
-template<typename B=border::zero, typename T>
-void hessian(container::image<math::mat2s_t<T>>& out, container::image<T> const& in)
+template<typename B=border::Zero, typename T>
+void hessian(container::Image<math::Mat2s<T>>& out, container::Image<T> const& in)
 {
     assert(in.size() == out.size());
 
-    if constexpr (std::is_same_v<B, border::zero>) {
+    if constexpr (std::is_same_v<B, border::Zero>) {
         hess::impl::hessian_zero<T>(out, in);
     } else {
         hess::impl::hessian_generic<B, T>(out, in);

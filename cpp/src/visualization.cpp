@@ -6,12 +6,12 @@
 #include "container/image.hpp"
 
 
-visualization::visualization(index2_t heatmap_size)
+Visualization::Visualization(index2_t heatmap_size)
     : m_data{heatmap_size}
 {}
 
-void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img,
-                         std::vector<touch_point> const& tps, int width, int height)
+void Visualization::draw(gfx::cairo::Cairo& cr, container::Image<f32> const& img,
+                         std::vector<TouchPoint> const& tps, int width, int height)
 {
     auto const img_w = static_cast<f64>(img.size().x);
     auto const img_h = static_cast<f64>(img.size().y);
@@ -19,7 +19,7 @@ void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img
     auto const win_w = static_cast<f64>(width);
     auto const win_h = static_cast<f64>(height);
 
-    auto const t = [&](math::vec2_t<f64> p) -> math::vec2_t<f64> {
+    auto const t = [&](math::Vec2<f64> p) -> math::Vec2<f64> {
         return { p.x * (win_w / img_w), win_h - p.y * (win_h / img_h) };
     };
 
@@ -31,17 +31,17 @@ void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img
     auto src = gfx::cairo::image_surface_create(m_data);
 
     // select font
-    cr.select_font_face("monospace", gfx::cairo::font_slant::normal, gfx::cairo::font_weight::normal);
+    cr.select_font_face("monospace", gfx::cairo::FontSlant::Normal, gfx::cairo::FontWeight::Normal);
     cr.set_font_size(12.0);
 
     // plot heatmap
-    auto m = gfx::cairo::matrix::identity();
+    auto m = gfx::cairo::Matrix::identity();
     m.translate({ 0.0, img_h });
     m.scale({ img_w / win_w, -img_h / win_h });
 
-    auto p = gfx::cairo::pattern::create_for_surface(src);
+    auto p = gfx::cairo::Pattern::create_for_surface(src);
     p.set_matrix(m);
-    p.set_filter(gfx::cairo::filter::nearest);
+    p.set_filter(gfx::cairo::Filter::Nearest);
 
     cr.set_source(p);
     cr.rectangle({ 0, 0 }, { win_w, win_h });
@@ -63,7 +63,7 @@ void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img
         auto const v2 = eigen.v[1].cast<f64>() * s2;
 
         // standard deviation
-        cr.set_source(gfx::srgba { 0.0, 0.0, 0.0, 0.33 });
+        cr.set_source(gfx::Srgba { 0.0, 0.0, 0.0, 0.33 });
 
         cr.move_to(t({ tp.mean.x + 0.5, tp.mean.y + 0.5 }));
         cr.line_to(t({ tp.mean.x + 0.5 + v1.x, tp.mean.y + 0.5 + v1.y }));
@@ -74,7 +74,7 @@ void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img
         cr.stroke();
 
         // mean
-        cr.set_source(gfx::srgb { 1.0, 0.0, 0.0 });
+        cr.set_source(gfx::Srgb { 1.0, 0.0, 0.0 });
 
         cr.move_to(t({ tp.mean.x + 0.1, tp.mean.y + 0.5 }));
         cr.line_to(t({ tp.mean.x + 0.9, tp.mean.y + 0.5 }));
@@ -85,7 +85,7 @@ void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img
         cr.stroke();
 
         // standard deviation ellipse
-        cr.set_source(gfx::srgb { 1.0, 0.0, 0.0 });
+        cr.set_source(gfx::Srgb { 1.0, 0.0, 0.0 });
 
         cr.save();
 
@@ -98,7 +98,7 @@ void visualization::draw(gfx::cairo::cairo& cr, container::image<f32> const& img
         cr.stroke();
 
         // stats
-        cr.set_source(gfx::srgb { 1.0, 1.0, 1.0 });
+        cr.set_source(gfx::Srgb { 1.0, 1.0, 1.0 });
 
         std::snprintf(txtbuf.data(), txtbuf.size(), "c:%.02f", tp.confidence);
         cr.move_to(t({ tp.mean.x - 3.5, tp.mean.y + 3.0 }));

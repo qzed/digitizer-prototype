@@ -6,49 +6,49 @@
 #include <string>
 
 
-struct ipts_data {
+struct IptsData {
     u32 type;
     u32 size;
     u32 buffer;
     u8 reserved[52];
 } __attribute__ ((packed));
 
-struct ipts_payload {
+struct IptsPayload {
     u32 counter;
     u32 frames;
     u8 reserved[4];
 } __attribute__ ((packed));
 
-struct ipts_payload_frame {
+struct IptsPayloadFrame {
     u16 index;
     u16 type;
     u32 size;
     u8 reserved[8];
 } __attribute__ ((packed));
 
-struct ipts_report {
+struct IptsReport {
     u16 type;
     u16 size;
 } __attribute__ ((packed));
 
-struct ipts_timestamp_report {
+struct IptsTimestampReport {
     u16 unknown;
     u16 counter;
     u32 timestamp;
 };
 
-struct ipts_stylus_report_s {
+struct IptsStylusReportS {
     u8 elements;
     u8 reserved[3];
     u32 serial;
 } __attribute__ ((packed));
 
-struct ipts_stylus_report_n {
+struct IptsStylusReportN {
     u8 elements;
     u8 reserved[3];
 } __attribute__ ((packed));
 
-struct ipts_stylus_data_v1 {
+struct IptsStylusDataV1 {
     u8 reserved1[4];
     u8 mode;
     u16 x;
@@ -57,7 +57,7 @@ struct ipts_stylus_data_v1 {
     u8 reserved2;
 } __attribute__ ((packed));
 
-struct ipts_stylus_data_v2 {
+struct IptsStylusDataV2 {
     u16 timestamp;
     u16 mode;
     u16 x;
@@ -68,7 +68,7 @@ struct ipts_stylus_data_v2 {
     u8 reserved[2];
 } __attribute__ ((packed));
 
-struct ipts_heatmap_dim {
+struct IptsHeatmapDim {
     u8 height;
     u8 width;
     u8 y_min;
@@ -80,83 +80,83 @@ struct ipts_heatmap_dim {
 } __attribute__ ((packed));
 
 
-struct slice_index {
+struct SliceIndex {
     std::size_t begin;
     std::size_t end;
 };
 
 template<typename T>
-struct slice {
+struct Slice {
     T const* begin;
     T const* end;
 
     auto size() const noexcept -> std::size_t;
-    auto operator[] (slice_index i) const noexcept -> slice<T>;
+    auto operator[] (SliceIndex i) const noexcept -> Slice<T>;
 };
 
 template<typename T>
-auto slice<T>::size() const noexcept -> std::size_t
+auto Slice<T>::size() const noexcept -> std::size_t
 {
     return end - begin;
 }
 
 template<typename T>
-auto slice<T>::operator[] (slice_index i) const noexcept -> slice<T>
+auto Slice<T>::operator[] (SliceIndex i) const noexcept -> Slice<T>
 {
     return { this->begin + i.begin, std::min(this->begin + i.end, this->end) };
 }
 
 
 template<typename T>
-auto make_slice(std::vector<T> const& v) -> slice<T>
+auto make_slice(std::vector<T> const& v) -> Slice<T>
 {
     return { v.data(), v.data() + v.size() };
 }
 
 
-class parser_exception : public std::exception {
+class ParserException : public std::exception {
 private:
     std::string m_reason;
 
 public:
-    parser_exception(std::string reason);
+    ParserException(std::string reason);
 
     auto what() const noexcept -> const char*;
 };
 
-parser_exception::parser_exception(std::string reason)
+ParserException::ParserException(std::string reason)
     : m_reason{reason}
 {}
 
-auto parser_exception::what() const noexcept -> const char*
+auto ParserException::what() const noexcept -> const char*
 {
     return m_reason.c_str();
 }
 
 
-class parser_base {
+class ParserBase {
 public:
-    virtual ~parser_base() = default;
+    virtual ~ParserBase() = default;
 
 protected:
-    void do_parse(slice<u8> data, bool oneshot=false);
+    void do_parse(Slice<u8> data, bool oneshot=false);
 
-    auto parse_data(slice<u8> data) -> slice<u8>;
-    void parse_data_payload(ipts_data const& header, slice<u8> data);
-    auto parse_payload_frame(ipts_payload const& header, slice<u8> data) -> slice<u8>;
-    void parse_payload_frame_reports(ipts_payload_frame const& header, slice<u8> data);
-    auto parse_report(ipts_payload_frame const& header, slice<u8> data) -> slice<u8>;
-    void parse_report_timestamp(ipts_report const& header, slice<u8> data);
-    void parse_report_heatmap_dim(ipts_report const& header, slice<u8> data);
-    void parse_report_heatmap(ipts_report const& header, slice<u8> data);
+    auto parse_data(Slice<u8> data) -> Slice<u8>;
+    void parse_data_payload(IptsData const& header, Slice<u8> data);
+    auto parse_payload_frame(IptsPayload const& header, Slice<u8> data) -> Slice<u8>;
+    void parse_payload_frame_reports(IptsPayloadFrame const& header, Slice<u8> data);
+    auto parse_report(IptsPayloadFrame const& header, Slice<u8> data) -> Slice<u8>;
+    void parse_report_timestamp(IptsReport const& header, Slice<u8> data);
+    void parse_report_heatmap_dim(IptsReport const& header, Slice<u8> data);
+    void parse_report_heatmap(IptsReport const& header, Slice<u8> data);
 
-    virtual void on_timestamp(ipts_timestamp_report const& ts);
-    virtual void on_heatmap_dim(ipts_heatmap_dim const& dim);
-    virtual void on_heatmap(slice<u8> const& data);
+    virtual void on_timestamp(IptsTimestampReport const& ts);
+    virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
+    virtual void on_heatmap(Slice<u8> const& data);
 };
 
 
-void parser_base::do_parse(slice<u8> data, bool oneshot)
+void ParserBase::do_parse(Slice<u8> data, bool oneshot)
 {
     if (!data.size()) {
         return;
@@ -167,16 +167,16 @@ void parser_base::do_parse(slice<u8> data, bool oneshot)
     } while (data.size() && !oneshot);
 }
 
-auto parser_base::parse_data(slice<u8> data) -> slice<u8>
+auto ParserBase::parse_data(Slice<u8> data) -> Slice<u8>
 {
-    ipts_data hdr;
-    slice<u8> pld;
+    IptsData hdr;
+    Slice<u8> pld;
 
     std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
     pld = { data.begin + sizeof(hdr), data.begin + sizeof(hdr) + hdr.size };
 
     if (data.begin + sizeof(hdr) + hdr.size > data.end)
-        throw parser_exception{"EOF"};
+        throw ParserException{"EOF"};
 
     switch (hdr.type) {
     case 0x00:
@@ -190,10 +190,10 @@ auto parser_base::parse_data(slice<u8> data) -> slice<u8>
     return { pld.end, data.end };
 }
 
-void parser_base::parse_data_payload(ipts_data const& header, slice<u8> data)
+void ParserBase::parse_data_payload(IptsData const& header, Slice<u8> data)
 {
-    ipts_payload hdr;
-    slice<u8> pld;
+    IptsPayload hdr;
+    Slice<u8> pld;
 
     std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
     pld = { data.begin + sizeof(hdr), data.end };
@@ -203,16 +203,16 @@ void parser_base::parse_data_payload(ipts_data const& header, slice<u8> data)
     }
 }
 
-auto parser_base::parse_payload_frame(ipts_payload const& header, slice<u8> data) -> slice<u8>
+auto ParserBase::parse_payload_frame(IptsPayload const& header, Slice<u8> data) -> Slice<u8>
 {
-    ipts_payload_frame hdr;
-    slice<u8> pld;
+    IptsPayloadFrame hdr;
+    Slice<u8> pld;
 
     std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
     pld = { data.begin + sizeof(hdr), data.begin + sizeof(hdr) + hdr.size };
 
     if (data.begin + sizeof(hdr) + hdr.size > data.end)
-        throw parser_exception{"EOF"};
+        throw ParserException{"EOF"};
 
     switch (hdr.type)
     {
@@ -229,17 +229,17 @@ auto parser_base::parse_payload_frame(ipts_payload const& header, slice<u8> data
     return { pld.end, data.end };
 }
 
-void parser_base::parse_payload_frame_reports(ipts_payload_frame const& header, slice<u8> data)
+void ParserBase::parse_payload_frame_reports(IptsPayloadFrame const& header, Slice<u8> data)
 {
-    while (data.size() >= sizeof(ipts_report)) {
+    while (data.size() >= sizeof(IptsReport)) {
         data = parse_report(header, data);
     }
 }
 
-auto parser_base::parse_report(ipts_payload_frame const& header, slice<u8> data) -> slice<u8>
+auto ParserBase::parse_report(IptsPayloadFrame const& header, Slice<u8> data) -> Slice<u8>
 {
-    ipts_report hdr;
-    slice<u8> pld;
+    IptsReport hdr;
+    Slice<u8> pld;
 
     std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
     pld = { data.begin + sizeof(hdr), data.begin + sizeof(hdr) + hdr.size };
@@ -265,35 +265,35 @@ auto parser_base::parse_report(ipts_payload_frame const& header, slice<u8> data)
     return { pld.end, data.end };
 }
 
-void parser_base::parse_report_timestamp(ipts_report const& header, slice<u8> data)
+void ParserBase::parse_report_timestamp(IptsReport const& header, Slice<u8> data)
 {
-    ipts_timestamp_report ts;
+    IptsTimestampReport ts;
 
     std::copy(data.begin, data.begin + sizeof(ts), reinterpret_cast<u8*>(&ts));
 
     on_timestamp(ts);
 }
 
-void parser_base::parse_report_heatmap_dim(ipts_report const& header, slice<u8> data)
+void ParserBase::parse_report_heatmap_dim(IptsReport const& header, Slice<u8> data)
 {
-    ipts_heatmap_dim dim;
+    IptsHeatmapDim dim;
 
     std::copy(data.begin, data.begin + sizeof(dim), reinterpret_cast<u8*>(&dim));
 
     on_heatmap_dim(dim);
 }
 
-void parser_base::parse_report_heatmap(ipts_report const& header, slice<u8> data)
+void ParserBase::parse_report_heatmap(IptsReport const& header, Slice<u8> data)
 {
     on_heatmap(data);
 }
 
 
-void parser_base::on_timestamp(ipts_timestamp_report const& ts)
+void ParserBase::on_timestamp(IptsTimestampReport const& ts)
 {}
 
-void parser_base::on_heatmap_dim(ipts_heatmap_dim const& dim)
+void ParserBase::on_heatmap_dim(IptsHeatmapDim const& dim)
 {}
 
-void parser_base::on_heatmap(slice<u8> const& dim)
+void ParserBase::on_heatmap(Slice<u8> const& dim)
 {}

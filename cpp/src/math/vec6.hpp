@@ -8,7 +8,7 @@
 namespace math {
 
 template<class T>
-struct vec6_t {
+struct Vec6 {
 public:
     std::array<T, 6> data;
 
@@ -22,21 +22,21 @@ public:
 
 
 template<class T>
-inline constexpr auto vec6_t<T>::operator[] (index_t i) -> T&
+inline constexpr auto Vec6<T>::operator[] (index_t i) -> T&
 {
     return utils::access::access<T>(data, data.size(), i);
 }
 
 template<class T>
-inline constexpr auto vec6_t<T>::operator[] (index_t i) const -> T const&
+inline constexpr auto Vec6<T>::operator[] (index_t i) const -> T const&
 {
     return utils::access::access<T>(data, data.size(), i);
 }
 
 
 template<class T>
-struct num<vec6_t<T>> {
-    static inline constexpr vec6_t<T> zero = {
+struct num<Vec6<T>> {
+    static inline constexpr Vec6<T> zero = {
             num<T>::zero, num<T>::zero, num<T>::zero,
             num<T>::zero, num<T>::zero, num<T>::zero };
 };

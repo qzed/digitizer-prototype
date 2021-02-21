@@ -8,10 +8,10 @@
 namespace alg::stensor::impl {
 
 template<typename T>
-void structure_tensor_3x3_zero(container::image<math::mat2s_t<T>>& out,
-                               container::image<T> const& in,
-                               container::kernel<T, 3, 3> const& kx,
-                               container::kernel<T, 3, 3> const& ky)
+void structure_tensor_3x3_zero(container::Image<math::Mat2s<T>>& out,
+                               container::Image<T> const& in,
+                               container::Kernel<T, 3, 3> const& kx,
+                               container::Kernel<T, 3, 3> const& ky)
 {
     assert(in.size() == out.size());
     assert(kx.stride() == ky.stride());

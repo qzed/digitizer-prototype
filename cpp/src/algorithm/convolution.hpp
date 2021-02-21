@@ -20,35 +20,35 @@ namespace conv {
 namespace kernels {
 
 template<class T>
-inline constexpr container::kernel<T, 3, 3> sobel3_x {
+inline constexpr container::Kernel<T, 3, 3> sobel3_x {
     static_cast<T>( 1), static_cast<T>( 0), static_cast<T>(-1),
     static_cast<T>( 2), static_cast<T>( 0), static_cast<T>(-2),
     static_cast<T>( 1), static_cast<T>( 0), static_cast<T>(-1),
 };
 
 template<class T>
-inline constexpr container::kernel<T, 3, 3> sobel3_y {
+inline constexpr container::Kernel<T, 3, 3> sobel3_y {
     static_cast<T>( 1), static_cast<T>( 2), static_cast<T>( 1),
     static_cast<T>( 0), static_cast<T>( 0), static_cast<T>( 0),
     static_cast<T>(-1), static_cast<T>(-2), static_cast<T>(-1),
 };
 
 template<class T>
-inline constexpr container::kernel<T, 3, 3> sobel3_xx {
+inline constexpr container::Kernel<T, 3, 3> sobel3_xx {
     static_cast<T>( 1), static_cast<T>(-2), static_cast<T>( 1),
     static_cast<T>( 2), static_cast<T>(-4), static_cast<T>( 2),
     static_cast<T>( 1), static_cast<T>(-2), static_cast<T>( 1),
 };
 
 template<class T>
-inline constexpr container::kernel<T, 3, 3> sobel3_yy {
+inline constexpr container::Kernel<T, 3, 3> sobel3_yy {
     static_cast<T>( 1), static_cast<T>( 2), static_cast<T>( 1),
     static_cast<T>(-2), static_cast<T>(-4), static_cast<T>(-2),
     static_cast<T>( 1), static_cast<T>( 2), static_cast<T>( 1),
 };
 
 template<class T>
-inline constexpr container::kernel<T, 3, 3> sobel3_xy {
+inline constexpr container::Kernel<T, 3, 3> sobel3_xy {
     static_cast<T>( 1), static_cast<T>( 0), static_cast<T>(-1),
     static_cast<T>( 0), static_cast<T>( 0), static_cast<T>( 0),
     static_cast<T>(-1), static_cast<T>( 0), static_cast<T>( 1),
@@ -56,18 +56,18 @@ inline constexpr container::kernel<T, 3, 3> sobel3_xy {
 
 
 template<class T, index_t Nx, index_t Ny>
-auto gaussian(T sigma) -> container::kernel<T, Nx, Ny>
+auto gaussian(T sigma) -> container::Kernel<T, Nx, Ny>
 {
     static_assert(Nx % 2 == 1);
     static_assert(Ny % 2 == 1);
 
-    auto k = container::kernel<T, Nx, Ny>{};
+    auto k = container::Kernel<T, Nx, Ny>{};
 
     T sum = static_cast<T>(0.0);
 
     for (index_t j = 0; j < Ny; j++) {
         for (index_t i = 0; i < Nx; i++) {
-            auto const x = (math::vec2_t<T> {
+            auto const x = (math::Vec2<T> {
                 static_cast<T>(i - (Nx - 1) / 2),
                 static_cast<T>(j - (Ny - 1) / 2)
             } / sigma).norm_l2();
@@ -92,8 +92,8 @@ auto gaussian(T sigma) -> container::kernel<T, Nx, Ny>
 namespace impl {
 
 template<typename B, typename T, typename S, index_t Nx, index_t Ny>
-void conv_generic(container::image<T>& out, container::image<T> const& in,
-                  container::kernel<S, Nx, Ny> const& k)
+void conv_generic(container::Image<T>& out, container::Image<T> const& in,
+                  container::Kernel<S, Nx, Ny> const& k)
 {
     index_t const dx = (Nx - 1) / 2;
     index_t const dy = (Ny - 1) / 2;
@@ -115,14 +115,14 @@ void conv_generic(container::image<T>& out, container::image<T> const& in,
 } /* namespace conv */
 
 
-template<typename B=border::extend, typename T, typename S, index_t Nx, index_t Ny>
-void convolve(container::image<T>& out, container::image<T> const& in,
-              container::kernel<S, Nx, Ny> const& k)
+template<typename B=border::Extend, typename T, typename S, index_t Nx, index_t Ny>
+void convolve(container::Image<T>& out, container::Image<T> const& in,
+              container::Kernel<S, Nx, Ny> const& k)
 {
     // workaround for partial function template specialization
-    if constexpr (Nx == 5 && Ny == 5 && std::is_same_v<B, border::extend>) {
+    if constexpr (Nx == 5 && Ny == 5 && std::is_same_v<B, border::Extend>) {
         conv::impl::conv_5x5_extend<T, S>(out, in, k);
-    } else if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<B, border::extend>) {
+    } else if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<B, border::Extend>) {
         conv::impl::conv_3x3_extend<T, S>(out, in, k);
     } else {
         conv::impl::conv_generic<B, T, S, Nx, Ny>(out, in, k);

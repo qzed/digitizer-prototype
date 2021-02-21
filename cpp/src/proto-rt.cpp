@@ -24,38 +24,38 @@
 #include <atomic>
 
 
-class parser : public parser_base {
+class Parser : public ParserBase {
 public:
-    parser(index2_t size);
+    Parser(index2_t size);
 
-    auto parse(slice<u8> data) -> container::image<f32> const&;
+    auto parse(Slice<u8> data) -> container::Image<f32> const&;
 
 protected:
-    virtual void on_heatmap_dim(ipts_heatmap_dim const& dim);
-    virtual void on_heatmap(slice<u8> const& data);
+    virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
+    virtual void on_heatmap(Slice<u8> const& data);
 
 private:
-    ipts_heatmap_dim      m_dim;
-    container::image<f32> m_img;
+    IptsHeatmapDim        m_dim;
+    container::Image<f32> m_img;
 };
 
-parser::parser(index2_t size)
+Parser::Parser(index2_t size)
     : m_dim{}
     , m_img { size }
 {}
 
-auto parser::parse(slice<u8> data) -> container::image<f32> const&
+auto Parser::parse(Slice<u8> data) -> container::Image<f32> const&
 {
     this->do_parse(data, true);
     return m_img;
 }
 
-void parser::on_heatmap_dim(ipts_heatmap_dim const& dim)
+void Parser::on_heatmap_dim(IptsHeatmapDim const& dim)
 {
     m_dim = dim;
 }
 
-void parser::on_heatmap(slice<u8> const& data)
+void Parser::on_heatmap(Slice<u8> const& data)
 {
     if (m_dim.width != m_img.size().x || m_dim.height != m_img.size().y) {
         std::cout << "error: invalid heatmap size" << std::endl;
@@ -68,13 +68,13 @@ void parser::on_heatmap(slice<u8> const& data)
 }
 
 
-class main_context {
+class MainContext {
 public:
-    main_context(GtkWidget* widget, index2_t img_size);
+    MainContext(GtkWidget* widget, index2_t img_size);
 
-    void submit(container::image<f32> const& img, std::vector<touch_point> const& tps);
+    void submit(container::Image<f32> const& img, std::vector<TouchPoint> const& tps);
 
-    auto draw_event(gfx::cairo::cairo& cr) -> bool;
+    auto draw_event(gfx::cairo::Cairo& cr) -> bool;
 
 public:
     static auto on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data) -> gboolean;
@@ -82,23 +82,23 @@ public:
 private:
     GtkWidget* m_widget;
 
-    visualization m_vis;
+    Visualization m_vis;
 
-    container::image<f32> m_img1;
-    container::image<f32> m_img2;
-    std::vector<touch_point> m_tps1;
-    std::vector<touch_point> m_tps2;
+    container::Image<f32> m_img1;
+    container::Image<f32> m_img2;
+    std::vector<TouchPoint> m_tps1;
+    std::vector<TouchPoint> m_tps2;
 
     std::mutex m_lock;
 
-    container::image<f32>* m_img_frnt;
-    container::image<f32>* m_img_back;
-    std::vector<touch_point>* m_tps_frnt;
-    std::vector<touch_point>* m_tps_back;
+    container::Image<f32>* m_img_frnt;
+    container::Image<f32>* m_img_back;
+    std::vector<TouchPoint>* m_tps_frnt;
+    std::vector<TouchPoint>* m_tps_back;
     bool m_swap;
 };
 
-main_context::main_context(GtkWidget* widget, index2_t img_size)
+MainContext::MainContext(GtkWidget* widget, index2_t img_size)
     : m_widget{widget}
     , m_vis{img_size}
     , m_img1{img_size}
@@ -111,7 +111,7 @@ main_context::main_context(GtkWidget* widget, index2_t img_size)
     , m_tps_back{&m_tps2}
 {}
 
-void main_context::submit(container::image<f32> const& img, std::vector<touch_point> const& tps)
+void MainContext::submit(container::Image<f32> const& img, std::vector<TouchPoint> const& tps)
 {
     {   // set swap to false to prevent read-access in draw
         auto guard = std::lock_guard(m_lock);
@@ -131,7 +131,7 @@ void main_context::submit(container::image<f32> const& img, std::vector<touch_po
     gtk_widget_queue_draw(m_widget);
 }
 
-auto main_context::draw_event(gfx::cairo::cairo& cr) -> bool
+auto MainContext::draw_event(gfx::cairo::Cairo& cr) -> bool
 {
     auto const width  = gtk_widget_get_allocated_width(m_widget);
     auto const height = gtk_widget_get_allocated_height(m_widget);
@@ -150,10 +150,10 @@ auto main_context::draw_event(gfx::cairo::cairo& cr) -> bool
     return false;
 }
 
-auto main_context::on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data) -> gboolean
+auto MainContext::on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data) -> gboolean
 {
-    auto ctx = reinterpret_cast<main_context*>(user_data);
-    auto crw = gfx::cairo::cairo::wrap_raw(cr);
+    auto ctx = reinterpret_cast<MainContext*>(user_data);
+    auto crw = gfx::cairo::Cairo::wrap_raw(cr);
 
     return ctx->draw_event(crw);
 }
@@ -172,13 +172,13 @@ auto main(int argc, char** argv) -> int
     gtk_container_add(GTK_CONTAINER (window), darea);
 
     auto const size = index2_t { 72, 48 };
-    auto ctx = main_context { darea, size };
-    auto prc = touch_processor { size };
+    auto ctx = MainContext { darea, size };
+    auto prc = TouchProcessor { size };
 
     auto ctrl = iptsd_control {};
     iptsd_control_start(&ctrl);
 
-    g_signal_connect(G_OBJECT(darea), "draw", G_CALLBACK(main_context::on_draw_event), &ctx);
+    g_signal_connect(G_OBJECT(darea), "draw", G_CALLBACK(MainContext::on_draw_event), &ctx);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     // fix aspect to 3-to-2
@@ -196,7 +196,7 @@ auto main(int argc, char** argv) -> int
     auto updt = std::thread([&]() -> void {
         using namespace std::chrono_literals;
 
-        auto p = parser { size };
+        auto p = Parser { size };
         auto buf = std::vector<u8>(ctrl.device_info.buffer_size);
 
         while(run.load()) {

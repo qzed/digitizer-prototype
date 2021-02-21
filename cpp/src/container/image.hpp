@@ -10,7 +10,7 @@
 namespace container {
 
 template<class T>
-class image {
+class Image {
 public:
     using value_type             = T;
     using reference              = value_type&;
@@ -23,14 +23,14 @@ public:
     using const_reverse_iterator = T const*;
 
 public:
-    image();
-    image(index2_t size);
-    image(image const& other);
-    image(image&& other) noexcept;
-    ~image();
+    Image();
+    Image(index2_t size);
+    Image(Image const& other);
+    Image(Image&& other) noexcept;
+    ~Image();
 
-    auto operator= (image<T> const& rhs) -> image<T>&;
-    auto operator= (image<T>&& rhs) noexcept -> image<T>&;
+    auto operator= (Image<T> const& rhs) -> Image<T>&;
+    auto operator= (Image<T>&& rhs) noexcept -> Image<T>&;
 
     auto size() const -> index2_t;
     auto stride() const -> index_t;
@@ -63,13 +63,13 @@ private:
 
 
 template<class T>
-image<T>::image()
+Image<T>::Image()
     : m_size{0, 0}
     , m_data{nullptr}
 {}
 
 template<class T>
-image<T>::image(index2_t size)
+Image<T>::Image(index2_t size)
     : m_size{0, 0}
     , m_data{nullptr}
 {
@@ -78,12 +78,12 @@ image<T>::image(index2_t size)
 }
 
 template<class T>
-image<T>::image(image const& other)
+Image<T>::Image(Image const& other)
     : m_size{0, 0}
     , m_data{nullptr}
 {
     // implement in terms of copy assignment operator to not leak any memory if copy throws...
-    auto tmp = image<T>{};
+    auto tmp = Image<T>{};
     tmp = other;
 
     std::swap(m_size, tmp.m_size);
@@ -91,19 +91,19 @@ image<T>::image(image const& other)
 }
 
 template<class T>
-image<T>::image(image&& other) noexcept
+Image<T>::Image(Image&& other) noexcept
     : m_size{std::exchange(other.m_size, { 0, 0 })}
     , m_data{std::exchange(other.m_data, nullptr)}
 {}
 
 template<class T>
-image<T>::~image()
+Image<T>::~Image()
 {
     delete[] std::exchange(m_data, nullptr);
 }
 
 template<class T>
-auto image<T>::operator= (image<T> const& rhs) -> image<T>&
+auto Image<T>::operator= (Image<T> const& rhs) -> Image<T>&
 {
     if (m_size != rhs.m_size) {
         delete[] std::exchange(m_data, nullptr);
@@ -118,7 +118,7 @@ auto image<T>::operator= (image<T> const& rhs) -> image<T>&
 }
 
 template<class T>
-auto image<T>::operator= (image<T>&& rhs) noexcept -> image<T>&
+auto Image<T>::operator= (Image<T>&& rhs) noexcept -> Image<T>&
 {
     delete[] m_data;
 
@@ -130,98 +130,98 @@ auto image<T>::operator= (image<T>&& rhs) noexcept -> image<T>&
 
 
 template<class T>
-inline auto image<T>::size() const -> index2_t
+inline auto Image<T>::size() const -> index2_t
 {
     return m_size;
 }
 
 template<class T>
-inline auto image<T>::stride() const -> index_t
+inline auto Image<T>::stride() const -> index_t
 {
     return m_size.x;
 }
 
 template<class T>
-inline auto image<T>::data() -> pointer
+inline auto Image<T>::data() -> pointer
 {
     return m_data;
 }
 
 template<class T>
-inline auto image<T>::data() const -> const_pointer
+inline auto Image<T>::data() const -> const_pointer
 {
     return m_data;
 }
 
 template<class T>
-inline auto image<T>::operator[] (index2_t const& i) const -> const_reference
+inline auto Image<T>::operator[] (index2_t const& i) const -> const_reference
 {
     return utils::access::access<T>(m_data, ravel, m_size, i);
 }
 
 template<class T>
-inline auto image<T>::operator[] (index2_t const& i) -> reference
+inline auto Image<T>::operator[] (index2_t const& i) -> reference
 {
     return utils::access::access<T>(m_data, ravel, m_size, i);
 }
 
 template<class T>
-inline auto image<T>::operator[] (index_t const& i) const -> const_reference
+inline auto Image<T>::operator[] (index_t const& i) const -> const_reference
 {
     return utils::access::access<T>(m_data, m_size.product(), i);
 }
 
 template<class T>
-inline auto image<T>::operator[] (index_t const& i) -> reference
+inline auto Image<T>::operator[] (index_t const& i) -> reference
 {
     return utils::access::access<T>(m_data, m_size.product(), i);
 }
 
 template<class T>
-inline auto image<T>::begin() -> iterator
+inline auto Image<T>::begin() -> iterator
 {
     return &m_data[0];
 }
 
 template<class T>
-inline auto image<T>::end() -> iterator
+inline auto Image<T>::end() -> iterator
 {
     return &m_data[m_size.product()];
 }
 
 template<class T>
-inline auto image<T>::begin() const -> const_iterator
+inline auto Image<T>::begin() const -> const_iterator
 {
     return &m_data[0];
 }
 
 template<class T>
-inline auto image<T>::end() const -> const_iterator
+inline auto Image<T>::end() const -> const_iterator
 {
     return &m_data[m_size.product()];
 }
 
 template<class T>
-inline auto image<T>::cbegin() const -> const_iterator
+inline auto Image<T>::cbegin() const -> const_iterator
 {
     return &m_data[0];
 }
 
 template<class T>
-inline auto image<T>::cend() const -> const_iterator
+inline auto Image<T>::cend() const -> const_iterator
 {
     return &m_data[m_size.product()];
 }
 
 
 template<class T>
-inline constexpr auto image<T>::ravel(index2_t size, index2_t i) -> index_t
+inline constexpr auto Image<T>::ravel(index2_t size, index2_t i) -> index_t
 {
     return i.y * size.x + i.x;
 }
 
 template<class T>
-inline constexpr auto image<T>::unravel(index2_t size, index_t i) -> index2_t
+inline constexpr auto Image<T>::unravel(index2_t size, index_t i) -> index2_t
 {
     return { i % size.x, i / size.x };
 }

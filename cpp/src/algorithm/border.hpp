@@ -9,13 +9,13 @@
 
 namespace alg::border {
 
-struct mirror {
+struct Mirror {
     template<class T>
-    static constexpr auto value(container::image<T> const& img, index2_t const& i) -> T;
+    static constexpr auto value(container::Image<T> const& img, index2_t const& i) -> T;
 };
 
 template<class T>
-constexpr auto mirror::value(container::image<T> const& img, index2_t const& i) -> T
+constexpr auto Mirror::value(container::Image<T> const& img, index2_t const& i) -> T
 {
     index_t const x = i.x >= 0 ? (i.x < img.shape().x ? i.x : 2 * img.shape().x - i.x - 1) : (-1 - i.x);
     index_t const y = i.y >= 0 ? (i.y < img.shape().y ? i.y : 2 * img.shape().y - i.y - 1) : (-1 - i.y);
@@ -24,13 +24,13 @@ constexpr auto mirror::value(container::image<T> const& img, index2_t const& i) 
 }
 
 
-struct mirror_x {
+struct MirrorX {
     template<class T>
-    static constexpr auto value(container::image<T> const& img, index2_t const& i) -> T;
+    static constexpr auto value(container::Image<T> const& img, index2_t const& i) -> T;
 };
 
 template<class T>
-constexpr auto mirror_x::value(container::image<T> const& img, index2_t const& i) -> T
+constexpr auto MirrorX::value(container::Image<T> const& img, index2_t const& i) -> T
 {
     index_t const x = i.x >= 0 ? (i.x < img.shape().x ? i.x : 2 * img.shape().x - i.x - 1) : (-1 - i.x);
 
@@ -38,13 +38,13 @@ constexpr auto mirror_x::value(container::image<T> const& img, index2_t const& i
 }
 
 
-struct mirror_y {
+struct MirrorY {
     template<class T>
-    static constexpr auto value(container::image<T> const& img, index2_t const& i) -> T;
+    static constexpr auto value(container::Image<T> const& img, index2_t const& i) -> T;
 };
 
 template<class T>
-constexpr auto mirror_y::value(container::image<T> const& img, index2_t const& i) -> T
+constexpr auto MirrorY::value(container::Image<T> const& img, index2_t const& i) -> T
 {
     index_t const y = i.y >= 0 ? (i.y < img.shape().y ? i.y : 2 * img.shape().y - i.y - 1) : (-1 - i.y);
 
@@ -52,13 +52,13 @@ constexpr auto mirror_y::value(container::image<T> const& img, index2_t const& i
 }
 
 
-struct extend {
+struct Extend {
     template<class T>
-    static constexpr auto value(container::image<T> const& img, index2_t const& i) -> T;
+    static constexpr auto value(container::Image<T> const& img, index2_t const& i) -> T;
 };
 
 template<class T>
-constexpr auto extend::value(container::image<T> const& img, index2_t const& i) -> T
+constexpr auto Extend::value(container::Image<T> const& img, index2_t const& i) -> T
 {
     index_t const x = std::clamp(i.x, 0, img.shape().x - 1);
     index_t const y = std::clamp(i.y, 0, img.shape().y - 1);
@@ -67,13 +67,13 @@ constexpr auto extend::value(container::image<T> const& img, index2_t const& i) 
 }
 
 
-struct zero {
+struct Zero {
     template<class T>
-    static constexpr auto value(container::image<T> const& img, index2_t const& i) -> T;
+    static constexpr auto value(container::Image<T> const& img, index2_t const& i) -> T;
 };
 
 template<class T>
-constexpr auto zero::value(container::image<T> const& img, index2_t const& i) -> T
+constexpr auto Zero::value(container::Image<T> const& img, index2_t const& i) -> T
 {
     return i.x >= 0 && i.x < img.shape().x && i.y >= 0 && i.y < img.shape().y ?
         img[{i.x, i.y}] : math::num<T>::zero;

@@ -20,10 +20,10 @@ namespace alg {
 namespace stensor::impl {
 
 template<typename Bx, typename By, typename T, index_t Nx, index_t Ny>
-void structure_tensor_generic(container::image<math::mat2s_t<T>>& out,
-                              container::image<T> const& in,
-                              container::kernel<T, Nx, Ny> const& kx,
-                              container::kernel<T, Nx, Ny> const& ky)
+void structure_tensor_generic(container::Image<math::Mat2s<T>>& out,
+                              container::Image<T> const& in,
+                              container::Kernel<T, Nx, Ny> const& kx,
+                              container::Kernel<T, Nx, Ny> const& ky)
 {
     index_t const dx = (Nx - 1) / 2;
     index_t const dy = (Ny - 1) / 2;
@@ -50,16 +50,16 @@ void structure_tensor_generic(container::image<math::mat2s_t<T>>& out,
 } /* namespace stensor::impl */
 
 
-template<typename Bx=border::zero, typename By=border::zero, typename T, index_t Nx=3, index_t Ny=3>
-void structure_tensor(container::image<math::mat2s_t<T>>& out,
-                      container::image<T> const& in,
-                      container::kernel<T, Nx, Ny> const& kx=conv::kernels::sobel3_x<T>,
-                      container::kernel<T, Nx, Ny> const& ky=conv::kernels::sobel3_y<T>)
+template<typename Bx=border::Zero, typename By=border::Zero, typename T, index_t Nx=3, index_t Ny=3>
+void structure_tensor(container::Image<math::Mat2s<T>>& out,
+                      container::Image<T> const& in,
+                      container::Kernel<T, Nx, Ny> const& kx=conv::kernels::sobel3_x<T>,
+                      container::Kernel<T, Nx, Ny> const& ky=conv::kernels::sobel3_y<T>)
 {
     assert(in.size() == out.size());
 
     // workaround for partial function template specialization
-    if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<Bx, border::zero> && std::is_same_v<By, border::zero>) {
+    if constexpr (Nx == 3 && Ny == 3 && std::is_same_v<Bx, border::Zero> && std::is_same_v<By, border::Zero>) {
         stensor::impl::structure_tensor_3x3_zero<T>(out, in, kx, ky);
     } else {
         stensor::impl::structure_tensor_generic<Bx, By, T, Nx, Ny>(out, in, kx, ky);

@@ -8,8 +8,8 @@
 namespace alg::conv::impl {
 
 template<typename T, typename S>
-void conv_5x5_extend(container::image<T>& out, container::image<T> const& data,
-                     container::kernel<S, 5, 5> const& kern)
+void conv_5x5_extend(container::Image<T>& out, container::Image<T> const& data,
+                     container::Kernel<S, 5, 5> const& kern)
 {
     // strides
     auto const stride_d = data.stride();

@@ -12,13 +12,13 @@
 #include <vector>
 
 
-class visualization {
+class Visualization {
 public:
-    visualization(index2_t heatmap_size);
+    Visualization(index2_t heatmap_size);
 
-    void draw(gfx::cairo::cairo& cr, container::image<f32> const& img,
-              std::vector<touch_point> const& tps, int width, int height);
+    void draw(gfx::cairo::Cairo& cr, container::Image<f32> const& img,
+              std::vector<TouchPoint> const& tps, int width, int height);
 
 private:
-    container::image<gfx::srgb> m_data;
+    container::Image<gfx::Srgb> m_data;
 };

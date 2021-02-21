@@ -33,22 +33,22 @@ auto read_file(char const* path) -> std::vector<u8>
 }
 
 
-class parser : public parser_base {
+class Parser : public ParserBase {
 private:
-    std::vector<container::image<f32>> m_data;
-    ipts_heatmap_dim m_dim;
+    std::vector<container::Image<f32>> m_data;
+    IptsHeatmapDim m_dim;
 
 public:
-    auto parse(char const* file) -> std::vector<container::image<f32>>;
+    auto parse(char const* file) -> std::vector<container::Image<f32>>;
 
 protected:
-    virtual void on_heatmap_dim(ipts_heatmap_dim const& dim);
-    virtual void on_heatmap(slice<u8> const& data);
+    virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
+    virtual void on_heatmap(Slice<u8> const& data);
 };
 
-auto parser::parse(char const* file) -> std::vector<container::image<f32>>
+auto Parser::parse(char const* file) -> std::vector<container::Image<f32>>
 {
-    m_data = std::vector<container::image<f32>>{};
+    m_data = std::vector<container::Image<f32>>{};
 
     auto const data = read_file(file);
     this->do_parse({data.data(), data.data() + data.size()});
@@ -56,14 +56,14 @@ auto parser::parse(char const* file) -> std::vector<container::image<f32>>
     return std::move(m_data);
 }
 
-void parser::on_heatmap_dim(ipts_heatmap_dim const& dim)
+void Parser::on_heatmap_dim(IptsHeatmapDim const& dim)
 {
     m_dim = dim;
 }
 
-void parser::on_heatmap(slice<u8> const& data)
+void Parser::on_heatmap(Slice<u8> const& data)
 {
-    auto img = container::image<f32> {{ m_dim.width, m_dim.height }};
+    auto img = container::Image<f32> {{ m_dim.width, m_dim.height }};
 
     std::transform(data.begin, data.end, img.begin(), [&](auto v) {
         return 1.0f - static_cast<f32>(v - m_dim.z_min) / static_cast<f32>(m_dim.z_max - m_dim.z_min);
@@ -107,19 +107,19 @@ auto main(int argc, char** argv) -> int
         print_usage_and_exit(argv[0]);
     }
 
-    auto const heatmaps = parser().parse(argv[2]);
+    auto const heatmaps = Parser().parse(argv[2]);
 
     if (heatmaps.empty()) {
         std::cout << "No touch data found!" << std::endl;
         return 0;
     }
 
-    auto proc = touch_processor { heatmaps[0].size() };
+    auto proc = TouchProcessor { heatmaps[0].size() };
 
-    auto out = std::vector<container::image<f32>>{};
+    auto out = std::vector<container::Image<f32>>{};
     out.reserve(heatmaps.size());
 
-    auto out_tp = std::vector<std::vector<touch_point>>{};
+    auto out_tp = std::vector<std::vector<TouchPoint>>{};
     out_tp.reserve(heatmaps.size());
 
     std::cout << "Processing..." << std::endl;
@@ -163,10 +163,10 @@ auto main(int argc, char** argv) -> int
     auto const dir_out = std::filesystem::path { argv[3] };
     std::filesystem::create_directories(dir_out);
 
-    auto surface = gfx::cairo::image_surface_create(gfx::cairo::format::argb32, { width, height });
-    auto cr = gfx::cairo::cairo::create(surface);
+    auto surface = gfx::cairo::image_surface_create(gfx::cairo::Format::Argb32, { width, height });
+    auto cr = gfx::cairo::Cairo::create(surface);
 
-    auto vis = visualization { heatmaps[0].size() };
+    auto vis = Visualization { heatmaps[0].size() };
 
     for (std::size_t i = 0; i < out.size(); ++i) {
         vis.draw(cr, out[i], out_tp[i], width, height);

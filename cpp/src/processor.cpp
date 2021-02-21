@@ -25,7 +25,7 @@
 #include <queue>
 
 
-touch_processor::touch_processor(index2_t size)
+TouchProcessor::TouchProcessor(index2_t size)
     : m_perf_reg{}
     , m_perf_t_total{m_perf_reg.create_entry("total")}
     , m_perf_t_prep{m_perf_reg.create_entry("preprocessing")}
@@ -63,8 +63,8 @@ touch_processor::touch_processor(index2_t size)
     , m_gf_window{11, 11}
     , m_touchpoints{}
 {
-    m_wdt_queue = std::priority_queue { std::less<alg::wdt::q_item<f32>>(), [](){
-        auto buf = std::vector<alg::wdt::q_item<f32>>{};
+    m_wdt_queue = std::priority_queue { std::less<alg::wdt::QItem<f32>>(), [](){
+        auto buf = std::vector<alg::wdt::QItem<f32>>{};
         buf.reserve(512);
         return buf;
     }() };
@@ -74,7 +74,7 @@ touch_processor::touch_processor(index2_t size)
     m_touchpoints.reserve(32);
 }
 
-auto touch_processor::process(container::image<f32> const& hm) -> std::vector<touch_point> const&
+auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<TouchPoint> const&
 {
     auto _tr = m_perf_reg.record(m_perf_t_total);
 
@@ -162,7 +162,7 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
         auto _r = m_perf_reg.record(m_perf_t_cscr);
 
         m_cstats.clear();
-        m_cstats.assign(num_labels, component_stats { 0, 0, 0, 0 });
+        m_cstats.assign(num_labels, ComponentStats { 0, 0, 0, 0 });
 
         for (index_t i = 0; i < m_img_pp.size().product(); ++i) {
             auto const label = m_img_lbl[i];
@@ -291,10 +291,10 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
         alg::gfit::reserve(m_gf_params, m_maximas.size(), m_gf_window);
 
         for (std::size_t i = 0; i < m_maximas.size(); ++i) {
-            auto const [x, y] = container::image<f32>::unravel(m_img_pp.size(), m_maximas[i]);
+            auto const [x, y] = container::Image<f32>::unravel(m_img_pp.size(), m_maximas[i]);
 
             // TODO: move window inwards instead of clamping?
-            auto const bounds = alg::gfit::bbox {
+            auto const bounds = alg::gfit::BBox {
                 std::max(x - (m_gf_window.x - 1) / 2, 0),
                 std::min(x + (m_gf_window.x - 1) / 2, m_img_pp.size().x - 1),
                 std::max(y - (m_gf_window.y - 1) / 2, 0),
@@ -346,7 +346,7 @@ auto touch_processor::process(container::image<f32> const& hm) -> std::vector<to
         auto const y = std::clamp(static_cast<index_t>(p.mean.y), 0, m_img_lbl.size().y - 1);
         auto const cs = m_img_lbl[{ x, y }] > 0 ? m_cscore.at(m_img_lbl[{ x, y }] - 1) : 0.0f;
 
-        m_touchpoints.push_back(touch_point { cs, static_cast<f32>(p.scale), p.mean.cast<f32>(), cov->cast<f32>() });
+        m_touchpoints.push_back(TouchPoint { cs, static_cast<f32>(p.scale), p.mean.cast<f32>(), cov->cast<f32>() });
     }
 
     return m_touchpoints;

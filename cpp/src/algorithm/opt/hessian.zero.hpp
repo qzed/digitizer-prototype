@@ -5,7 +5,7 @@
 #include "algorithm/hessian.hpp"
 
 
-namespace alg::hess::impl {
+namespace iptsd::alg::hess::impl {
 
 template<typename T>
 void hessian_zero(container::Image<math::Mat2s<T>>& out, container::Image<T> const& in)
@@ -300,4 +300,4 @@ void hessian_zero(container::Image<math::Mat2s<T>>& out, container::Image<T> con
     }
 }
 
-} /* namespace alg::hess::impl */
+} /* namespace iptsd::alg::hess::impl */

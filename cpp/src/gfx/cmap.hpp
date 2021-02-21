@@ -12,7 +12,7 @@
 #include <optional>
 
 
-namespace gfx::cmap {
+namespace iptsd::gfx::cmap {
 
 namespace impl {
 
@@ -1248,4 +1248,4 @@ inline const Lut<256> viridis {
     Srgb { 0.993248, 0.906157, 0.143936 },
 };
 
-} /* namespace gfx::cmap */
+} /* namespace iptsd::gfx::cmap */

@@ -7,7 +7,7 @@
 #include <utility>
 
 
-namespace container {
+namespace iptsd::container {
 
 template<class T>
 class Image {
@@ -226,4 +226,4 @@ inline constexpr auto Image<T>::unravel(index2_t size, index_t i) -> index2_t
     return { i % size.x, i / size.x };
 }
 
-} /* namespace container */
+} /* namespace iptsd::container */

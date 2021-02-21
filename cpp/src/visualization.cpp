@@ -6,6 +6,8 @@
 #include "container/image.hpp"
 
 
+namespace iptsd {
+
 Visualization::Visualization(index2_t heatmap_size)
     : m_data{heatmap_size}
 {}
@@ -113,3 +115,5 @@ void Visualization::draw(gfx::cairo::Cairo& cr, container::Image<f32> const& img
         cr.show_text(txtbuf.data());
     }
 }
+
+} /* namespace iptsd */

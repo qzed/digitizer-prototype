@@ -6,7 +6,7 @@
 #include <cmath>
 
 
-namespace eval::perf {
+namespace iptsd::eval::perf {
 
 using clock = std::chrono::high_resolution_clock;
 
@@ -216,4 +216,4 @@ inline auto Registry::entries() const -> std::vector<Entry> const&
     return m_entries;
 }
 
-} /* namespace eval::perf */
+} /* namespace iptsd::eval::perf */

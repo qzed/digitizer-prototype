@@ -16,7 +16,7 @@
 #include <cassert>
 
 
-namespace alg {
+namespace iptsd::alg {
 namespace hess::impl {
 
 template<typename B=border::Zero, typename T>
@@ -68,4 +68,4 @@ void hessian(container::Image<math::Mat2s<T>>& out, container::Image<T> const& i
     }
 }
 
-} /* namespace alg */
+} /* namespace iptsd::alg */

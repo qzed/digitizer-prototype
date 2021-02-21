@@ -15,6 +15,8 @@
 #include <iomanip>
 #include <filesystem>
 
+using namespace iptsd;
+
 
 auto read_file(char const* path) -> std::vector<u8>
 {

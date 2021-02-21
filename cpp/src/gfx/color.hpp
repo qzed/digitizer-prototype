@@ -3,7 +3,7 @@
 #include "types.hpp"
 
 
-namespace gfx {
+namespace iptsd::gfx {
 
 struct Srgb {
     f32 r, g, b;
@@ -44,4 +44,4 @@ constexpr auto Srgba::from(f32 r, f32 g, f32 b) -> Srgba
     return {r, g, b, 1.0};
 }
 
-} /* namespace gfx */
+} /* namespace iptsd::gfx */

@@ -4,7 +4,7 @@
 #include "utils/access.hpp"
 
 
-namespace math {
+namespace iptsd::math {
 
 template<class T>
 struct Mat6 {
@@ -58,4 +58,4 @@ inline constexpr auto Mat6<T>::operator[] (index2_t i) const -> T const&
     return utils::access::access<T>(data, ravel, { 6, 6 }, i);
 }
 
-} /* namespace math */
+} /* namespace iptsd::math */

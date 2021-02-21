@@ -7,7 +7,7 @@
 #include <algorithm>
 
 
-namespace alg::border {
+namespace iptsd::alg::border {
 
 struct Mirror {
     template<class T>
@@ -79,4 +79,4 @@ constexpr auto Zero::value(container::Image<T> const& img, index2_t const& i) ->
         img[{i.x, i.y}] : math::num<T>::zero;
 }
 
-} /* namespace alg::border */
+} /* namespace iptsd::alg::border */

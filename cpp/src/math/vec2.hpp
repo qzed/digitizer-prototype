@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-namespace math {
+namespace iptsd::math {
 
 template<class T>
 struct Vec2 {
@@ -191,4 +191,4 @@ struct num<Vec2<T>> {
     static inline constexpr Vec2<T> zero = { num<T>::zero, num<T>::zero };
 };
 
-} /* namespace math */
+} /* namespace iptsd::math */

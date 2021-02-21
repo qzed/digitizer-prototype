@@ -12,7 +12,7 @@
 #include <cairo/cairo.h>
 
 
-namespace gfx::cairo {
+namespace iptsd::gfx::cairo {
 
 using math::Vec2;
 
@@ -597,4 +597,4 @@ inline auto image_surface_create(container::Image<T>& image) -> Surface
     return s;
 }
 
-} /* namespace gfx::cairo */
+} /* namespace iptsd::gfx::cairo */

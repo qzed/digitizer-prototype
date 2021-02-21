@@ -4,7 +4,7 @@
 #include "container/image.hpp"
 
 
-namespace alg {
+namespace iptsd::alg {
 
 template<int C=8, typename T, typename O>
 void find_local_maximas(container::Image<T> const& data, T threshold, O output_iter)
@@ -236,4 +236,4 @@ void find_local_maximas(container::Image<T> const& data, T threshold, O output_i
     }
 }
 
-} /* namespace alg */
+} /* namespace iptsd::alg */

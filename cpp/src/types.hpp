@@ -16,6 +16,8 @@ using f32 = float;
 using f64 = double;
 
 
+namespace iptsd {
+
 using index_t = int;
 
 struct index2_t {
@@ -77,3 +79,5 @@ inline constexpr auto operator- (index2_t const& a, index2_t const& b) -> index2
 {
     return { a.x - b.x, a.y - b.y };
 }
+
+} /* namespace iptsd */

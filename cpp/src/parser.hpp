@@ -6,6 +6,8 @@
 #include <string>
 
 
+namespace iptsd {
+
 struct IptsData {
     u32 type;
     u32 size;
@@ -297,3 +299,5 @@ void ParserBase::on_heatmap_dim(IptsHeatmapDim const& dim)
 
 void ParserBase::on_heatmap(Slice<u8> const& dim)
 {}
+
+} /* namespace iptsd */

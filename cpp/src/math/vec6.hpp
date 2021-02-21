@@ -5,7 +5,7 @@
 #include "utils/access.hpp"
 
 
-namespace math {
+namespace iptsd::math {
 
 template<class T>
 struct Vec6 {
@@ -41,4 +41,4 @@ struct num<Vec6<T>> {
             num<T>::zero, num<T>::zero, num<T>::zero };
 };
 
-} /* namespace math */
+} /* namespace iptsd::math */

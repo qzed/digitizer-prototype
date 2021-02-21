@@ -5,7 +5,7 @@
 #include "algorithm/convolution.hpp"
 
 
-namespace alg::conv::impl {
+namespace iptsd::alg::conv::impl {
 
 template<typename T, typename S>
 void conv_5x5_extend(container::Image<T>& out, container::Image<T> const& data,
@@ -973,4 +973,4 @@ void conv_5x5_extend(container::Image<T>& out, container::Image<T> const& data,
     }
 }
 
-} /* namespace alg::conv::impl */
+} /* namespace iptsd::alg::conv::impl */

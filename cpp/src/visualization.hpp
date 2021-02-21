@@ -12,6 +12,8 @@
 #include <vector>
 
 
+namespace iptsd {
+
 class Visualization {
 public:
     Visualization(index2_t heatmap_size);
@@ -22,3 +24,5 @@ public:
 private:
     container::Image<gfx::Srgb> m_data;
 };
+
+} /* namespace iptsd */

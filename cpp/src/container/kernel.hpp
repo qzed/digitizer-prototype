@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-namespace container {
+namespace iptsd::container {
 
 template<class T, index_t Nx, index_t Ny>
 struct Kernel {
@@ -190,4 +190,4 @@ inline constexpr auto Kernel<T, Nx, Ny>::unravel(index2_t size, index_t i) -> in
     return { i % size.x, i / size.x };
 }
 
-} /* namespace container */
+} /* namespace iptsd::container */

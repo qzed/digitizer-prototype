@@ -25,6 +25,8 @@
 #include <queue>
 
 
+namespace iptsd {
+
 TouchProcessor::TouchProcessor(index2_t size)
     : m_perf_reg{}
     , m_perf_t_total{m_perf_reg.create_entry("total")}
@@ -351,3 +353,5 @@ auto TouchProcessor::process(container::Image<f32> const& hm) -> std::vector<Tou
 
     return m_touchpoints;
 }
+
+} /* namespace iptsd */

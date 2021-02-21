@@ -23,6 +23,8 @@
 #include <thread>
 #include <atomic>
 
+using namespace iptsd;
+
 
 class Parser : public ParserBase {
 public:

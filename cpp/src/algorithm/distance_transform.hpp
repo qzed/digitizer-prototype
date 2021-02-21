@@ -7,7 +7,7 @@
 #include <numeric>
 
 
-namespace alg {
+namespace iptsd::alg {
 namespace wdt {
 
 template<typename T>
@@ -492,4 +492,4 @@ void weighted_distance_transform(container::Image<T>& out, F& bin, M& mask, C& c
     }
 }
 
-} /* namespace alg */
+} /* namespace iptsd::alg */

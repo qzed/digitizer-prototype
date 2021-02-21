@@ -21,7 +21,7 @@
 #include <numeric>
 
 
-namespace alg {
+namespace iptsd::alg {
 namespace impl {
 
 inline auto is_root(container::Image<u16> const& forest, u16 idx) -> bool
@@ -205,4 +205,4 @@ auto label(container::Image<u16>& out, container::Image<T> const& data, T thresh
     return impl::resolve(out, background);
 }
 
-} /* namespace alg */
+} /* namespace iptsd::alg */

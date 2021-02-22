@@ -64,6 +64,9 @@ fmt_dep = fmt_proj.get_variable('fmt_dep')
 spdlog_proj = subproject('spdlog')
 spdlog_dep = spdlog_proj.get_variable('spdlog_dep')
 
+cli11_proj = subproject('CLI11')
+cli11_dep = cli11_proj.get_variable('CLI11_dep')
+
 
 # binaries
 src_plot = [
@@ -82,5 +85,5 @@ src_rt = [
     'src/utils.c',
 ]
 
-executable('proto-plot', src_plot, dependencies: [gsl_dep, fmt_dep, spdlog_dep, cairo_dep],                       include_directories: inc_main)
-executable('proto-rt',   src_rt,   dependencies: [gsl_dep, fmt_dep, spdlog_dep, cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)
+executable('proto-plot', src_plot, dependencies: [gsl_dep, fmt_dep, spdlog_dep, cli11_dep, cairo_dep],                       include_directories: inc_main)
+executable('proto-rt',   src_rt,   dependencies: [gsl_dep, fmt_dep, spdlog_dep, cli11_dep, cairo_dep, gtk_dep, threads_dep], include_directories: inc_main)

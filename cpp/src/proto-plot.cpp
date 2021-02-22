@@ -9,6 +9,7 @@
 
 #include "gfx/cairo.hpp"
 
+#include <CLI/CLI.hpp>
 #include <fmt/core.h>
 #include <spdlog/spdlog.h>
 
@@ -81,14 +82,6 @@ void Parser::on_heatmap(gsl::span<const std::byte> const& data)
 }
 
 
-void print_usage_and_exit(char const* name)
-{
-    std::cout << "Usage:\n";
-    std::cout << "  "  << name << " plot <ipts-data> <output-directory>\n";
-    std::cout << "  "  << name << " perf <ipts-data>\n";
-    exit(1);
-}
-
 enum class mode_type {
     plot,
     perf,
@@ -96,28 +89,29 @@ enum class mode_type {
 
 auto main(int argc, char** argv) -> int
 {
-    using namespace std::string_literals;
-    mode_type mode;
-
     spdlog::set_pattern("[%X.%e] [%^%l%$] %v");
 
-    if (argc < 2) {
-        print_usage_and_exit(argv[0]);
-    }
+    auto mode = mode_type::plot;
+    auto path_in = std::string{};
+    auto path_out = std::string{};
 
-    if (argv[1] == "plot"s) {
-        mode = mode_type::plot;
-    } else if (argv[1] == "perf"s) {
-        mode = mode_type::perf;
-    } else {
-        print_usage_and_exit(argv[0]);
-    }
+    auto app = CLI::App { "Digitizer Prototype -- Plotter" };
+    app.failure_message(CLI::FailureMessage::help);
+    app.set_help_all_flag("--help-all", "Show full help message");
+    app.require_subcommand(1);
 
-    if ((mode == mode_type::plot && argc != 4) || (mode == mode_type::perf && argc != 3)) {
-        print_usage_and_exit(argv[0]);
-    }
+    auto cmd_plot = app.add_subcommand("plot", "Plot results to PNG files");
+    cmd_plot->callback([&]() { mode = mode_type::plot; });
+    cmd_plot->add_option("input", path_in, "Input file")->required();
+    cmd_plot->add_option("output", path_out, "Output directory")->required();
 
-    auto const heatmaps = Parser().parse(argv[2]);
+    auto cmd_perf = app.add_subcommand("perf", "Evaluate performance");
+    cmd_perf->callback([&]() { mode = mode_type::perf; });
+    cmd_perf->add_option("input", path_in, "Input file")->required();
+
+    CLI11_PARSE(app, argc, argv);
+
+    auto const heatmaps = Parser().parse(path_in.c_str());
 
     if (heatmaps.empty()) {
         spdlog::warn("No touch data found!");
@@ -170,7 +164,7 @@ auto main(int argc, char** argv) -> int
     auto const width  = 900;
     auto const height = 600;
 
-    auto const dir_out = std::filesystem::path { argv[3] };
+    auto const dir_out = std::filesystem::path { path_out };
     std::filesystem::create_directories(dir_out);
 
     auto surface = gfx::cairo::image_surface_create(gfx::cairo::Format::Argb32, { width, height });

@@ -27,6 +27,10 @@
 
 using namespace iptsd;
 
+using namespace gfx::cairo;
+using namespace gfx::gtk;
+using namespace gfx::gdk;
+
 
 class Parser : public ParserBase {
 public:
@@ -81,10 +85,10 @@ public:
 
     void submit(Image<f32> const& img, std::vector<TouchPoint> const& tps);
 
-    auto draw_event(gfx::cairo::Cairo& cr) -> bool;
+    auto draw_event(Cairo& cr) -> bool;
 
 public:
-    gfx::gtk::Widget m_widget;
+    Widget m_widget;
 
 private:
     Visualization m_vis;
@@ -137,7 +141,7 @@ void MainContext::submit(Image<f32> const& img, std::vector<TouchPoint> const& t
         m_widget.queue_draw();
 }
 
-auto MainContext::draw_event(gfx::cairo::Cairo& cr) -> bool
+auto MainContext::draw_event(Cairo& cr) -> bool
 {
     auto const width  = m_widget.get_allocated_width();
     auto const height = m_widget.get_allocated_height();
@@ -168,24 +172,24 @@ auto main(int argc, char** argv) -> int
     auto ctrl = iptsd_control {};
     iptsd_control_start(&ctrl);
 
-    auto app = gfx::gtk::Application::create("com.github.qzed.digitizer-prototype.rt");
+    auto app = Application::create("com.github.qzed.digitizer-prototype.rt");
 
-    app.connect("activate", [&](gfx::gtk::Application app) -> void {
-        auto window = gfx::gtk::ApplicationWindow::create(app);
+    app.connect("activate", [&](Application app) -> void {
+        auto window = ApplicationWindow::create(app);
 
         // fix aspect to 3-to-2
-        auto geom = gfx::gdk::Geometry { 0, 0, 0, 0, 0, 0, 0, 0, 1.5f, 1.5f, gfx::gdk::Gravity::Center };
+        auto geom = Geometry { 0, 0, 0, 0, 0, 0, 0, 0, 1.5f, 1.5f, Gravity::Center };
 
-        window.set_position(gfx::gtk::WindowPosition::Center);
+        window.set_position(WindowPosition::Center);
         window.set_default_size(900, 600);
         window.set_title("IPTS Processor Prototype");
-        window.set_geometry_hints(geom, gfx::gdk::WindowHints::Aspect);
+        window.set_geometry_hints(geom, WindowHints::Aspect);
 
-        auto darea = gfx::gtk::DrawingArea::create();
+        auto darea = DrawingArea::create();
         window.add(darea);
 
         ctx.m_widget = darea;
-        darea.connect("draw", [&](gfx::gtk::Widget widget, gfx::cairo::Cairo cr) -> bool {
+        darea.connect("draw", [&](Widget widget, Cairo cr) -> bool {
             return ctx.draw_event(cr);
         });
 

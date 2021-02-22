@@ -72,6 +72,9 @@ private:
 
 class Cairo {
 public:
+    using raw_t = cairo_t*;
+
+public:
     Cairo();
     Cairo(gsl::owner<cairo_t*> raw);
     Cairo(Cairo const& other);

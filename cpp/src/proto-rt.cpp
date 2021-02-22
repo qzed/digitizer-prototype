@@ -13,8 +13,8 @@
 
 #include "eval/perf.hpp"
 
-#include <cairo/cairo.h>
-#include <gtk/gtk.h>
+#include "gfx/cairo.hpp"
+#include "gfx/gtk.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -77,18 +77,16 @@ void Parser::on_heatmap(gsl::span<const std::byte> const& data)
 
 class MainContext {
 public:
-    MainContext(GtkWidget* widget, index2_t img_size);
+    MainContext(index2_t img_size);
 
     void submit(Image<f32> const& img, std::vector<TouchPoint> const& tps);
 
     auto draw_event(gfx::cairo::Cairo& cr) -> bool;
 
 public:
-    static auto on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data) -> gboolean;
+    gfx::gtk::Widget m_widget;
 
 private:
-    GtkWidget* m_widget;
-
     Visualization m_vis;
 
     Image<f32> m_img1;
@@ -105,8 +103,8 @@ private:
     bool m_swap;
 };
 
-MainContext::MainContext(GtkWidget* widget, index2_t img_size)
-    : m_widget{widget}
+MainContext::MainContext(index2_t img_size)
+    : m_widget{nullptr}
     , m_vis{img_size}
     , m_img1{img_size}
     , m_img2{img_size}
@@ -135,13 +133,14 @@ void MainContext::submit(Image<f32> const& img, std::vector<TouchPoint> const& t
     }
 
     // request update
-    gtk_widget_queue_draw(m_widget);
+    if (m_widget)
+        m_widget.queue_draw();
 }
 
 auto MainContext::draw_event(gfx::cairo::Cairo& cr) -> bool
 {
-    auto const width  = gtk_widget_get_allocated_width(m_widget);
-    auto const height = gtk_widget_get_allocated_height(m_widget);
+    auto const width  = m_widget.get_allocated_width();
+    auto const height = m_widget.get_allocated_height();
 
     {   // check and swap buffers, if necessary
         auto guard = std::lock_guard(m_lock);
@@ -157,51 +156,43 @@ auto MainContext::draw_event(gfx::cairo::Cairo& cr) -> bool
     return false;
 }
 
-auto MainContext::on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data) -> gboolean
-{
-    auto ctx = reinterpret_cast<MainContext*>(user_data);
-    auto crw = gfx::cairo::Cairo::wrap_raw(cr);
-
-    return ctx->draw_event(crw);
-}
-
 
 auto main(int argc, char** argv) -> int
 {
-    spdlog::set_pattern("[%X.%e] [%l] %v");
-
-    GtkWidget* window;
-    GtkWidget* darea;
-
-    gtk_init(&argc, &argv);
-
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-
-    darea = gtk_drawing_area_new();
-    gtk_container_add(GTK_CONTAINER (window), darea);
+    spdlog::set_pattern("[%X.%e] [%^%l%$] %v");
 
     auto const size = index2_t { 72, 48 };
-    auto ctx = MainContext { darea, size };
+    auto ctx = MainContext { size };
     auto prc = TouchProcessor { size };
 
     auto ctrl = iptsd_control {};
     iptsd_control_start(&ctrl);
 
-    g_signal_connect(G_OBJECT(darea), "draw", G_CALLBACK(MainContext::on_draw_event), &ctx);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    auto app = gfx::gtk::Application::create("com.github.qzed.digitizer-prototype.rt");
 
-    // fix aspect to 3-to-2
-    auto geom = GdkGeometry { 0, 0, 0, 0, 0, 0, 0, 0, 1.5f, 1.5f, GDK_GRAVITY_CENTER };
+    app.connect("activate", [&](gfx::gtk::Application app) -> void {
+        auto window = gfx::gtk::ApplicationWindow::create(app);
 
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-    gtk_window_set_default_size(GTK_WINDOW(window), 900, 600);
-    gtk_window_set_title(GTK_WINDOW(window), "IPTS Processor Prototype");
-    gtk_window_set_geometry_hints(GTK_WINDOW(window), NULL, &geom, GDK_HINT_ASPECT);
+        // fix aspect to 3-to-2
+        auto geom = gfx::gdk::Geometry { 0, 0, 0, 0, 0, 0, 0, 0, 1.5f, 1.5f, gfx::gdk::Gravity::Center };
 
-    gtk_widget_show_all(window);
+        window.set_position(gfx::gtk::WindowPosition::Center);
+        window.set_default_size(900, 600);
+        window.set_title("IPTS Processor Prototype");
+        window.set_geometry_hints(geom, gfx::gdk::WindowHints::Aspect);
+
+        auto darea = gfx::gtk::DrawingArea::create();
+        window.add(darea);
+
+        ctx.m_widget = darea;
+        darea.connect("draw", [&](gfx::gtk::Widget widget, gfx::cairo::Cairo cr) -> bool {
+            return ctx.draw_event(cr);
+        });
+
+        window.show_all();
+    });
 
     auto run = std::atomic_bool(true);
-
     auto updt = std::thread([&]() -> void {
         using namespace std::chrono_literals;
 
@@ -238,7 +229,7 @@ auto main(int argc, char** argv) -> int
         }
     });
 
-    gtk_main();
+    int status = app.run(argc, argv);
 
     iptsd_control_stop(&ctrl);
 
@@ -246,4 +237,6 @@ auto main(int argc, char** argv) -> int
 
     run.store(false);
     updt.join();
+
+    return status;
 }

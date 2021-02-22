@@ -32,11 +32,11 @@ class Parser : public ParserBase {
 public:
     Parser(index2_t size);
 
-    auto parse(Slice<u8> data) -> Image<f32> const&;
+    auto parse(gsl::span<const std::byte> data) -> Image<f32> const&;
 
 protected:
     virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
-    virtual void on_heatmap(Slice<u8> const& data);
+    virtual void on_heatmap(gsl::span<const std::byte> const& data);
 
 private:
     IptsHeatmapDim m_dim;
@@ -48,7 +48,7 @@ Parser::Parser(index2_t size)
     , m_img { size }
 {}
 
-auto Parser::parse(Slice<u8> data) -> Image<f32> const&
+auto Parser::parse(gsl::span<const std::byte> data) -> Image<f32> const&
 {
     this->do_parse(data, true);
     return m_img;
@@ -59,15 +59,18 @@ void Parser::on_heatmap_dim(IptsHeatmapDim const& dim)
     m_dim = dim;
 }
 
-void Parser::on_heatmap(Slice<u8> const& data)
+void Parser::on_heatmap(gsl::span<const std::byte> const& data)
 {
     if (m_dim.width != m_img.size().x || m_dim.height != m_img.size().y) {
         spdlog::error("invalid heatmap size");
         abort();
     }
 
-    std::transform(data.begin, data.end, m_img.begin(), [&](auto v) {
-        return 1.0f - static_cast<f32>(v - m_dim.z_min) / static_cast<f32>(m_dim.z_max - m_dim.z_min);
+    std::transform(data.begin(), data.end(), m_img.begin(), [&](auto v) {
+        auto const n = static_cast<f32>(m_dim.z_max - m_dim.z_min);
+        auto const x = static_cast<f32>(std::to_integer<u8>(v) - m_dim.z_min);
+
+        return 1.0f - x / n;
     });
 }
 
@@ -221,7 +224,7 @@ auto main(int argc, char** argv) -> int
                     return;
                 }
 
-                auto hm = p.parse({ buf.data(), buf.data() + buf.size() });
+                auto hm = p.parse(gsl::as_bytes(gsl::span{buf}));
                 ctx.submit(hm, prc.process(hm));
 
                 ret = iptsd_control_send_feedback(&ctrl);

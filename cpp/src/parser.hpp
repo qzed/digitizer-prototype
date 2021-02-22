@@ -84,40 +84,6 @@ struct IptsHeatmapDim {
 } __attribute__ ((packed));
 
 
-struct SliceIndex {
-    std::size_t begin;
-    std::size_t end;
-};
-
-template<typename T>
-struct Slice {
-    T const* begin;
-    T const* end;
-
-    auto size() const noexcept -> std::size_t;
-    auto operator[] (SliceIndex i) const noexcept -> Slice<T>;
-};
-
-template<typename T>
-auto Slice<T>::size() const noexcept -> std::size_t
-{
-    return end - begin;
-}
-
-template<typename T>
-auto Slice<T>::operator[] (SliceIndex i) const noexcept -> Slice<T>
-{
-    return { this->begin + i.begin, std::min(this->begin + i.end, this->end) };
-}
-
-
-template<typename T>
-auto make_slice(std::vector<T> const& v) -> Slice<T>
-{
-    return { v.data(), v.data() + v.size() };
-}
-
-
 class ParserException : public std::exception {
 private:
     std::string m_reason;
@@ -143,44 +109,44 @@ public:
     virtual ~ParserBase() = default;
 
 protected:
-    void do_parse(Slice<u8> data, bool oneshot=false);
+    void do_parse(gsl::span<const std::byte> data, bool oneshot=false);
 
-    auto parse_data(Slice<u8> data) -> Slice<u8>;
-    void parse_data_payload(IptsData const& header, Slice<u8> data);
-    auto parse_payload_frame(IptsPayload const& header, Slice<u8> data) -> Slice<u8>;
-    void parse_payload_frame_reports(IptsPayloadFrame const& header, Slice<u8> data);
-    auto parse_report(IptsPayloadFrame const& header, Slice<u8> data) -> Slice<u8>;
-    void parse_report_timestamp(IptsReport const& header, Slice<u8> data);
-    void parse_report_heatmap_dim(IptsReport const& header, Slice<u8> data);
-    void parse_report_heatmap(IptsReport const& header, Slice<u8> data);
+    auto parse_data(gsl::span<const std::byte> data) -> gsl::span<const std::byte>;
+    void parse_data_payload(IptsData const& header, gsl::span<const std::byte> data);
+    auto parse_payload_frame(IptsPayload const& header, gsl::span<const std::byte> data) -> gsl::span<const std::byte>;
+    void parse_payload_frame_reports(IptsPayloadFrame const& header, gsl::span<const std::byte> data);
+    auto parse_report(IptsPayloadFrame const& header, gsl::span<const std::byte> data) -> gsl::span<const std::byte>;
+    void parse_report_timestamp(IptsReport const& header, gsl::span<const std::byte> data);
+    void parse_report_heatmap_dim(IptsReport const& header, gsl::span<const std::byte> data);
+    void parse_report_heatmap(IptsReport const& header, gsl::span<const std::byte> data);
 
     virtual void on_timestamp(IptsTimestampReport const& ts);
     virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
-    virtual void on_heatmap(Slice<u8> const& data);
+    virtual void on_heatmap(gsl::span<const std::byte> const& data);
 };
 
-
-void ParserBase::do_parse(Slice<u8> data, bool oneshot)
+void ParserBase::do_parse(gsl::span<const std::byte> data, bool oneshot)
 {
-    if (!data.size()) {
+    if (data.empty()) {
         return;
     }
 
     do {
         data = parse_data(data);
-    } while (data.size() && !oneshot);
+    } while (!data.empty() && !oneshot);
 }
 
-auto ParserBase::parse_data(Slice<u8> data) -> Slice<u8>
+auto ParserBase::parse_data(gsl::span<const std::byte> data) -> gsl::span<const std::byte>
 {
     IptsData hdr;
-    Slice<u8> pld;
+    gsl::span<const std::byte> pld;
 
-    std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
-    pld = { data.begin + sizeof(hdr), data.begin + sizeof(hdr) + hdr.size };
+    std::copy(data.begin(), data.begin() + sizeof(hdr), reinterpret_cast<std::byte*>(&hdr));
 
-    if (data.begin + sizeof(hdr) + hdr.size > data.end)
+    if (sizeof(hdr) + hdr.size > data.size())
         throw ParserException{"EOF"};
+
+    pld = data.subspan(sizeof(hdr), hdr.size);
 
     switch (hdr.type) {
     case 0x00:
@@ -191,32 +157,34 @@ auto ParserBase::parse_data(Slice<u8> data) -> Slice<u8>
         break;
     };
 
-    return { pld.end, data.end };
+    return data.subspan(sizeof(hdr) + hdr.size);
 }
 
-void ParserBase::parse_data_payload(IptsData const& header, Slice<u8> data)
+void ParserBase::parse_data_payload(IptsData const& header, gsl::span<const std::byte> data)
 {
     IptsPayload hdr;
-    Slice<u8> pld;
+    gsl::span<const std::byte> pld;
 
-    std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
-    pld = { data.begin + sizeof(hdr), data.end };
+    std::copy(data.begin(), data.begin() + sizeof(hdr), reinterpret_cast<std::byte*>(&hdr));
+    pld = data.subspan(sizeof(hdr));
 
     for (unsigned int i = 0; i < hdr.frames; ++i) {
         pld = parse_payload_frame(hdr, pld);
     }
 }
 
-auto ParserBase::parse_payload_frame(IptsPayload const& header, Slice<u8> data) -> Slice<u8>
+auto ParserBase::parse_payload_frame(IptsPayload const& header, gsl::span<const std::byte> data)
+    -> gsl::span<const std::byte>
 {
     IptsPayloadFrame hdr;
-    Slice<u8> pld;
+    gsl::span<const std::byte> pld;
 
-    std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
-    pld = { data.begin + sizeof(hdr), data.begin + sizeof(hdr) + hdr.size };
+    std::copy(data.begin(), data.begin() + sizeof(hdr), reinterpret_cast<std::byte*>(&hdr));
 
-    if (data.begin + sizeof(hdr) + hdr.size > data.end)
+    if (sizeof(hdr) + hdr.size > data.size())
         throw ParserException{"EOF"};
+
+    pld = data.subspan(sizeof(hdr), hdr.size);
 
     switch (hdr.type)
     {
@@ -230,23 +198,28 @@ auto ParserBase::parse_payload_frame(IptsPayload const& header, Slice<u8> data) 
         break;
     }
 
-    return { pld.end, data.end };
+    return data.subspan(sizeof(hdr) + hdr.size);
 }
 
-void ParserBase::parse_payload_frame_reports(IptsPayloadFrame const& header, Slice<u8> data)
+void ParserBase::parse_payload_frame_reports(IptsPayloadFrame const& header, gsl::span<const std::byte> data)
 {
     while (data.size() >= sizeof(IptsReport)) {
         data = parse_report(header, data);
     }
 }
 
-auto ParserBase::parse_report(IptsPayloadFrame const& header, Slice<u8> data) -> Slice<u8>
+auto ParserBase::parse_report(IptsPayloadFrame const& header, gsl::span<const std::byte> data)
+    -> gsl::span<const std::byte>
 {
     IptsReport hdr;
-    Slice<u8> pld;
+    gsl::span<const std::byte> pld;
 
-    std::copy(data.begin, data.begin + sizeof(hdr), reinterpret_cast<u8*>(&hdr));
-    pld = { data.begin + sizeof(hdr), data.begin + sizeof(hdr) + hdr.size };
+    std::copy(data.begin(), data.begin() + sizeof(hdr), reinterpret_cast<std::byte*>(&hdr));
+
+    if (sizeof(hdr) + hdr.size > data.size())
+        throw ParserException{"EOF"};
+
+    pld = data.subspan(sizeof(hdr), hdr.size);
 
     switch (hdr.type)
     {
@@ -266,28 +239,28 @@ auto ParserBase::parse_report(IptsPayloadFrame const& header, Slice<u8> data) ->
         break;
     }
 
-    return { pld.end, data.end };
+    return data.subspan(sizeof(hdr) + hdr.size);
 }
 
-void ParserBase::parse_report_timestamp(IptsReport const& header, Slice<u8> data)
+void ParserBase::parse_report_timestamp(IptsReport const& header, gsl::span<const std::byte> data)
 {
     IptsTimestampReport ts;
 
-    std::copy(data.begin, data.begin + sizeof(ts), reinterpret_cast<u8*>(&ts));
+    std::copy(data.begin(), data.begin() + sizeof(ts), reinterpret_cast<std::byte*>(&ts));
 
     on_timestamp(ts);
 }
 
-void ParserBase::parse_report_heatmap_dim(IptsReport const& header, Slice<u8> data)
+void ParserBase::parse_report_heatmap_dim(IptsReport const& header, gsl::span<const std::byte> data)
 {
     IptsHeatmapDim dim;
 
-    std::copy(data.begin, data.begin + sizeof(dim), reinterpret_cast<u8*>(&dim));
+    std::copy(data.begin(), data.begin() + sizeof(dim), reinterpret_cast<std::byte*>(&dim));
 
     on_heatmap_dim(dim);
 }
 
-void ParserBase::parse_report_heatmap(IptsReport const& header, Slice<u8> data)
+void ParserBase::parse_report_heatmap(IptsReport const& header, gsl::span<const std::byte> data)
 {
     on_heatmap(data);
 }
@@ -299,7 +272,7 @@ void ParserBase::on_timestamp(IptsTimestampReport const& ts)
 void ParserBase::on_heatmap_dim(IptsHeatmapDim const& dim)
 {}
 
-void ParserBase::on_heatmap(Slice<u8> const& dim)
+void ParserBase::on_heatmap(gsl::span<const std::byte> const& dim)
 {}
 
 } /* namespace iptsd */

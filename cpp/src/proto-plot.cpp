@@ -48,7 +48,7 @@ public:
 
 protected:
     virtual void on_heatmap_dim(IptsHeatmapDim const& dim);
-    virtual void on_heatmap(Slice<u8> const& data);
+    virtual void on_heatmap(gsl::span<const std::byte> const& data);
 };
 
 auto Parser::parse(char const* file) -> std::vector<Image<f32>>
@@ -56,7 +56,7 @@ auto Parser::parse(char const* file) -> std::vector<Image<f32>>
     m_data = std::vector<Image<f32>>{};
 
     auto const data = read_file(file);
-    this->do_parse({data.data(), data.data() + data.size()});
+    this->do_parse(gsl::as_bytes(gsl::span{data}));
 
     return std::move(m_data);
 }
@@ -66,12 +66,15 @@ void Parser::on_heatmap_dim(IptsHeatmapDim const& dim)
     m_dim = dim;
 }
 
-void Parser::on_heatmap(Slice<u8> const& data)
+void Parser::on_heatmap(gsl::span<const std::byte> const& data)
 {
     auto img = Image<f32> {{ m_dim.width, m_dim.height }};
 
-    std::transform(data.begin, data.end, img.begin(), [&](auto v) {
-        return 1.0f - static_cast<f32>(v - m_dim.z_min) / static_cast<f32>(m_dim.z_max - m_dim.z_min);
+    std::transform(data.begin(), data.end(), img.begin(), [&](auto v) {
+        auto const n = static_cast<f32>(m_dim.z_max - m_dim.z_min);
+        auto const x = static_cast<f32>(std::to_integer<u8>(v) - m_dim.z_min);
+
+        return 1.0f - x / n;
     });
 
     m_data.push_back(img);
